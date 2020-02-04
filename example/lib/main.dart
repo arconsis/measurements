@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:measurements/measurements.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,22 +14,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  String _filePath;
+  int viewId;
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    loadPdf();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await Measurements.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+  Future<void> loadPdf() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final File file = File(directory.path + "/measurementTest.pdf");
+
+    if (!file.existsSync()) {
+      final stream = await http.get('https://sample-videos.com/pdf/Sample-pdf-5mb.pdf');
+      file.writeAsBytes(stream.bodyBytes);
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -36,20 +39,31 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() {
-      _platformVersion = platformVersion;
+      _filePath = file.path;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+
+    print("Build Main");
+
+    if (_filePath == null) {
+      child = Text("Pdf not loaded yet");
+    } else {
+      child = MeasurementView(filePath: _filePath, onViewCreated: (int id) => print("PDF View Id: $id"),);
+    }
+
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
+          ),
+          body: Container(
+            height: 700,
+            child: child,
+          )
       ),
     );
   }

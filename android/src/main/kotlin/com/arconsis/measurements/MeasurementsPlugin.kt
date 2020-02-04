@@ -2,13 +2,16 @@ package com.arconsis.measurements
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** MeasurementsPlugin */
-class MeasurementsPlugin : FlutterPlugin/*, MethodCallHandler */ {
+class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-//		val channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, "measurements")
-//		channel.setMethodCallHandler(MeasurementsPlugin())
+		val channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, "measurements")
+		channel.setMethodCallHandler(MeasurementsPlugin())
 
 		flutterPluginBinding.platformViewRegistry.registerViewFactory("measurement_view", MeasurementViewFactory(flutterPluginBinding.binaryMessenger))
 	}
@@ -25,21 +28,21 @@ class MeasurementsPlugin : FlutterPlugin/*, MethodCallHandler */ {
 	companion object {
 		@JvmStatic
 		fun registerWith(registrar: Registrar) {
-//			val channel = MethodChannel(registrar.messenger(), "measurements")
-//			channel.setMethodCallHandler(MeasurementsPlugin())
+			val channel = MethodChannel(registrar.messenger(), "measurements")
+			channel.setMethodCallHandler(MeasurementsPlugin())
 
 			registrar.platformViewRegistry().registerViewFactory("measurement_view", MeasurementViewFactory(registrar.messenger()))
 		}
 	}
 
-//	override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-//		if (call.method == "getPlatformVersion") {
-//			result.success("Android ${android.os.Build.VERSION.RELEASE}")
-//		} else {
-//			result.notImplemented()
-//		}
-//	}
-
 	override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+	}
+
+	override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+		if (call.method == "getPlatformVersion") {
+			result.success("Android ${android.os.Build.VERSION.RELEASE}")
+		} else {
+			result.notImplemented()
+		}
 	}
 }

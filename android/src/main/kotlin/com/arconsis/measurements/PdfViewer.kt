@@ -1,6 +1,8 @@
 package com.arconsis.measurements
 
 import android.content.Context
+import android.util.Log
+import android.view.View
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.util.FitPolicy
 import io.flutter.plugin.common.BinaryMessenger
@@ -10,12 +12,11 @@ import java.io.File
 
 class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Map<String, Any>) : PlatformView {
 	private val view: PDFView
+	private val filePath: String
 	private var zoomEvents: EventChannel.EventSink? = null
 
 	init {
 		linkEventChannel(messenger, id)
-
-		val filePath: String
 
 		if (args.containsKey("filePath")) {
 			filePath = args["filePath"] as String
@@ -24,10 +25,12 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 		}
 
 		view = PDFView(context, null)
-		initPdfView(filePath)
+		initPdfView()
 	}
 
 	private fun linkEventChannel(messenger: BinaryMessenger, id: Int) {
+		Log.d("MEASUREMENT", "listen on channel with id  $id")
+
 		EventChannel(messenger, "measurement_pdf_zoom_$id").setStreamHandler(object : EventChannel.StreamHandler {
 			override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
 				zoomEvents = events
@@ -40,7 +43,7 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 		})
 	}
 
-	private fun initPdfView(filePath: String) {
+	private fun initPdfView() {
 		view.fromFile(File(filePath))
 				.enableSwipe(true)
 				.defaultPage(0)
@@ -56,9 +59,13 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 		zoomEvents?.success(zoom)
 	}
 
-	override fun getView() = view
+	override fun getView(): View {
+		Log.d("MEASUREMENT", "returning view: $view")
+
+		return view
+	}
 
 	override fun dispose() {
-		view.recycle()
+//		view.recycle()
 	}
 }
