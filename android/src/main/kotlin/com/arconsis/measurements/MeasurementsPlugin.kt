@@ -1,4 +1,4 @@
-package com.example.measurements
+package com.arconsis.measurements
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin
