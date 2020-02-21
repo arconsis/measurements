@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
 
 class Point {
   Offset pos;
+
   Point({this.pos});
 
   Point operator -(other) {
-    return new Point(pos: pos - other.pos);
+    return Point(pos: pos - other.pos);
   }
 
   double length() {

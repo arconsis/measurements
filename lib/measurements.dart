@@ -45,6 +45,10 @@ class _MeasurementViewState extends State<MeasurementView> {
   @override
   void initState() {
     _bloc = MeasurementBloc();
+    _bloc.pixelDistanceStream.listen((double distance) {
+      widget.outputStream.add(distance);
+    });
+
     super.initState();
   }
 
@@ -60,10 +64,15 @@ class _MeasurementViewState extends State<MeasurementView> {
             MeasureArea()
           else
             Opacity(opacity: 0.0),
-
         ],
       )
       ,
     );
+  }
+
+  @override
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
   }
 }

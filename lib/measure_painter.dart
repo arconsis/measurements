@@ -4,28 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:measurements/point.dart';
 
 class MeasurePainter extends CustomPainter {
-  Point downPoint, upPoint;
+  Point fromPoint, toPoint;
 
-  MeasurePainter({this.downPoint, this.upPoint});
+  MeasurePainter({this.fromPoint, this.toPoint});
 
-  Color green = new Color(0xFFAADD22);
+  Color green = Color(0xFFAADD22);
   Paint drawPaint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (downPoint != null) {
+    if (fromPoint != null) {
       drawPaint.color = green;
-      canvas.drawCircle(downPoint.pos, 10, drawPaint);
+      canvas.drawCircle(fromPoint.pos, 10, drawPaint);
     }
 
-    if (upPoint != null) {
+    if (toPoint != null) {
       drawPaint.color = green;
-      canvas.drawCircle(upPoint.pos, 10, drawPaint);
+      canvas.drawCircle(toPoint.pos, 10, drawPaint);
     }
 
-    if (downPoint != null && upPoint != null) {
+    if (fromPoint != null && toPoint != null) {
       drawPaint.strokeWidth = 5.0;
-      canvas.drawLine(downPoint.pos, upPoint.pos, drawPaint);
+      canvas.drawLine(fromPoint.pos, toPoint.pos, drawPaint);
     }
   }
 

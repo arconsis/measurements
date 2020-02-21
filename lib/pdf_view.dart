@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:measurements/bloc/bloc_provider.dart';
+import 'package:measurements/measurement_bloc.dart';
 
 typedef OnViewCreated(int id);
 
@@ -21,21 +23,25 @@ class PdfView extends StatefulWidget {
 }
 
 class _PdfViewState extends State<PdfView> {
+  MeasurementBloc _bloc;
+
+  @override
+  void initState() {
+    _bloc = BlocProvider.of(context);
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    print("Build MeasurementView");
-
     if (Platform.isAndroid) {
-      print("MEASUREMENT: AndroidView with path: ${widget.filePath}");
-
       return AndroidView(
           viewType: "measurement_view",
           creationParams: <String, dynamic>{
             "filePath": widget.filePath,
           },
           creationParamsCodec: StandardMessageCodec(),
-          onPlatformViewCreated: widget.onViewCreated
+          onPlatformViewCreated: widget.onViewCreated,
       );
     }
 

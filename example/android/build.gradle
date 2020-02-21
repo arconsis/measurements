@@ -15,6 +15,20 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url arconsisRepo
+            credentials {
+                username arconsisRepoUser
+                password arconsisRepoUserPassword
+            }
+        }
+        maven {
+            url arconsisSnapshotRepo
+            credentials {
+                username arconsisRepoUser
+                password arconsisRepoUserPassword
+            }
+        }
     }
 }
 

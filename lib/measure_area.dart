@@ -8,11 +8,11 @@ class MeasureArea extends StatefulWidget {
   MeasureArea({Key key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => new _MeasureState();
+  State<StatefulWidget> createState() => _MeasureState();
 }
 
 class _MeasureState extends State<MeasureArea> {
-  Point downPoint, upPoint;
+  Point fromPoint, toPoint;
   MeasurementBloc _bloc;
 
   @override
@@ -25,13 +25,10 @@ class _MeasureState extends State<MeasureArea> {
   Widget build(BuildContext context) {
     double dist = -1.0;
 
-    if (downPoint != null && upPoint != null) {
-      dist = (downPoint - upPoint).length();
+    if (fromPoint != null && toPoint != null) {
+      dist = (fromPoint - toPoint).length();
 
       _bloc.setPixelDistance(dist);
-      _bloc.setMeasurementPointsSet(true);
-    } else {
-      _bloc.setMeasurementPointsSet(false);
     }
 
     Size size = MediaQuery
@@ -41,26 +38,30 @@ class _MeasureState extends State<MeasureArea> {
     return Listener(
       onPointerDown: (PointerDownEvent event) {
         setState(() {
-          downPoint = new Point(pos: event.localPosition);
-          upPoint = null;
+          fromPoint = Point(pos: event.localPosition);
+          toPoint = null;
         });
-
-        print("Down");
       },
       onPointerMove: (PointerMoveEvent event) {
         setState(() {
-          upPoint = new Point(pos: event.localPosition);
+          toPoint = Point(pos: event.localPosition);
         });
       },
       onPointerUp: (PointerUpEvent event) {
         setState(() {
-          upPoint = new Point(pos: event.localPosition);
+          toPoint = Point(pos: event.localPosition);
         });
       },
       child: CustomPaint(
           size: size,
           painter:
-          MeasurePainter(downPoint: downPoint, upPoint: upPoint)),
+          MeasurePainter(fromPoint: fromPoint, toPoint: toPoint)),
     );
+  }
+
+  @override
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
   }
 }

@@ -17,6 +17,8 @@ class _MyAppState extends State<MyApp> {
   String _filePath;
   int viewId;
 
+  String title = 'Measurement app';
+
   StreamController<double> distanceStream;
 
   @override
@@ -27,6 +29,7 @@ class _MyAppState extends State<MyApp> {
     distanceStream = StreamController<double>();
     distanceStream.stream.listen((double distance) {
       print("Returned distance is $distance");
+      title = "Distance: $distance mm";
     });
   }
 
@@ -54,8 +57,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     Widget child;
 
-    print("Build Main");
-
     if (_filePath == null) {
       child = Text("Pdf not loaded yet");
     } else {
@@ -69,7 +70,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Measurement app'),
+            title: Text(title),
           ),
           body: Container(
             height: 700,

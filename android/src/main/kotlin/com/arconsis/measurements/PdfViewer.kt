@@ -3,8 +3,6 @@ package com.arconsis.measurements
 import android.content.Context
 import android.util.Log
 import android.view.View
-import com.github.barteksc.pdfviewer.PDFView
-import com.github.barteksc.pdfviewer.util.FitPolicy
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.platform.PlatformView
