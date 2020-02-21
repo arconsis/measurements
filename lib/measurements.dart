@@ -8,31 +8,23 @@ import 'package:measurements/pdf_view.dart';
 
 typedef OnViewCreated(int id);
 
-//class Measurements {
-//  static const MethodChannel _channel =
-//  const MethodChannel('measurements');
-//
-//  static Future<String> get platformVersion async {
-//    final String version = await _channel.invokeMethod('getPlatformVersion');
-//    return version;
-//  }
-//}
-
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
     Key key,
     this.filePath,
-    this.onViewCreated,
+    this.documentSize = const Size(210, 297),
     this.scale,
-    this.outputStream,
     this.measure,
+    this.onViewCreated,
+    this.outputStream,
   });
 
   final String filePath;
-  final OnViewCreated onViewCreated;
+  final Size documentSize;
   final double scale;
-  final StreamSink<double> outputStream;
   final bool measure;
+  final OnViewCreated onViewCreated;
+  final StreamSink<double> outputStream;
 
 
   @override
@@ -41,17 +33,38 @@ class MeasurementView extends StatefulWidget {
 
 class _MeasurementViewState extends State<MeasurementView> {
   MeasurementBloc _bloc;
+  double zoomLevel = 1.0;
+  double devicePixelRatio;
+  double initialPixelPerMM;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(_afterInit);
+
     _bloc = MeasurementBloc();
+
     _bloc.pixelDistanceStream.listen((double distance) {
-      widget.outputStream.add(distance);
+      double distanceInMM = distance / (initialPixelPerMM * zoomLevel * widget.scale);
+
+      widget.outputStream?.add(distanceInMM);
+    });
+
+    _bloc.zoomLevelStream.listen((double zoomLevel) {
+      this.zoomLevel = zoomLevel;
+    });
+
+    _bloc.logicalPdfViewWidthStream.listen((double width) {
+      initialPixelPerMM = (width * devicePixelRatio) / widget.documentSize.width;
     });
 
     super.initState();
   }
 
+  void _afterInit(_) {
+    devicePixelRatio = MediaQuery
+        .of(context)
+        .devicePixelRatio;
+  }
 
   @override
   Widget build(BuildContext context) {

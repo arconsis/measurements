@@ -24,8 +24,19 @@ class MeasurementBloc extends BlocBase {
   }
 
 
+  double logicalPdfViewWidth;
+  final _logicalPdfViewWidthController = StreamController<double>();
+
+  Stream<double> get logicalPdfViewWidthStream => _logicalPdfViewWidthController.stream;
+
+  void setLogicalPdfViewWidth(double width) {
+    _logicalPdfViewWidthController.add(width);
+  }
+
+
   @override
   void dispose() {
     _pixelDistanceController.close();
+    _zoomLevelController.close();
   }
 }

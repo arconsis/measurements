@@ -28,7 +28,7 @@ class _MeasureState extends State<MeasureArea> {
     if (fromPoint != null && toPoint != null) {
       dist = (fromPoint - toPoint).length();
 
-      _bloc.setPixelDistance(dist);
+      _bloc?.setPixelDistance(dist);
     }
 
     Size size = MediaQuery
@@ -57,11 +57,5 @@ class _MeasureState extends State<MeasureArea> {
           painter:
           MeasurePainter(fromPoint: fromPoint, toPoint: toPoint)),
     );
-  }
-
-  @override
-  void dispose() {
-    _bloc.dispose();
-    super.dispose();
   }
 }
