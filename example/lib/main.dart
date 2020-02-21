@@ -17,10 +17,17 @@ class _MyAppState extends State<MyApp> {
   String _filePath;
   int viewId;
 
+  StreamController<double> distanceStream;
+
   @override
   void initState() {
     super.initState();
     loadPdf();
+
+    distanceStream = StreamController<double>();
+    distanceStream.stream.listen((double distance) {
+      print("Returned distance is $distance");
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -52,13 +59,17 @@ class _MyAppState extends State<MyApp> {
     if (_filePath == null) {
       child = Text("Pdf not loaded yet");
     } else {
-      child = MeasurementView(filePath: _filePath, onViewCreated: (int id) => print("PDF View Id: $id"),);
+      child = MeasurementView(filePath: _filePath,
+          onViewCreated: (int id) => print("PDF View Id: $id"),
+          scale: 1.0,
+          outputStream: distanceStream.sink,
+          measure: true);
     }
 
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Plugin example app'),
+            title: const Text('Measurement app'),
           ),
           body: Container(
             height: 700,
@@ -66,5 +77,11 @@ class _MyAppState extends State<MyApp> {
           )
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    distanceStream.close();
+    super.dispose();
   }
 }
