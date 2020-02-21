@@ -62,6 +62,10 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 	override fun getView(): View {
 		Log.d("MEASUREMENT", "returning view: $view")
 
+		if (view.isRecycled) {
+			initPdfView()
+		}
+
 		return view
 	}
 

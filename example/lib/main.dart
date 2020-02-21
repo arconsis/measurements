@@ -71,13 +71,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Row(
             children: <Widget>[
-              Text(title),
               IconButton(onPressed: () {
                 setState(() {
                   measure = !measure;
                 });
               },
-                icon: Icon(Icons.straighten),)
+                icon: Icon(Icons.straighten)),
+              Text(title),
             ],
           ),
         ),
