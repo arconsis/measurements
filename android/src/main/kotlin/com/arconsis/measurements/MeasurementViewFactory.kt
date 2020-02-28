@@ -10,11 +10,11 @@ import io.flutter.plugin.platform.PlatformViewFactory
 class MeasurementViewFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
 	override fun create(context: Context?, viewId: Int, args: Any?): PlatformView {
-		Log.d("MEASUREMENT", "Args: $args")
+		Log.d("measure_android", "Factory created view with id: $viewId")
+		Log.d("measure_android", "Args: $args")
 
 		val arguments = args as Map<String, Any>
-		Log.d("MEASUREMENT", "Args: $arguments")
-		Log.d("MEASUREMENT", "Has key: ${arguments.containsKey("filePath")}")
+		Log.d("measure_android", "Has key: ${arguments.containsKey("filePath")}")
 
 		return PdfViewer(context, messenger, viewId, arguments)
 	}

@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
       child = Text("Pdf not loaded yet");
     } else {
       child = MeasurementView(filePath: _filePath,
-          onViewCreated: (int id) => print("PDF View Id: $id"),
+          onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
           scale: 1 / 10.0,
           outputStream: distanceStream.sink,
           measure: measure);

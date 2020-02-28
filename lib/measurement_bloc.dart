@@ -34,9 +34,20 @@ class MeasurementBloc extends BlocBase {
   }
 
 
+  double zoomTo;
+  final _zoomToController = StreamController<double>();
+
+  Stream<double> get zoomToStream => _zoomToController.stream;
+
+  void setZoomTo(double zoomTo) {
+    _zoomToController.add(zoomTo);
+  }
+
+
   @override
   void dispose() {
     _pixelDistanceController.close();
     _zoomLevelController.close();
+    _zoomToController.close();
   }
 }

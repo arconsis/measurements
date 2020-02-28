@@ -1,5 +1,6 @@
 package com.arconsis.measurements
 
+import android.content.res.Resources
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -10,7 +11,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 /** MeasurementsPlugin */
 class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-		val channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, "measurements")
+		val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "measurements")
 		channel.setMethodCallHandler(MeasurementsPlugin())
 
 		flutterPluginBinding.platformViewRegistry.registerViewFactory("measurement_view", MeasurementViewFactory(flutterPluginBinding.binaryMessenger))
@@ -39,8 +40,17 @@ class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	}
 
 	override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-		if (call.method == "getPlatformVersion") {
-			result.success("Android ${android.os.Build.VERSION.RELEASE}")
+		if (call.method == "getPhysicalScreenSize") {
+			val metrics = Resources.getSystem().displayMetrics
+
+			val screenWidth = metrics.widthPixels / metrics.xdpi
+			val screenHeight = metrics.heightPixels / metrics.ydpi
+
+			val screenSize = HashMap<String, Double>(2)
+			screenSize["width"] = screenWidth.toDouble()
+			screenSize["height"] = screenHeight.toDouble()
+
+			result.success(screenSize)
 		} else {
 			result.notImplemented()
 		}

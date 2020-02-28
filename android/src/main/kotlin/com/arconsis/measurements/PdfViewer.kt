@@ -7,10 +7,11 @@ import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.util.FitPolicy
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import java.io.File
 
-class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Map<String, Any>) : PlatformView {
+class PdfViewer(val context: Context?, messenger: BinaryMessenger, id: Int, args: Map<String, Any>) : PlatformView {
 	private val view: PDFView
 	private val filePath: String
 	private var zoomEvents: EventChannel.EventSink? = null
@@ -29,18 +30,33 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 	}
 
 	private fun linkEventChannel(messenger: BinaryMessenger, id: Int) {
-		Log.d("MEASUREMENT", "listen on channel with id  $id")
+		Log.d("measure_android", "listen on channel with id  $id")
 
-		EventChannel(messenger, "measurement_pdf_zoom_$id").setStreamHandler(object : EventChannel.StreamHandler {
-			override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-				zoomEvents = events
-			}
+		EventChannel(messenger, "measurement_pdf_zoom_$id")
+				.setStreamHandler(object : EventChannel.StreamHandler {
+					override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+						zoomEvents = events
+					}
 
-			override fun onCancel(arguments: Any?) {
-				zoomEvents?.endOfStream()
-				zoomEvents = null
-			}
-		})
+					override fun onCancel(arguments: Any?) {
+						zoomEvents?.endOfStream()
+						zoomEvents = null
+					}
+				})
+
+		MethodChannel(messenger, "measurement_pdf_set_zoom_$id")
+				.setMethodCallHandler { call, result ->
+					if (call.method == "setZoom") {
+						val zoomLevel = call.arguments<Double>()
+						setZoom(zoomLevel)
+					} else {
+						result.notImplemented()
+					}
+				}
+	}
+
+	private fun setZoom(zoomLevel: Double?) {
+		view.zoomTo(zoomLevel?.toFloat() ?: 0.0f)
 	}
 
 	private fun initPdfView() {
@@ -60,7 +76,8 @@ class PdfViewer(context: Context?, messenger: BinaryMessenger, id: Int, args: Ma
 	}
 
 	override fun getView(): View {
-		Log.d("MEASUREMENT", "returning view: $view")
+		Log.d("measure_android", "returning view: $view")
+		Log.d("measure_android", "initial context was $context")
 
 		if (view.isRecycled) {
 			initPdfView()

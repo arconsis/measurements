@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/measure_area.dart';
 import 'package:measurements/measurement_bloc.dart';
 import 'package:measurements/pdf_view.dart';
 
 typedef OnViewCreated(int id);
+const double mmPerInch = 25.4;
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
@@ -15,6 +17,7 @@ class MeasurementView extends StatefulWidget {
     this.documentSize = const Size(210, 297),
     this.scale,
     this.measure,
+    this.showOriginalSize,
     this.onViewCreated,
     this.outputStream,
   });
@@ -23,6 +26,7 @@ class MeasurementView extends StatefulWidget {
   final Size documentSize;
   final double scale;
   final bool measure;
+  final bool showOriginalSize;
   final OnViewCreated onViewCreated;
   final StreamSink<double> outputStream;
 
@@ -32,10 +36,14 @@ class MeasurementView extends StatefulWidget {
 }
 
 class _MeasurementViewState extends State<MeasurementView> {
+  MethodChannel _channel = MethodChannel("measurements");
+
   MeasurementBloc _bloc;
   double zoomLevel = 1.0;
   double devicePixelRatio;
   double initialPixelPerMM;
+  double screenWidth;
+  double screenHeight;
 
   @override
   void initState() {
@@ -60,10 +68,17 @@ class _MeasurementViewState extends State<MeasurementView> {
     super.initState();
   }
 
-  void _afterInit(_) {
+  void _afterInit(_) async {
     devicePixelRatio = MediaQuery
         .of(context)
         .devicePixelRatio;
+
+    final Map size = await _channel.invokeMethod("getPhysicalScreenSize");
+
+    screenWidth = size["width"] * mmPerInch;
+    screenHeight = size["height"] * mmPerInch;
+
+    print("measure_flutter: Physical Screen Size is: $screenWidth x $screenHeight");
   }
 
   @override
