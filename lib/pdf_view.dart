@@ -73,7 +73,9 @@ class _PdfViewState extends State<PdfView> {
     if (zoomToSubscription == null) {
       zoomToSubscription = _bloc.zoomToStream.listen((double event) {
         print("measure_flutter: invoking set zoom method with zoom level: $event");
-        _zoomToMethodChannel.invokeMethod("setZoom", 15.0);
+        _zoomToMethodChannel.invokeMethod("setZoom", event);
+        AndroidView v = _pdfViewKey.currentWidget;
+        v.createState().reassemble();
       });
     }
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:measurements/measurements.dart';
+import 'package:measurements_example/colors.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
@@ -17,8 +18,10 @@ class _MyAppState extends State<MyApp> {
   String _filePath;
   int viewId;
 
-  String title = 'Measurement app';
+  static String originalTitle = 'Measurement app';
+  String title = originalTitle;
   bool measure = false;
+  bool showOriginalSize = false;
 
   StreamController<double> distanceStream;
 
@@ -29,19 +32,18 @@ class _MyAppState extends State<MyApp> {
 
     distanceStream = StreamController<double>();
     distanceStream.stream.listen((double distance) {
-      title = "Distance: $distance mm";
       setState(() {
-        this.title = title;
+        this.title = "Distance: ${distance.toStringAsFixed(2)} mm";
       });
     });
   }
 
   Future<void> loadPdf() async {
     final directory = await getApplicationDocumentsDirectory();
-    final File file = File(directory.path + "/measurementTest.pdf");
+    final File file = File(directory.path + "/TechDraw_Workbench_Example.pdf");
 
     if (!file.existsSync()) {
-      final stream = await http.get('https://sample-videos.com/pdf/Sample-pdf-5mb.pdf');
+      final stream = await http.get('http://192.168.2.133:8000/TechDraw_Workbench_Example.pdf');
       file.writeAsBytes(stream.bodyBytes);
     }
 
@@ -52,6 +54,14 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Color getButtonColor(bool selected) {
+    if (selected) {
+      return selectedColor;
+    } else {
+      return unselectedColor;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget child;
@@ -60,12 +70,12 @@ class _MyAppState extends State<MyApp> {
       child = Text("Pdf not loaded yet");
     } else {
       child = MeasurementView(
-        filePath: _filePath,
-        onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
-        scale: 1 / 2.0,
-        outputStream: distanceStream.sink,
-        measure: measure,
-        showOriginalSize: true);
+          filePath: _filePath,
+          onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
+          scale: 1 / 2.0,
+          outputStream: distanceStream.sink,
+          measure: measure,
+          showOriginalSize: showOriginalSize);
     }
 
     return MaterialApp(
@@ -76,9 +86,16 @@ class _MyAppState extends State<MyApp> {
               IconButton(onPressed: () {
                 setState(() {
                   measure = !measure;
+                  title = originalTitle;
                 });
               },
-                  icon: Icon(Icons.straighten)),
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+              IconButton(onPressed: () {
+                setState(() {
+                  showOriginalSize = !showOriginalSize;
+                });
+              },
+                  icon: Icon(Icons.adjust, color: getButtonColor(showOriginalSize))),
               Text(title),
             ],
           ),

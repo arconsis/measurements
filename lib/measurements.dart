@@ -31,7 +31,6 @@ class MeasurementView extends StatefulWidget {
   final OnViewCreated onViewCreated;
   final StreamSink<double> outputStream;
 
-
   @override
   _MeasurementViewState createState() => _MeasurementViewState();
 }
@@ -80,10 +79,6 @@ class _MeasurementViewState extends State<MeasurementView> {
     screenHeight = size["height"] * mmPerInch;
 
     print("measure_flutter: Physical Screen Size is: $screenWidth x $screenHeight");
-
-    if (widget.showOriginalSize) {
-      zoomViewToOriginalSize();
-    }
   }
 
   void zoomViewToOriginalSize() {
@@ -96,6 +91,10 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.showOriginalSize) {
+      zoomViewToOriginalSize();
+    }
+
     return BlocProvider(
       bloc: _bloc,
       child: Stack(
@@ -106,8 +105,7 @@ class _MeasurementViewState extends State<MeasurementView> {
           else
             Opacity(opacity: 0.0),
         ],
-      )
-      ,
+      ),
     );
   }
 
