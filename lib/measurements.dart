@@ -8,6 +8,7 @@ import 'package:measurements/measurement_bloc.dart';
 import 'package:measurements/pdf_view.dart';
 
 typedef OnViewCreated(int id);
+
 const double mmPerInch = 25.4;
 
 class MeasurementView extends StatefulWidget {
@@ -79,6 +80,18 @@ class _MeasurementViewState extends State<MeasurementView> {
     screenHeight = size["height"] * mmPerInch;
 
     print("measure_flutter: Physical Screen Size is: $screenWidth x $screenHeight");
+
+    if (widget.showOriginalSize) {
+      zoomViewToOriginalSize();
+    }
+  }
+
+  void zoomViewToOriginalSize() {
+    double pageToDeviceScale = widget.documentSize.width / screenWidth;
+    double targetZoomLevel = pageToDeviceScale / widget.scale;
+
+    print("measure_flutter: show original size with zoom level: $targetZoomLevel");
+    _bloc.setZoomTo(targetZoomLevel);
   }
 
   @override

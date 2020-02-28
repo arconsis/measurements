@@ -59,11 +59,13 @@ class _MyAppState extends State<MyApp> {
     if (_filePath == null) {
       child = Text("Pdf not loaded yet");
     } else {
-      child = MeasurementView(filePath: _filePath,
-          onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
-          scale: 1 / 10.0,
-          outputStream: distanceStream.sink,
-          measure: measure);
+      child = MeasurementView(
+        filePath: _filePath,
+        onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
+        scale: 1 / 2.0,
+        outputStream: distanceStream.sink,
+        measure: measure,
+        showOriginalSize: true);
     }
 
     return MaterialApp(
@@ -76,7 +78,7 @@ class _MyAppState extends State<MyApp> {
                   measure = !measure;
                 });
               },
-                icon: Icon(Icons.straighten)),
+                  icon: Icon(Icons.straighten)),
               Text(title),
             ],
           ),

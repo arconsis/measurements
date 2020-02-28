@@ -13,12 +13,10 @@ class PdfView extends StatefulWidget {
     Key key,
     this.filePath,
     this.onViewCreated,
-    this.initialZoomLevel,
   });
 
   final String filePath;
   final OnViewCreated onViewCreated;
-  final double initialZoomLevel;
 
   @override
   State<StatefulWidget> createState() => _PdfViewState();
@@ -48,7 +46,6 @@ class _PdfViewState extends State<PdfView> {
         viewType: "measurement_view",
         creationParams: <String, dynamic>{
           "filePath": widget.filePath,
-          "zoomLevel": widget.initialZoomLevel,
         },
         creationParamsCodec: StandardMessageCodec(),
         onPlatformViewCreated: _onPlatformViewCreated,
@@ -75,7 +72,8 @@ class _PdfViewState extends State<PdfView> {
 
     if (zoomToSubscription == null) {
       zoomToSubscription = _bloc.zoomToStream.listen((double event) {
-        _zoomToMethodChannel.invokeMethod("setZoom", event);
+        print("measure_flutter: invoking set zoom method with zoom level: $event");
+        _zoomToMethodChannel.invokeMethod("setZoom", 15.0);
       });
     }
 
