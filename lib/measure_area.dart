@@ -15,6 +15,8 @@ class _MeasureState extends State<MeasureArea> {
   Point fromPoint, toPoint;
   MeasurementBloc _bloc;
 
+  double lastDistance;
+
   @override
   void initState() {
     _bloc = BlocProvider.of(context);
@@ -28,7 +30,10 @@ class _MeasureState extends State<MeasureArea> {
     if (fromPoint != null && toPoint != null) {
       dist = (fromPoint - toPoint).length();
 
-      _bloc?.setPixelDistance(dist);
+      if (dist != lastDistance) {
+        lastDistance = dist;
+        _bloc?.setPixelDistance(dist);
+      }
     }
 
     Size size = MediaQuery
