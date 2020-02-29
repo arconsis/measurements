@@ -41,9 +41,13 @@ class _MeasurementViewState extends State<MeasurementView> {
   MeasurementBloc _bloc;
   double zoomLevel = 1.0;
   double devicePixelRatio;
-  double initialPixelPerMM;
+  double totalScaleFactor;
   double screenWidth;
   double screenHeight;
+  double viewWidth;
+  double paperToDeviceScaleFactor;
+
+  bool showOriginalSizeLastState = false;
 
   @override
   void initState() {
@@ -52,20 +56,38 @@ class _MeasurementViewState extends State<MeasurementView> {
     _bloc = MeasurementBloc();
 
     _bloc.pixelDistanceStream.listen((double distance) {
-      double distanceInMM = distance / (initialPixelPerMM * zoomLevel * widget.scale);
+      if (totalScaleFactor == null) {
+        totalScaleFactor = getTotalScaleFactor();
+        print("measure_flutter: totalScaleFactor - $totalScaleFactor");
+      }
+
+      print("measure_flutter: distance is $distance");
+      double distanceInMM = distance * screenWidth / viewWidth / zoomLevel / widget.scale * (widget.documentSize.width / screenWidth);
 
       widget.outputStream?.add(distanceInMM);
     });
 
     _bloc.zoomLevelStream.listen((double zoomLevel) {
+      print("measure_flutter: zoom level updated to: $zoomLevel");
       this.zoomLevel = zoomLevel;
+
+      if (totalScaleFactor != null) {
+        totalScaleFactor = getTotalScaleFactor();
+        print("measure_flutter: totalScaleFactor - $totalScaleFactor");
+      }
     });
 
     _bloc.logicalPdfViewWidthStream.listen((double width) {
-      initialPixelPerMM = (width * devicePixelRatio) / widget.documentSize.width;
+      viewWidth = width;
+      print("measure_flutter: view is $viewWidth pixels wide");
     });
 
     super.initState();
+  }
+
+  double getTotalScaleFactor() {
+    print("measure_flutter: viewWidth - $viewWidth widgetScale - ${widget.scale} zoomLevel - $zoomLevel");
+    return paperToDeviceScaleFactor / (widget.scale * zoomLevel);
   }
 
   void _afterInit(_) async {
@@ -78,6 +100,8 @@ class _MeasurementViewState extends State<MeasurementView> {
     screenWidth = size["width"] * mmPerInch;
     screenHeight = size["height"] * mmPerInch;
 
+    paperToDeviceScaleFactor = widget.documentSize.width / screenWidth;
+
     print("measure_flutter: Physical Screen Size is: $screenWidth x $screenHeight");
   }
 
@@ -89,11 +113,18 @@ class _MeasurementViewState extends State<MeasurementView> {
     _bloc.setZoomTo(targetZoomLevel);
   }
 
+  void zoomIfWidgetParamChanged() {
+    if (widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
+      showOriginalSizeLastState = widget.showOriginalSize;
+      zoomViewToOriginalSize();
+    } else if (!widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
+      showOriginalSizeLastState = widget.showOriginalSize;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.showOriginalSize) {
-      zoomViewToOriginalSize();
-    }
+    zoomIfWidgetParamChanged();
 
     return BlocProvider(
       bloc: _bloc,
