@@ -1,53 +1,104 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
+import 'package:measurements/point.dart';
+
+const double mmPerInch = 25.4;
 
 class MeasurementBloc extends BlocBase {
 
-  double pixelDistance;
-  final _pixelDistanceController = StreamController<double>();
+  final double scale;
+  final Size documentSize;
+  final Sink<double> outputSink;
 
-  Stream<double> get pixelDistanceStream => _pixelDistanceController.stream;
+  final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
+  MethodChannel _setZoomChannel;
+  EventChannel _getZoomChannel;
 
-  void setPixelDistance(double distance) {
-    _pixelDistanceController.add(distance);
+  Point _fromPoint;
+  Point _toPoint;
+  double _zoomLevel = 1.0;
+  double _viewWidth;
+  double _transformationFactor;
+  double _originalSizeZoomLevel;
+
+  final _fromPointController = StreamController<Point>();
+  final _toPointController = StreamController<Point>();
+  final _viewWidthController = StreamController<double>();
+  final _viewIdController = StreamController<int>();
+
+  MeasurementBloc(this.scale, this.documentSize, this.outputSink) {
+    _fromPointController.stream.listen((Point fromPoint) {
+      _fromPoint = fromPoint;
+      _toPoint = null;
+    });
+
+    _toPointController.stream.listen((Point toPoint) {
+      _toPoint = toPoint;
+
+      _updateDistance();
+    });
+
+    _viewWidthController.stream.listen((double viewWidth) {
+      _viewWidth = viewWidth;
+
+      _updateTransformationFactor();
+    });
+
+    _viewIdController.stream.listen((int id) {
+      _setZoomChannel = MethodChannel("measurement_pdf_set_zoom_$id");
+      _getZoomChannel = EventChannel("measurement_pdf_zoom_$id");
+
+      _getZoomChannel.receiveBroadcastStream().listen((dynamic zoomLevel) {
+        _zoomLevel = zoomLevel;
+
+        _updateTransformationFactor();
+      });
+    });
   }
 
+  void _updateDistance() {
+    if (_transformationFactor != null && _transformationFactor != 0.0) {
+      double distance = (_fromPoint - _toPoint).length();
 
-  double zoomLevel;
-  final _zoomLevelController = StreamController<double>();
-
-  Stream<double> get zoomLevelStream => _zoomLevelController.stream;
-
-  void setZoomLevel(double zoomLevel) {
-    _zoomLevelController.add(zoomLevel);
+      outputSink.add(distance * _transformationFactor);
+    }
   }
 
-
-  double logicalPdfViewWidth;
-  final _logicalPdfViewWidthController = StreamController<double>();
-
-  Stream<double> get logicalPdfViewWidthStream => _logicalPdfViewWidthController.stream;
-
-  void setLogicalPdfViewWidth(double width) {
-    _logicalPdfViewWidthController.add(width);
+  void _updateTransformationFactor() {
+    if (_zoomLevel != null && _viewWidth != null) {
+      _transformationFactor = documentSize.width / (scale * _viewWidth * _zoomLevel);
+    }
   }
 
+  Sink<Point> get fromPoint => _fromPointController.sink;
 
-  double zoomTo;
-  final _zoomToController = StreamController<double>();
+  Sink<Point> get toPoint => _toPointController.sink;
 
-  Stream<double> get zoomToStream => _zoomToController.stream;
+  Sink<double> get viewWidth => _viewWidthController.sink;
 
-  void setZoomTo(double zoomTo) {
-    _zoomToController.add(zoomTo);
+  Sink<int> get viewId => _viewIdController.sink;
+
+  void zoomToOriginal() async {
+    if (_originalSizeZoomLevel == null) {
+      Map size = await _deviceInfoChannel.invokeMethod("getPhysicalScreenSize");
+
+      double screenWidth = size["width"] * mmPerInch;
+
+      _originalSizeZoomLevel = documentSize.width / (screenWidth * scale);
+    }
+
+    _setZoomChannel.invokeMethod("setZoom", _originalSizeZoomLevel);
   }
-
 
   @override
   void dispose() {
-    _pixelDistanceController.close();
-    _zoomLevelController.close();
-    _zoomToController.close();
+    _fromPointController.close();
+    _toPointController.close();
+    _viewWidthController.close();
+    _viewIdController.close();
   }
 }

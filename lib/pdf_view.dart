@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -24,10 +23,6 @@ class PdfView extends StatefulWidget {
 
 class _PdfViewState extends State<PdfView> {
   MeasurementBloc _bloc;
-  EventChannel _zoomEventChannel;
-  MethodChannel _zoomToMethodChannel;
-
-  StreamSubscription zoomToSubscription;
 
   GlobalKey _pdfViewKey = GlobalKey();
 
@@ -56,35 +51,15 @@ class _PdfViewState extends State<PdfView> {
   }
 
   void _onPlatformViewCreated(int id) {
+    _bloc.viewId.add(id);
+
     print("measure_flutter: New Platform View created with id: $id");
     final RenderBox pdfViewBox = _pdfViewKey.currentContext.findRenderObject();
     if (pdfViewBox.size != null) {
-      _bloc.setLogicalPdfViewWidth(pdfViewBox.size.width);
+      _bloc.viewWidth.add(pdfViewBox.size.width);
       print("measure_flutter: Android View Render Obejct id: ${_pdfViewKey.currentWidget}");
     }
 
-    _zoomEventChannel = EventChannel("measurement_pdf_zoom_$id");
-    _zoomEventChannel.receiveBroadcastStream().listen((dynamic data) {
-      _bloc.setZoomLevel(data);
-    });
-
-    _zoomToMethodChannel = MethodChannel("measurement_pdf_set_zoom_$id");
-
-    if (zoomToSubscription == null) {
-      zoomToSubscription = _bloc.zoomToStream.listen((double event) {
-        print("measure_flutter: invoking set zoom method with zoom level: $event");
-        _zoomToMethodChannel.invokeMethod("setZoom", event);
-        AndroidView v = _pdfViewKey.currentWidget;
-        v.createState().reassemble();
-      });
-    }
-
     widget?.onViewCreated(id);
-  }
-
-  @override
-  void dispose() {
-    zoomToSubscription.cancel();
-    super.dispose();
   }
 }

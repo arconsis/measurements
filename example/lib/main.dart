@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
           filePath: _filePath,
           onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
           scale: 1 / 2.0,
-          outputStream: distanceStream.sink,
+          outputSink: distanceStream.sink,
           measure: measure,
           showOriginalSize: showOriginalSize);
     }
