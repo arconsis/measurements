@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measurements/measurement_bloc.dart';
-import 'package:measurements/point.dart';
+import 'package:measurements/bloc/measurement_bloc.dart';
+import 'package:measurements/overlay/point.dart';
 
 void main() {
   const int id = 3;
@@ -57,9 +57,17 @@ void main() {
     classUnderTest.zoomToOriginal();
   });
 
-  test("getDistanceFromPoints", () async {
-    Point startPoint = Point(pos: Offset(10, 10));
-    Point endPoint = Point(pos: Offset(110, 10));
+  test("getDistanceFromHorizontalPoints", () async {
+    Point startPoint = Point(Offset(10, 10));
+    Point endPoint = Point(Offset(110, 10));
+
+    classUnderTest.fromPoint.add(startPoint);
+    classUnderTest.toPoint.add(endPoint);
+  });
+
+  test("getDistanceFromVerticalPoints", () async {
+    Point startPoint = Point(Offset(10, 10));
+    Point endPoint = Point(Offset(10, 110));
 
     classUnderTest.fromPoint.add(startPoint);
     classUnderTest.toPoint.add(endPoint);

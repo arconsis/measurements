@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/measure_painter.dart';
-import 'package:measurements/measurement_bloc.dart';
-import 'package:measurements/point.dart';
+import 'package:measurements/bloc/measurement_bloc.dart';
+import 'package:measurements/overlay/PointerHandler.dart';
+import 'package:measurements/overlay/measure_painter.dart';
+import 'package:measurements/overlay/point.dart';
 
 class MeasureArea extends StatefulWidget {
   MeasureArea({Key key, this.paintColor}) : super(key: key);
@@ -16,10 +17,13 @@ class MeasureArea extends StatefulWidget {
 class _MeasureState extends State<MeasureArea> {
   Point fromPoint, toPoint;
   MeasurementBloc _bloc;
+  PointerHandler handler;
 
   @override
   void initState() {
     _bloc = BlocProvider.of(context);
+    handler = PointerHandler(_bloc);
+
     super.initState();
   }
 
@@ -31,32 +35,31 @@ class _MeasureState extends State<MeasureArea> {
 
     return Listener(
       onPointerDown: (PointerDownEvent event) {
-        setState(() {
-          fromPoint = Point(pos: event.localPosition);
-          toPoint = null;
-        });
+        handler.registerDownEvent(event);
 
-        _bloc.fromPoint.add(fromPoint);
-        _bloc.toPoint.add(toPoint);
+        _updatePointState();
       },
       onPointerMove: (PointerMoveEvent event) {
-        setState(() {
-          toPoint = Point(pos: event.localPosition);
-        });
+        handler.registerMoveEvent(event);
 
-        _bloc.toPoint.add(toPoint);
+        _updatePointState();
       },
       onPointerUp: (PointerUpEvent event) {
-        setState(() {
-          toPoint = Point(pos: event.localPosition);
-        });
+        handler.registerUpEvent(event);
 
-        _bloc.toPoint.add(toPoint);
+        _updatePointState();
       },
       child: CustomPaint(
           size: size,
           painter:
           MeasurePainter(fromPoint: fromPoint, toPoint: toPoint, paintColor: widget.paintColor)),
     );
+  }
+
+  void _updatePointState() {
+    setState(() {
+      fromPoint = handler.fromPoint;
+      toPoint = handler.toPoint;
+    });
   }
 }

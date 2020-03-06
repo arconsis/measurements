@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/measure_area.dart';
-import 'package:measurements/measurement_bloc.dart';
+import 'package:measurements/overlay/measure_area.dart';
+import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/pdf_view.dart';
 
 typedef OnViewCreated(int id);
@@ -11,9 +11,9 @@ class MeasurementView extends StatefulWidget {
     Key key,
     this.filePath,
     this.documentSize = const Size(210, 297),
-    this.scale,
-    this.measure,
-    this.showOriginalSize,
+    this.scale = 1.0,
+    this.measure = false,
+    this.showOriginalSize = false,
     this.onViewCreated,
     this.outputSink,
     this.measurePaintColor,
@@ -46,11 +46,10 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   void zoomIfWidgetParamChanged() {
     if (widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
-      showOriginalSizeLastState = widget.showOriginalSize;
       _bloc.zoomToOriginal();
-    } else if (!widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
-      showOriginalSizeLastState = widget.showOriginalSize;
     }
+
+    showOriginalSizeLastState = widget.showOriginalSize;
   }
 
   @override
@@ -61,19 +60,27 @@ class _MeasurementViewState extends State<MeasurementView> {
       bloc: _bloc,
       child: Stack(
         children: <Widget>[
-          PdfView(filePath: widget.filePath, onViewCreated: widget.onViewCreated),
-          if (widget.measure)
-            MeasureArea(paintColor: widget.measurePaintColor)
-          else
-            Opacity(opacity: 0.0),
+          _showPdf(),
+          _overlay(),
         ],
       ),
     );
   }
 
+  Widget _showPdf() {
+    return PdfView(filePath: widget.filePath, onViewCreated: widget.onViewCreated);
+  }
+
+  Widget _overlay() {
+    if (widget.measure)
+      return MeasureArea(paintColor: widget.measurePaintColor);
+    else
+      return Opacity(opacity: 0.0);
+  }
+
   @override
   void dispose() {
-    _bloc.dispose();
+    _bloc?.dispose();
     super.dispose();
   }
 }

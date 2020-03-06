@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/measurement_bloc.dart';
+import 'package:measurements/bloc/measurement_bloc.dart';
 
 typedef OnViewCreated(int id);
 

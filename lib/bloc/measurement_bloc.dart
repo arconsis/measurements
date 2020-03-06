@@ -4,9 +4,9 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/point.dart';
+import 'package:measurements/overlay/point.dart';
 
-const double mmPerInch = 25.4;
+const double _mmPerInch = 25.4;
 
 class MeasurementBloc extends BlocBase {
 
@@ -52,7 +52,7 @@ class MeasurementBloc extends BlocBase {
       _setZoomChannel = MethodChannel("measurement_pdf_set_zoom_$id");
       _getZoomChannel = EventChannel("measurement_pdf_zoom_$id");
 
-      _getZoomChannel.receiveBroadcastStream().listen((dynamic zoomLevel) {
+      _getZoomChannel.receiveBroadcastStream()?.listen((dynamic zoomLevel) {
         _zoomLevel = zoomLevel;
 
         _updateTransformationFactor();
@@ -62,9 +62,9 @@ class MeasurementBloc extends BlocBase {
 
   void _updateDistance() {
     if (_transformationFactor != null && _transformationFactor != 0.0) {
-      double distance = (_fromPoint - _toPoint).length();
+      double distance = (_fromPoint - _toPoint)?.length();
 
-      _outputSink.add(distance * _transformationFactor);
+      _outputSink?.add(distance * _transformationFactor);
     }
   }
 
@@ -86,7 +86,7 @@ class MeasurementBloc extends BlocBase {
     if (_originalSizeZoomLevel == null) {
       Map size = await _deviceInfoChannel.invokeMethod("getPhysicalScreenSize");
 
-      double screenWidth = size["width"] * mmPerInch;
+      double screenWidth = size["width"] * _mmPerInch;
 
       _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
     }
@@ -96,9 +96,9 @@ class MeasurementBloc extends BlocBase {
 
   @override
   void dispose() {
-    _fromPointController.close();
-    _toPointController.close();
-    _viewWidthController.close();
-    _viewIdController.close();
+    _fromPointController?.close();
+    _toPointController?.close();
+    _viewWidthController?.close();
+    _viewIdController?.close();
   }
 }
