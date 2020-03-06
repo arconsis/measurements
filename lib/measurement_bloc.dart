@@ -10,9 +10,9 @@ const double mmPerInch = 25.4;
 
 class MeasurementBloc extends BlocBase {
 
-  final double scale;
-  final Size documentSize;
-  final Sink<double> outputSink;
+  final double _scale;
+  final Size _documentSize;
+  final Sink<double> _outputSink;
 
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
   MethodChannel _setZoomChannel;
@@ -30,7 +30,7 @@ class MeasurementBloc extends BlocBase {
   final _viewWidthController = StreamController<double>();
   final _viewIdController = StreamController<int>();
 
-  MeasurementBloc(this.scale, this.documentSize, this.outputSink) {
+  MeasurementBloc(this._scale, this._documentSize, this._outputSink) {
     _fromPointController.stream.listen((Point fromPoint) {
       _fromPoint = fromPoint;
       _toPoint = null;
@@ -64,13 +64,13 @@ class MeasurementBloc extends BlocBase {
     if (_transformationFactor != null && _transformationFactor != 0.0) {
       double distance = (_fromPoint - _toPoint).length();
 
-      outputSink.add(distance * _transformationFactor);
+      _outputSink.add(distance * _transformationFactor);
     }
   }
 
   void _updateTransformationFactor() {
     if (_zoomLevel != null && _viewWidth != null) {
-      _transformationFactor = documentSize.width / (scale * _viewWidth * _zoomLevel);
+      _transformationFactor = _documentSize.width / (_scale * _viewWidth * _zoomLevel);
     }
   }
 
@@ -88,7 +88,7 @@ class MeasurementBloc extends BlocBase {
 
       double screenWidth = size["width"] * mmPerInch;
 
-      _originalSizeZoomLevel = documentSize.width / (screenWidth * scale);
+      _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
     }
 
     _setZoomChannel.invokeMethod("setZoom", _originalSizeZoomLevel);
