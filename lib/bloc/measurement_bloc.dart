@@ -33,7 +33,8 @@ class MeasurementBloc extends BlocBase {
   MeasurementBloc(this._scale, this._documentSize, this._outputSink) {
     _fromPointController.stream.listen((Point fromPoint) {
       _fromPoint = fromPoint;
-      _toPoint = null;
+
+      _updateDistance();
     });
 
     _toPointController.stream.listen((Point toPoint) {
