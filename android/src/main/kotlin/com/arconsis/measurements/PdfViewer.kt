@@ -1,6 +1,8 @@
 package com.arconsis.measurements
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import com.github.barteksc.pdfviewer.PDFView
@@ -15,9 +17,16 @@ class PdfViewer(val context: Context?, messenger: BinaryMessenger, id: Int, args
 	private val view: PDFView
 	private val filePath: String
 	private var zoomEvents: EventChannel.EventSink? = null
+	private val screenWidth: Float
+	private val screenHeight: Float
 
 	init {
 		linkEventChannel(messenger, id)
+
+		val metrics = Resources.getSystem().displayMetrics
+
+		screenWidth = metrics.widthPixels.toFloat()
+		screenHeight = metrics.heightPixels.toFloat()
 
 		if (args.containsKey("filePath")) {
 			filePath = args["filePath"] as String
@@ -56,7 +65,7 @@ class PdfViewer(val context: Context?, messenger: BinaryMessenger, id: Int, args
 	}
 
 	private fun setZoom(zoomLevel: Double?) {
-		view.zoomTo(zoomLevel?.toFloat() ?: 0.0f)
+		view.zoomCenteredTo(zoomLevel?.toFloat() ?: 1.0f, PointF(screenWidth / 2.0f, screenHeight / 2.0f))
 	}
 
 	private fun initPdfView() {
