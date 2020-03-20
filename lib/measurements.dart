@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/measure_area.dart';
-import 'package:measurements/util/Logger.dart';
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({

@@ -41,7 +41,6 @@ class _MeasureState extends State<MeasureArea> {
     RenderBox box = listenerKey.currentContext.findRenderObject();
 
     _bloc.viewWidth = box.size.width;
-    _bloc.getZoomFactorForOriginalSize();
   }
 
   @override
