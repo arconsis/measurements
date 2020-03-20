@@ -54,8 +54,6 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO change size to size of child and update bloc viewWidth
-
     return BlocProvider(
         bloc: _bloc,
         child: _overlay()
