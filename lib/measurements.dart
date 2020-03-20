@@ -55,7 +55,11 @@ class _MeasurementViewState extends State<MeasurementView> {
   Widget build(BuildContext context) {
     return BlocProvider(
         bloc: _bloc,
-        child: _overlay()
+        child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
+          _bloc.orientation = orientation;
+
+          return _overlay();
+        },)
     );
   }
 

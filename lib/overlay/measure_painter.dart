@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:measurements/overlay/point.dart';
 
 class MeasurePainter extends CustomPainter {
   final Color defaultColor = Color(0xFFAADD22);
@@ -15,7 +14,7 @@ class MeasurePainter extends CustomPainter {
     canPaint = this.fromPoint != null && this.toPoint != null;
   }
 
-  final Point fromPoint, toPoint;
+  final Offset fromPoint, toPoint;
   final Paint drawPaint = Paint();
   Color paintColor;
   bool canPaint = false;
@@ -23,11 +22,11 @@ class MeasurePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (canPaint) {
-      canvas.drawCircle(fromPoint.position, 10, drawPaint);
-      canvas.drawCircle(toPoint.position, 10, drawPaint);
+      canvas.drawCircle(fromPoint, 10, drawPaint);
+      canvas.drawCircle(toPoint, 10, drawPaint);
 
       drawPaint.strokeWidth = 5.0;
-      canvas.drawLine(fromPoint.position, toPoint.position, drawPaint);
+      canvas.drawLine(fromPoint, toPoint, drawPaint);
     }
   }
 

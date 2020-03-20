@@ -3,7 +3,6 @@ import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/PointerHandler.dart';
 import 'package:measurements/overlay/measure_painter.dart';
-import 'package:measurements/overlay/point.dart';
 import 'package:measurements/util/Logger.dart';
 
 class MeasureArea extends StatefulWidget {
@@ -17,7 +16,7 @@ class MeasureArea extends StatefulWidget {
 }
 
 class _MeasureState extends State<MeasureArea> {
-  Point fromPoint, toPoint;
+  Offset fromPoint, toPoint;
   MeasurementBloc _bloc;
   PointerHandler handler;
   GlobalKey listenerKey = GlobalKey();
@@ -39,8 +38,11 @@ class _MeasureState extends State<MeasureArea> {
 
   void _updateSize() {
     RenderBox box = listenerKey.currentContext.findRenderObject();
+    Size viewSize = box.size;
 
-    _bloc.viewWidth = box.size.width;
+    _bloc.viewWidth = viewSize.width;
+    _bloc.viewHeight = viewSize.height;
+    _bloc.viewOffset = box.localToGlobal(Offset(0.0, 0.0));
   }
 
   @override
@@ -50,35 +52,32 @@ class _MeasureState extends State<MeasureArea> {
       onPointerDown: (PointerDownEvent event) {
         handler.registerDownEvent(event);
         Logger.log("downEvent", LogDistricts.MEASURE_AREA);
-
-        _updatePointState();
       },
       onPointerMove: (PointerMoveEvent event) {
         handler.registerMoveEvent(event);
         Logger.log("moveEvent", LogDistricts.MEASURE_AREA);
-
-        _updatePointState();
       },
       onPointerUp: (PointerUpEvent event) {
         handler.registerUpEvent(event);
         Logger.log("upEvent", LogDistricts.MEASURE_AREA);
-
-        _updatePointState();
       },
-      child: CustomPaint(
-        foregroundPainter: MeasurePainter(
-            fromPoint: fromPoint,
-            toPoint: toPoint,
-            paintColor: widget.paintColor),
-        child: widget.child,
-      ),
+      child: StreamBuilder(stream: _bloc.pointStream,
+          builder: (BuildContext context, AsyncSnapshot<Set<Offset>> points) {
+            return CustomPaint(
+              foregroundPainter: MeasurePainter(
+                  fromPoint: points?.data?.first,
+                  toPoint: points?.data?.last,
+                  paintColor: widget.paintColor
+              ),
+              child: widget.child,
+            );
+          }),
     );
   }
 
-  void _updatePointState() {
-    setState(() {
-      fromPoint = handler.fromPoint;
-      toPoint = handler.toPoint;
-    });
+  @override
+  void dispose() {
+    _bloc?.dispose();
+    super.dispose();
   }
 }

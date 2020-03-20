@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/point.dart';
 
 enum ActionType {
   NEW_POINT,
@@ -15,17 +14,17 @@ class PointerHandler {
 
   PointerHandler(this._bloc);
 
-  Point fromPoint, toPoint;
+  Offset fromPoint, toPoint;
   ActionType currentAction;
 
   void registerDownEvent(PointerDownEvent event) {
-    Point eventPoint = Point(event.localPosition);
+    Offset eventPoint = event.localPosition;
     double distanceToFirstPoint = double.maxFinite;
     double distanceToSecondPoint = double.maxFinite;
 
     if (fromPoint != null && toPoint != null) {
-      distanceToFirstPoint = (eventPoint - fromPoint).length();
-      distanceToSecondPoint = (eventPoint - toPoint).length();
+      distanceToFirstPoint = (eventPoint - fromPoint)?.distance;
+      distanceToSecondPoint = (eventPoint - toPoint)?.distance;
     }
 
     if (min(distanceToFirstPoint, distanceToSecondPoint) > 40.0) {
@@ -58,7 +57,7 @@ class PointerHandler {
     }
   }
 
-  void _updatePoints(Point eventPoint) {
+  void _updatePoints(Offset eventPoint) {
     switch (currentAction) {
       case ActionType.MOVE_FIRST_POINT:
         fromPoint = eventPoint;
@@ -80,9 +79,7 @@ class PointerHandler {
   }
 
   void _updateEventPoint(PointerEvent event) {
-    Point eventPoint = Point(event.localPosition);
-
-    _updatePoints(eventPoint);
+    _updatePoints(event.localPosition);
   }
 
   void registerMoveEvent(PointerMoveEvent event) {

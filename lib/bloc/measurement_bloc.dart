@@ -4,16 +4,20 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/overlay/point.dart';
 import 'package:measurements/util/Logger.dart';
 
 class MeasurementBloc extends BlocBase {
 
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
 
-  final _fromPointController = StreamController<Point>();
-  final _toPointController = StreamController<Point>();
+  final _fromPointController = StreamController<Offset>();
+  final _toPointController = StreamController<Offset>();
+  final _pointsController = StreamController<Set<Offset>>();
+
+  final _orientationController = StreamController<Orientation>();
   final _viewWidthController = StreamController<double>();
+  final _viewHeightController = StreamController<double>();
+  final _viewOffsetController = StreamController<Offset>();
 
   final _scaleController = StreamController<double>();
   final _zoomLevelController = StreamController<double>();
@@ -24,48 +28,96 @@ class MeasurementBloc extends BlocBase {
   double _scale;
   double _zoomLevel = 1.0;
 
-  Point _fromPoint;
-  Point _toPoint;
+  Offset _fromPoint;
+  Offset _toPoint;
+
+  bool _didUpdateOrientation = true;
+  Orientation _orientation;
+  Orientation _lastOrientation;
   double _viewWidth;
+  double _lastViewWidth;
+  double _viewHeight;
+  Offset _viewOffset;
+  Offset _lastViewOffset;
 
   double _transformationFactor;
   double _originalSizeZoomLevel;
 
-  set fromPoint(Point point) => _fromPointController.add(point);
+  set fromPoint(Offset point) => _fromPointController.add(point);
 
-  set toPoint(Point point) => _toPointController.add(point);
+  set toPoint(Offset point) => _toPointController.add(point);
+
+  Stream<Set<Offset>> get pointStream => _pointsController.stream;
+
+  set orientation(Orientation orientation) => _orientationController.add(orientation);
 
   set viewWidth(double width) => _viewWidthController.add(width);
+
+  set viewHeight(double height) => _viewHeightController.add(height);
+
+  set viewOffset(Offset offset) => _viewOffsetController.add(offset);
 
   set scale(double scale) => _scaleController.add(scale);
 
   set zoomLevel(double zoomLevel) => _zoomLevelController.add(zoomLevel);
 
   MeasurementBloc(this._documentSize, this._outputSink) {
-    _fromPointController.stream.listen((Point fromPoint) {
+    _fromPointController.stream.listen((Offset fromPoint) {
       _fromPoint = fromPoint;
       Logger.log("fromPoint: $_fromPoint", LogDistricts.BLOC);
 
       _updateDistance();
+
+      _pointsController.add({_fromPoint, _toPoint});
     });
 
-    _toPointController.stream.listen((Point toPoint) {
+    _toPointController.stream.listen((Offset toPoint) {
       _toPoint = toPoint;
       Logger.log("toPoint: $toPoint", LogDistricts.BLOC);
 
       _updateDistance();
+
+      _pointsController.add({_fromPoint, _toPoint});
+    });
+
+    _orientationController.stream.listen((Orientation orientation) {
+      if (_orientation != orientation) {
+        _lastOrientation = _orientation;
+        _didUpdateOrientation = false;
+
+        _orientation = orientation;
+
+        _updatePointsToOrientation();
+      }
+    });
+
+    _viewWidthController.stream.listen((double viewWidth) {
+      if (viewWidth != _viewWidth) {
+        _lastViewWidth = _viewWidth;
+        _didUpdateOrientation = false;
+
+        _viewWidth = viewWidth;
+        Logger.log("viewWidth: $_viewWidth", LogDistricts.BLOC);
+
+        _updateTransformationFactor();
+        _updatePointsToOrientation();
+      }
+    });
+
+    _viewHeightController.stream.listen((double height) {
+      _viewHeight = height;
+      _updatePointsToOrientation();
+    });
+
+    _viewOffsetController.stream.listen((Offset offset) {
+      _viewOffset = offset;
+
+      _updatePointsToOrientation();
     });
 
     _scaleController.stream.listen((double scale) {
       _scale = scale;
       Logger.log("scale: $scale", LogDistricts.BLOC);
-
-      _updateTransformationFactor();
-    });
-
-    _viewWidthController.stream.listen((double viewWidth) {
-      _viewWidth = viewWidth;
-      Logger.log("viewWidth: $viewWidth", LogDistricts.BLOC);
 
       _updateTransformationFactor();
     });
@@ -80,7 +132,7 @@ class MeasurementBloc extends BlocBase {
 
   void _updateDistance() {
     if (_transformationFactor != null && _transformationFactor != 0.0 && _fromPoint != null && _toPoint != null) {
-      double distance = (_fromPoint - _toPoint)?.length();
+      double distance = (_fromPoint - _toPoint)?.distance;
 
       _outputSink?.add(distance * _transformationFactor);
     }
@@ -89,6 +141,24 @@ class MeasurementBloc extends BlocBase {
   void _updateTransformationFactor() {
     if (_scale != null && _zoomLevel != null && _viewWidth != null) {
       _transformationFactor = _documentSize.width / (_scale * _viewWidth * _zoomLevel);
+    }
+  }
+
+  void _updatePointsToOrientation() {
+    if (!_didUpdateOrientation && _lastOrientation != null && _lastViewWidth != null) {
+      Offset fromPoint = _fromPoint;
+      Offset toPoint = _toPoint;
+
+      double scale = _viewWidth / _lastViewWidth;
+
+      _fromPointController.add(fromPoint * scale);
+      _toPointController.add(toPoint * scale);
+
+      _didUpdateOrientation = true;
+      _lastOrientation = null;
+      _lastViewWidth = null;
+
+      Logger.log("updated points to orientation", LogDistricts.BLOC);
     }
   }
 
@@ -108,8 +178,14 @@ class MeasurementBloc extends BlocBase {
   void dispose() {
     _fromPointController?.close();
     _toPointController?.close();
-    _scaleController?.close();
+    _pointsController?.close();
+
+    _orientationController?.close();
     _viewWidthController?.close();
+    _viewHeightController?.close();
+    _viewOffsetController?.close();
+
+    _scaleController?.close();
     _zoomLevelController?.close();
   }
 }

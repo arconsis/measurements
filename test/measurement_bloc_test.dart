@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/point.dart';
 
 void main() {
   const zoomLevel = 1.0;
@@ -48,16 +47,16 @@ void main() {
   });
 
   test("getDistanceFromHorizontalPoints", () async {
-    Point startPoint = Point(Offset(10, 10));
-    Point endPoint = Point(Offset(110, 10));
+    Offset startPoint = Offset(10, 10);
+    Offset endPoint = Offset(110, 10);
 
     classUnderTest.fromPoint = startPoint;
     classUnderTest.toPoint = endPoint;
   });
 
   test("getDistanceFromVerticalPoints", () async {
-    Point startPoint = Point(Offset(10, 10));
-    Point endPoint = Point(Offset(10, 110));
+    Offset startPoint = Offset(10, 10);
+    Offset endPoint = Offset(10, 110);
 
     classUnderTest.fromPoint = startPoint;
     classUnderTest.toPoint = endPoint;

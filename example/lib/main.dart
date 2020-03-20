@@ -12,8 +12,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int viewId;
-
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
   bool measure = false;
@@ -60,7 +58,14 @@ class _MyAppState extends State<MyApp> {
         ),
         body:
         MeasurementView(
-          child: Image.asset("assets/images/example.png", package: "measurements",),
+          child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
+            if (orientation == Orientation.portrait) {
+              return Image.asset("assets/images/example_portrait.png", package: "measurements",);
+            } else {
+              return Image.asset("assets/images/example_portrait.png", package: "measurements",);
+              return Image.asset("assets/images/example_landscape.png", package: "measurements",);
+            }
+          },),
           scale: 1 / 2.0,
           outputSink: distanceStream.sink,
           measure: measure,
