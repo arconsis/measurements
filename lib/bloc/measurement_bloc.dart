@@ -87,12 +87,12 @@ class MeasurementBloc extends BlocBase {
   }
 
   void _updateTransformationFactor() {
-    if (_zoomLevel != null && _viewWidth != null) {
+    if (_scale != null && _zoomLevel != null && _viewWidth != null) {
       _transformationFactor = _documentSize.width / (_scale * _viewWidth * _zoomLevel);
     }
   }
 
-  Future<double> zoomToOriginal() async {
+  Future<double> getZoomFactorForOriginalSize() async {
     if (_originalSizeZoomLevel == null) {
       double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
 
