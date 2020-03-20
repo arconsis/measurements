@@ -13,6 +13,7 @@ class MeasurementBloc extends BlocBase {
   final _fromPointController = StreamController<Offset>();
   final _toPointController = StreamController<Offset>();
   final _pointsController = StreamController<Set<Offset>>();
+  final _distanceController = StreamController<double>.broadcast();
 
   final _orientationController = StreamController<Orientation>();
   final _viewWidthController = StreamController<double>();
@@ -44,6 +45,8 @@ class MeasurementBloc extends BlocBase {
 
   Stream<Set<Offset>> get pointStream => _pointsController.stream;
 
+  Stream<double> get distanceStream => _distanceController.stream;
+
   set orientation(Orientation orientation) => _orientationController.add(orientation);
 
   set viewWidth(double width) => _viewWidthController.add(width);
@@ -69,6 +72,10 @@ class MeasurementBloc extends BlocBase {
       _updateDistance();
 
       _pointsController.add({_fromPoint, _toPoint});
+    });
+
+    _distanceController.stream.listen((double distance) {
+      _outputSink.add(distance);
     });
 
     _orientationController.stream.listen((Orientation orientation) {
@@ -114,7 +121,7 @@ class MeasurementBloc extends BlocBase {
     if (_transformationFactor != null && _transformationFactor != 0.0 && _fromPoint != null && _toPoint != null) {
       double distance = (_fromPoint - _toPoint)?.distance;
 
-      _outputSink?.add(distance * _transformationFactor);
+      _distanceController.add(distance * _transformationFactor);
     }
   }
 
@@ -159,6 +166,7 @@ class MeasurementBloc extends BlocBase {
     _fromPointController?.close();
     _toPointController?.close();
     _pointsController?.close();
+    _distanceController?.close();
 
     _orientationController?.close();
     _viewWidthController?.close();

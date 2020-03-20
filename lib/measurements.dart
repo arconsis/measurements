@@ -11,6 +11,7 @@ class MeasurementView extends StatefulWidget {
     this.scale = 1.0,
     this.zoom = 1.0,
     this.measure = false,
+    this.showDistanceOnLine,
     this.outputSink,
     this.measurePaintColor,
   });
@@ -20,6 +21,7 @@ class MeasurementView extends StatefulWidget {
   final double scale;
   final double zoom;
   final bool measure;
+  final bool showDistanceOnLine;
   final Color measurePaintColor;
   final Sink<double> outputSink;
 
@@ -65,7 +67,12 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   Widget _overlay() {
     if (widget.measure) {
-      return MeasureArea(paintColor: widget.measurePaintColor, child: widget.child);
+      return MeasureArea(
+          paintColor: widget.measurePaintColor,
+          // TODO show distance over bloc
+          showDistanceOnLine: widget.showDistanceOnLine,
+          child: widget.child
+      );
     } else {
       return widget.child;
     }

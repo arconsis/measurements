@@ -15,6 +15,7 @@ class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
   bool measure = false;
+  bool showDistanceOnLine = false;
 
   StreamController<double> distanceStream;
 
@@ -51,7 +52,15 @@ class _MyAppState extends State<MyApp> {
                   title = originalTitle;
                 });
               },
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))
+              ),
+              IconButton(onPressed: () {
+                setState(() {
+                  showDistanceOnLine = !showDistanceOnLine;
+                });
+              },
+                  icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
+              ),
               Text(title),
             ],
           ),
@@ -62,6 +71,7 @@ class _MyAppState extends State<MyApp> {
             child: Image.asset("assets/images/example_portrait.png", package: "measurements",),
             scale: 1 / 2.0,
             outputSink: distanceStream.sink,
+            showDistanceOnLine: showDistanceOnLine,
             measure: measure,
           ),
         ),

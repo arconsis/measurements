@@ -6,9 +6,10 @@ import 'package:measurements/overlay/measure_painter.dart';
 import 'package:measurements/util/Logger.dart';
 
 class MeasureArea extends StatefulWidget {
-  MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
+  MeasureArea({Key key, this.paintColor, this.child, this.showDistanceOnLine}) : super(key: key);
 
   final Color paintColor;
+  final bool showDistanceOnLine;
   final Widget child;
 
   @override
@@ -58,16 +59,21 @@ class _MeasureState extends State<MeasureArea> {
         handler.registerUpEvent(event);
         Logger.log("upEvent", LogDistricts.MEASURE_AREA);
       },
-      child: StreamBuilder(stream: _bloc.pointStream,
-          builder: (BuildContext context, AsyncSnapshot<Set<Offset>> points) {
-            return CustomPaint(
-              foregroundPainter: MeasurePainter(
-                  fromPoint: points?.data?.first,
-                  toPoint: points?.data?.last,
-                  paintColor: widget.paintColor
-              ),
-              child: widget.child,
-            );
+      child: StreamBuilder(stream: _bloc.distanceStream,
+          builder: (BuildContext context, AsyncSnapshot<double> distanceSnapshot) {
+            return StreamBuilder(stream: _bloc.pointStream,
+                builder: (BuildContext context, AsyncSnapshot<Set<Offset>> points) {
+                  return CustomPaint(
+                    foregroundPainter: MeasurePainter(
+                        fromPoint: points?.data?.first,
+                        toPoint: points?.data?.last,
+                        distance: distanceSnapshot.data,
+                        showDistanceOnLine: widget.showDistanceOnLine,
+                        paintColor: widget.paintColor
+                    ),
+                    child: widget.child,
+                  );
+                });
           }),
     );
   }
