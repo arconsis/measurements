@@ -16,8 +16,6 @@ class MeasurementBloc extends BlocBase {
 
   final _orientationController = StreamController<Orientation>();
   final _viewWidthController = StreamController<double>();
-  final _viewHeightController = StreamController<double>();
-  final _viewOffsetController = StreamController<Offset>();
 
   final _scaleController = StreamController<double>();
   final _zoomLevelController = StreamController<double>();
@@ -36,9 +34,6 @@ class MeasurementBloc extends BlocBase {
   Orientation _lastOrientation;
   double _viewWidth;
   double _lastViewWidth;
-  double _viewHeight;
-  Offset _viewOffset;
-  Offset _lastViewOffset;
 
   double _transformationFactor;
   double _originalSizeZoomLevel;
@@ -52,10 +47,6 @@ class MeasurementBloc extends BlocBase {
   set orientation(Orientation orientation) => _orientationController.add(orientation);
 
   set viewWidth(double width) => _viewWidthController.add(width);
-
-  set viewHeight(double height) => _viewHeightController.add(height);
-
-  set viewOffset(Offset offset) => _viewOffsetController.add(offset);
 
   set scale(double scale) => _scaleController.add(scale);
 
@@ -102,17 +93,6 @@ class MeasurementBloc extends BlocBase {
         _updateTransformationFactor();
         _updatePointsToOrientation();
       }
-    });
-
-    _viewHeightController.stream.listen((double height) {
-      _viewHeight = height;
-      _updatePointsToOrientation();
-    });
-
-    _viewOffsetController.stream.listen((Offset offset) {
-      _viewOffset = offset;
-
-      _updatePointsToOrientation();
     });
 
     _scaleController.stream.listen((double scale) {
@@ -182,8 +162,6 @@ class MeasurementBloc extends BlocBase {
 
     _orientationController?.close();
     _viewWidthController?.close();
-    _viewHeightController?.close();
-    _viewOffsetController?.close();
 
     _scaleController?.close();
     _zoomLevelController?.close();

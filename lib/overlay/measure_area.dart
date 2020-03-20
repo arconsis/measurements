@@ -38,11 +38,8 @@ class _MeasureState extends State<MeasureArea> {
 
   void _updateSize() {
     RenderBox box = listenerKey.currentContext.findRenderObject();
-    Size viewSize = box.size;
 
-    _bloc.viewWidth = viewSize.width;
-    _bloc.viewHeight = viewSize.height;
-    _bloc.viewOffset = box.localToGlobal(Offset(0.0, 0.0));
+    _bloc.viewWidth = box.size.width;
   }
 
   @override
