@@ -70,8 +70,7 @@ class _MyAppState extends State<MyApp> {
       child = Text("Pdf not loaded yet");
     } else {
       child = MeasurementView(
-          filePath: _filePath,
-          onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
+          child: Image.asset("assets/images/TechDraw_Workbench_Example.png"),
           scale: 1 / 2.0,
           outputSink: distanceStream.sink,
           measure: measure,
@@ -100,9 +99,12 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body: child,
+        body:
+        child
+        ,
 
-      ),
+      )
+      ,
     );
   }
 

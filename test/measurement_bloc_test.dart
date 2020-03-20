@@ -46,7 +46,7 @@ void main() {
     });
 
     classUnderTest.viewWidth.add(400);
-    classUnderTest.viewId.add(id);
+    // TODO add zoom
 
     outputStreamController.stream.listen((double distance) {
       expect(distance, expectedDistance);

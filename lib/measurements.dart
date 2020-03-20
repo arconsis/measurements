@@ -1,28 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/overlay/measure_area.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/pdf_view.dart';
-
-typedef OnViewCreated(int id);
+import 'package:measurements/overlay/measure_area.dart';
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
     Key key,
-    this.filePath,
+    @required this.child,
     this.documentSize = const Size(210, 297),
     this.scale = 1.0,
+    this.zoom = 1.0,
     this.measure = false,
     this.showOriginalSize = false,
-    this.onViewCreated,
     this.outputSink,
     this.measurePaintColor,
   });
 
-  final String filePath;
+  final Widget child;
   final Size documentSize;
   final double scale;
-  final OnViewCreated onViewCreated;
+  final double zoom;
   final bool measure;
   final bool showOriginalSize;
   final Color measurePaintColor;
@@ -44,6 +41,12 @@ class _MeasurementViewState extends State<MeasurementView> {
     super.initState();
   }
 
+  @override
+  void didUpdateWidget(MeasurementView oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+  }
+
   void zoomIfWidgetParamChanged() {
     if (widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
       _bloc.zoomToOriginal();
@@ -60,22 +63,19 @@ class _MeasurementViewState extends State<MeasurementView> {
       bloc: _bloc,
       child: Stack(
         children: <Widget>[
-          _showPdf(),
-          _overlay(),
+          widget.child,
+          if (widget.measure) MeasureArea(paintColor: widget.measurePaintColor),
         ],
-      ),
+      )
+      ,
     );
-  }
-
-  Widget _showPdf() {
-    return PdfView(filePath: widget.filePath, onViewCreated: widget.onViewCreated);
   }
 
   Widget _overlay() {
     if (widget.measure)
       return MeasureArea(paintColor: widget.measurePaintColor);
-    else
-      return Opacity(opacity: 0.0);
+
+    return null;
   }
 
   @override

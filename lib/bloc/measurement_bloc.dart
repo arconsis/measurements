@@ -15,8 +15,6 @@ class MeasurementBloc extends BlocBase {
   final Sink<double> _outputSink;
 
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
-  MethodChannel _setZoomChannel;
-  EventChannel _getZoomChannel;
 
   Point _fromPoint;
   Point _toPoint;
@@ -27,8 +25,8 @@ class MeasurementBloc extends BlocBase {
 
   final _fromPointController = StreamController<Point>();
   final _toPointController = StreamController<Point>();
+  final _zoomLevelController = StreamController<double>();
   final _viewWidthController = StreamController<double>();
-  final _viewIdController = StreamController<int>();
 
   MeasurementBloc(this._scale, this._documentSize, this._outputSink) {
     _fromPointController.stream.listen((Point fromPoint) {
@@ -49,15 +47,10 @@ class MeasurementBloc extends BlocBase {
       _updateTransformationFactor();
     });
 
-    _viewIdController.stream.listen((int id) {
-      _setZoomChannel = MethodChannel("measurement_pdf_set_zoom_$id");
-      _getZoomChannel = EventChannel("measurement_pdf_zoom_$id");
+    _zoomLevelController.stream.listen((double zoomLevel) {
+      _zoomLevel = zoomLevel;
 
-      _getZoomChannel.receiveBroadcastStream()?.listen((dynamic zoomLevel) {
-        _zoomLevel = zoomLevel;
-
-        _updateTransformationFactor();
-      });
+      _updateTransformationFactor();
     });
   }
 
@@ -81,9 +74,9 @@ class MeasurementBloc extends BlocBase {
 
   Sink<double> get viewWidth => _viewWidthController.sink;
 
-  Sink<int> get viewId => _viewIdController.sink;
+  Sink<double> get zoomLevel => _zoomLevelController.sink;
 
-  void zoomToOriginal() async {
+  Future<double> zoomToOriginal() async {
     if (_originalSizeZoomLevel == null) {
       Map size = await _deviceInfoChannel.invokeMethod("getPhysicalScreenSize");
 
@@ -92,7 +85,7 @@ class MeasurementBloc extends BlocBase {
       _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
     }
 
-    _setZoomChannel.invokeMethod("setZoom", _originalSizeZoomLevel);
+    return _originalSizeZoomLevel;
   }
 
   @override
@@ -100,6 +93,6 @@ class MeasurementBloc extends BlocBase {
     _fromPointController?.close();
     _toPointController?.close();
     _viewWidthController?.close();
-    _viewIdController?.close();
+    _zoomLevelController?.close();
   }
 }
