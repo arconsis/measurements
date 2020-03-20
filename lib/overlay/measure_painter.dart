@@ -12,23 +12,29 @@ class MeasurePainter extends CustomPainter {
     }
 
     drawPaint.color = paintColor;
+    canPaint = this.fromPoint != null && this.toPoint != null;
   }
 
-  Point fromPoint, toPoint;
+  final Point fromPoint, toPoint;
+  final Paint drawPaint = Paint();
   Color paintColor;
-  Paint drawPaint = Paint();
+  bool canPaint = false;
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(fromPoint.position, 10, drawPaint);
-    canvas.drawCircle(toPoint.position, 10, drawPaint);
+    if (canPaint) {
+      canvas.drawCircle(fromPoint.position, 10, drawPaint);
+      canvas.drawCircle(toPoint.position, 10, drawPaint);
 
-    drawPaint.strokeWidth = 5.0;
-    canvas.drawLine(fromPoint.position, toPoint.position, drawPaint);
+      drawPaint.strokeWidth = 5.0;
+      canvas.drawLine(fromPoint.position, toPoint.position, drawPaint);
+    }
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+    MeasurePainter old = oldDelegate as MeasurePainter;
+
+    return canPaint && old.fromPoint != fromPoint || old.toPoint != toPoint;
   }
 }

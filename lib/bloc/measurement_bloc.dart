@@ -5,57 +5,81 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/overlay/point.dart';
-
-const double _mmPerInch = 25.4;
+import 'package:measurements/util/Logger.dart';
 
 class MeasurementBloc extends BlocBase {
 
-  final double _scale;
-  final Size _documentSize;
-  final Sink<double> _outputSink;
-
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
-
-  Point _fromPoint;
-  Point _toPoint;
-  double _zoomLevel = 1.0;
-  double _viewWidth;
-  double _transformationFactor;
-  double _originalSizeZoomLevel;
 
   final _fromPointController = StreamController<Point>();
   final _toPointController = StreamController<Point>();
-  final _zoomLevelController = StreamController<double>();
   final _viewWidthController = StreamController<double>();
 
-  MeasurementBloc(this._scale, this._documentSize, this._outputSink) {
+  final _scaleController = StreamController<double>();
+  final _zoomLevelController = StreamController<double>();
+
+
+  Size _documentSize;
+  Sink<double> _outputSink;
+  double _scale;
+  double _zoomLevel = 1.0;
+
+  Point _fromPoint;
+  Point _toPoint;
+  double _viewWidth;
+
+  double _transformationFactor;
+  double _originalSizeZoomLevel;
+
+  set fromPoint(Point point) => _fromPointController.add(point);
+
+  set toPoint(Point point) => _toPointController.add(point);
+
+  set viewWidth(double width) => _viewWidthController.add(width);
+
+  set scale(double scale) => _scaleController.add(scale);
+
+  set zoomLevel(double zoomLevel) => _zoomLevelController.add(zoomLevel);
+
+  MeasurementBloc(this._documentSize, this._outputSink) {
     _fromPointController.stream.listen((Point fromPoint) {
       _fromPoint = fromPoint;
+      Logger.log("fromPoint: $_fromPoint", LogDistricts.BLOC);
 
       _updateDistance();
     });
 
     _toPointController.stream.listen((Point toPoint) {
       _toPoint = toPoint;
+      Logger.log("toPoint: $toPoint", LogDistricts.BLOC);
 
       _updateDistance();
     });
 
+    _scaleController.stream.listen((double scale) {
+      _scale = scale;
+      Logger.log("scale: $scale", LogDistricts.BLOC);
+
+      _updateTransformationFactor();
+    });
+
     _viewWidthController.stream.listen((double viewWidth) {
       _viewWidth = viewWidth;
+      Logger.log("viewWidth: $viewWidth", LogDistricts.BLOC);
 
       _updateTransformationFactor();
     });
 
     _zoomLevelController.stream.listen((double zoomLevel) {
       _zoomLevel = zoomLevel;
+      Logger.log("zoomLevel: $zoomLevel", LogDistricts.BLOC);
 
       _updateTransformationFactor();
     });
   }
 
   void _updateDistance() {
-    if (_transformationFactor != null && _transformationFactor != 0.0) {
+    if (_transformationFactor != null && _transformationFactor != 0.0 && _fromPoint != null && _toPoint != null) {
       double distance = (_fromPoint - _toPoint)?.length();
 
       _outputSink?.add(distance * _transformationFactor);
@@ -68,19 +92,11 @@ class MeasurementBloc extends BlocBase {
     }
   }
 
-  Sink<Point> get fromPoint => _fromPointController.sink;
-
-  Sink<Point> get toPoint => _toPointController.sink;
-
-  Sink<double> get viewWidth => _viewWidthController.sink;
-
-  Sink<double> get zoomLevel => _zoomLevelController.sink;
-
   Future<double> zoomToOriginal() async {
     if (_originalSizeZoomLevel == null) {
-      Map size = await _deviceInfoChannel.invokeMethod("getPhysicalScreenSize");
+      double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
 
-      double screenWidth = size["width"] * _mmPerInch;
+      double screenWidth = _viewWidth / dpm;
 
       _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
     }
@@ -92,6 +108,7 @@ class MeasurementBloc extends BlocBase {
   void dispose() {
     _fromPointController?.close();
     _toPointController?.close();
+    _scaleController?.close();
     _viewWidthController?.close();
     _zoomLevelController?.close();
   }

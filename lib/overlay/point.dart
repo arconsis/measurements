@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class Point {
@@ -12,11 +10,19 @@ class Point {
   }
 
   double length() {
-    return sqrt(position.dx * position.dx + position.dy * position.dy);
+    return position.distance;
   }
 
   @override
   String toString() {
-    return "x: " + position.dx.toString() + " y: " + position.dy.toString();
+    return "Point(x: ${position.dx.toStringAsFixed(2)} y: ${position.dy.toStringAsFixed(2)}";
   }
+
+  @override
+  bool operator ==(other) {
+    return position == other;
+  }
+
+  @override
+  int get hashCode => position.hashCode;
 }

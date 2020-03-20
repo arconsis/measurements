@@ -40,20 +40,20 @@ class PointerHandler {
       case ActionType.MOVE_FIRST_POINT:
         fromPoint = eventPoint;
 
-        _bloc.fromPoint.add(fromPoint);
+        _bloc.fromPoint = fromPoint;
         break;
       case ActionType.MOVE_SECOND_POINT:
         toPoint = eventPoint;
 
-        _bloc.toPoint.add(toPoint);
+        _bloc.toPoint = toPoint;
         break;
       case ActionType.NEW_POINT:
       default:
         fromPoint = eventPoint;
         toPoint = eventPoint;
 
-        _bloc.fromPoint.add(fromPoint);
-        _bloc.toPoint.add(toPoint);
+        _bloc.fromPoint = fromPoint;
+        _bloc.toPoint = toPoint;
         break;
     }
   }
@@ -63,18 +63,18 @@ class PointerHandler {
       case ActionType.MOVE_FIRST_POINT:
         fromPoint = eventPoint;
 
-        _bloc.fromPoint.add(fromPoint);
+        _bloc.fromPoint = fromPoint;
         break;
       case ActionType.MOVE_SECOND_POINT:
         toPoint = eventPoint;
 
-        _bloc.toPoint.add(toPoint);
+        _bloc.toPoint = toPoint;
         break;
       case ActionType.NEW_POINT:
       default:
         toPoint = eventPoint;
 
-        _bloc.toPoint.add(toPoint);
+        _bloc.toPoint = toPoint;
         break;
     }
   }

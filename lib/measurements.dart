@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/measure_area.dart';
+import 'package:measurements/util/Logger.dart';
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
@@ -11,7 +12,6 @@ class MeasurementView extends StatefulWidget {
     this.scale = 1.0,
     this.zoom = 1.0,
     this.measure = false,
-    this.showOriginalSize = false,
     this.outputSink,
     this.measurePaintColor,
   });
@@ -21,7 +21,6 @@ class MeasurementView extends StatefulWidget {
   final double scale;
   final double zoom;
   final bool measure;
-  final bool showOriginalSize;
   final Color measurePaintColor;
   final Sink<double> outputSink;
 
@@ -32,50 +31,43 @@ class MeasurementView extends StatefulWidget {
 class _MeasurementViewState extends State<MeasurementView> {
   MeasurementBloc _bloc;
 
-  bool showOriginalSizeLastState = false;
-
   @override
   void initState() {
-    _bloc = MeasurementBloc(widget.scale, widget.documentSize, widget.outputSink);
+    _bloc = MeasurementBloc(widget.documentSize, widget.outputSink);
+    setWidgetArgumentsToBloc();
 
     super.initState();
   }
 
   @override
   void didUpdateWidget(MeasurementView oldWidget) {
-    // TODO: implement didUpdateWidget
+    setWidgetArgumentsToBloc();
+
     super.didUpdateWidget(oldWidget);
   }
 
-  void zoomIfWidgetParamChanged() {
-    if (widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
-      _bloc.zoomToOriginal();
-    }
-
-    showOriginalSizeLastState = widget.showOriginalSize;
+  void setWidgetArgumentsToBloc() {
+    _bloc
+      ..zoomLevel = widget.zoom
+      ..scale = widget.scale;
   }
 
   @override
   Widget build(BuildContext context) {
-    zoomIfWidgetParamChanged();
+    // TODO change size to size of child and update bloc viewWidth
 
     return BlocProvider(
-      bloc: _bloc,
-      child: Stack(
-        children: <Widget>[
-          widget.child,
-          if (widget.measure) MeasureArea(paintColor: widget.measurePaintColor),
-        ],
-      )
-      ,
+        bloc: _bloc,
+        child: _overlay()
     );
   }
 
   Widget _overlay() {
-    if (widget.measure)
-      return MeasureArea(paintColor: widget.measurePaintColor);
-
-    return null;
+    if (widget.measure) {
+      return MeasureArea(paintColor: widget.measurePaintColor, child: widget.child);
+    } else {
+      return widget.child;
+    }
   }
 
   @override

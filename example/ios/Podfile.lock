@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - measurements (0.0.1):
+    - Flutter
+  - path_provider (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - measurements (from `.symlinks/plugins/measurements/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  measurements:
+    :path: ".symlinks/plugins/measurements/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  measurements: 4cebb186555f19abd65e6bae42e39fb55989e6f0
+  path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
+
+PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+
+COCOAPODS: 1.8.4

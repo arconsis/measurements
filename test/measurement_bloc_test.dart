@@ -15,7 +15,6 @@ void main() {
 
   const MethodChannel channel = MethodChannel('measurements');
   const MethodChannel setZoomChannel = MethodChannel("measurement_pdf_set_zoom_$id");
-  const EventChannel getZoomChannel = EventChannel("measurement_pdf_zoom_$id");
 
   StreamController<double> outputStreamController = StreamController<double>();
 
@@ -45,8 +44,7 @@ void main() {
       }
     });
 
-    classUnderTest.viewWidth.add(400);
-    // TODO add zoom
+    classUnderTest.viewWidth = 400;
 
     outputStreamController.stream.listen((double distance) {
       expect(distance, expectedDistance);
@@ -61,16 +59,16 @@ void main() {
     Point startPoint = Point(Offset(10, 10));
     Point endPoint = Point(Offset(110, 10));
 
-    classUnderTest.fromPoint.add(startPoint);
-    classUnderTest.toPoint.add(endPoint);
+    classUnderTest.fromPoint = startPoint;
+    classUnderTest.toPoint = endPoint;
   });
 
   test("getDistanceFromVerticalPoints", () async {
     Point startPoint = Point(Offset(10, 10));
     Point endPoint = Point(Offset(10, 110));
 
-    classUnderTest.fromPoint.add(startPoint);
-    classUnderTest.toPoint.add(endPoint);
+    classUnderTest.fromPoint = startPoint;
+    classUnderTest.toPoint = endPoint;
   });
 
   tearDownAll(() {
