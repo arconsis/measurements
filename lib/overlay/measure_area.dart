@@ -52,15 +52,15 @@ class _MeasureState extends State<MeasureArea> {
       key: listenerKey,
       onPointerDown: (PointerDownEvent event) {
         handler.registerDownEvent(event);
-        logger.log("downEvent");
+        logger.log("downEvent $event");
       },
       onPointerMove: (PointerMoveEvent event) {
         handler.registerMoveEvent(event);
-        logger.log("moveEvent");
+        logger.log("moveEvent $event");
       },
       onPointerUp: (PointerUpEvent event) {
         handler.registerUpEvent(event);
-        logger.log("upEvent");
+        logger.log("upEvent $event");
       },
       child: StreamBuilder(stream: _bloc.distanceStream,
           builder: (BuildContext context, AsyncSnapshot<double> distanceSnapshot) {
@@ -70,29 +70,31 @@ class _MeasureState extends State<MeasureArea> {
                       last = points?.data?.last;
 
                   if (widget.showDistanceOnLine && distanceSnapshot.hasData) {
-                    Offset midPoint = first + (last - first) / 2.0;
-                    logger.log("drawing with distance");
+                    Offset difference = last - first;
+                    Offset midPoint = first + difference / 2.0;
+                    double radians = difference.direction;
 
+                    logger.log("drawing with distance");
                     return Stack(
                       children: <Widget>[
                         _pointPainter(first, last),
-                        _distancePainter(midPoint, distanceSnapshot),
+                        _distancePainter(midPoint, distanceSnapshot?.data, radians),
                       ],);
                   }
 
                   logger.log("drawing only points");
-
                   return _pointPainter(first, last);
                 });
           }),
     );
   }
 
-  CustomPaint _distancePainter(Offset midPoint, AsyncSnapshot<double> distanceSnapshot) {
+  CustomPaint _distancePainter(Offset midPoint, double distance, double radians) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
           position: midPoint,
-          distance: distanceSnapshot?.data,
+          distance: distance,
+          radians: radians,
           drawColor: widget.paintColor
       ),
     );
