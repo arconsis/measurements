@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 
@@ -20,58 +18,39 @@ class PointerHandler {
 
   PointerHandler(this._bloc);
 
-  Offset fromPoint, toPoint;
   Action currentAction;
 
   void registerDownEvent(PointerDownEvent event) {
     Offset eventPoint = event.localPosition;
-    double distanceToFirstPoint = double.maxFinite;
-    double distanceToSecondPoint = double.maxFinite;
 
-    if (fromPoint != null && toPoint != null) {
-      distanceToFirstPoint = (eventPoint - fromPoint)?.distance;
-      distanceToSecondPoint = (eventPoint - toPoint)?.distance;
-    }
+    int closestIndex = _bloc.getClosestPointIndex(eventPoint);
+    if (closestIndex >= 0) {
+      Offset closestPoint = _bloc.getPoint(closestIndex);
 
-    if (min(distanceToFirstPoint, distanceToSecondPoint) > 40.0) {
-      currentAction = Action(ActionType.NEW_POINT);
-    } else if (distanceToFirstPoint < distanceToSecondPoint) {
-//      currentAction = ActionType.MOVE_FIRST_POINT;
+      if ((closestPoint - eventPoint).distance > 40.0) {
+        addNewPoint(eventPoint);
+      } else {
+        currentAction = Action(ActionType.UPDATE_POINT, index: closestIndex);
+
+        _bloc.updatePoint(eventPoint, closestIndex);
+      }
     } else {
-//      currentAction = ActionType.MOVE_SECOND_POINT;
+      addNewPoint(eventPoint);
     }
+  }
 
-    switch (currentAction.type) {
-//      case ActionType.MOVE_FIRST_POINT:
-//        fromPoint = eventPoint;
-//
-//        _bloc.fromPoint = fromPoint;
-//        break;
-//      case ActionType.MOVE_SECOND_POINT:
-//        toPoint = eventPoint;
-//
-//        _bloc.toPoint = toPoint;
-//        break;
-      case ActionType.NEW_POINT:
-      default:
-        int index = _bloc.addPoint(eventPoint);
-        currentAction.index = index;
-        break;
-    }
+  void addNewPoint(Offset eventPoint) {
+    currentAction = Action(ActionType.NEW_POINT);
+
+    int index = _bloc.addPoint(eventPoint);
+    currentAction.index = index;
   }
 
   void _updatePoints(Offset eventPoint) {
     switch (currentAction.type) {
-//      case ActionType.MOVE_FIRST_POINT:
-//        fromPoint = eventPoint;
-//
-//        _bloc.fromPoint = fromPoint;
-//        break;
-//      case ActionType.MOVE_SECOND_POINT:
-//        toPoint = eventPoint;
-//
-//        _bloc.toPoint = toPoint;
-//        break;
+      case ActionType.UPDATE_POINT:
+        _bloc.updatePoint(eventPoint, currentAction.index);
+        break;
       case ActionType.NEW_POINT:
       default:
         _bloc.updatePoint(eventPoint, currentAction.index);

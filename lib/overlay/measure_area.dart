@@ -67,6 +67,7 @@ class _MeasureState extends State<MeasureArea> {
         handler.registerUpEvent(event);
         logger.log("upEvent $event");
       },
+      // TODO should work when re-enable measure
       // TODO combine Streams to avoid double execution on updates
       child: StreamBuilder(stream: _bloc.distancesStream,
           builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {

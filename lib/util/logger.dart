@@ -10,7 +10,7 @@ class Logger {
   static final List<LogDistricts> _activeDistricts = [
 //    LogDistricts.MEASURE_AREA,
 //    LogDistricts.MEASUREMENT,
-    LogDistricts.MEASURE_PAINTER,
+//    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.BLOC
   ];

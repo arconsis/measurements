@@ -51,6 +51,20 @@ class MeasurementBloc extends BlocBase {
     _pointsController.add(_points);
   }
 
+  int getClosestPointIndex(Offset reference) {
+    int index = 0;
+    
+    List<CompareHolder> sortedPoints = _points
+        .map((Offset point) => CompareHolder(index++, (reference - point).distance))
+        .toList();
+
+    sortedPoints.sort((CompareHolder a, CompareHolder b) => a.distance.compareTo(b.distance));
+
+    return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
+  }
+
+  Offset getPoint(int index) => _points[index];
+
   Stream<List<Offset>> get pointsStream => _pointsController.stream;
 
   Stream<List<double>> get distancesStream => _distanceController.stream;
@@ -169,4 +183,11 @@ class MeasurementBloc extends BlocBase {
     _scaleController?.close();
     _zoomLevelController?.close();
   }
+}
+
+class CompareHolder {
+  double distance;
+  int index;
+
+  CompareHolder(this.index, this.distance);
 }
