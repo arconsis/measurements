@@ -14,7 +14,6 @@ class DistancePainter extends material.CustomPainter {
 
   Offset _zeroPoint = Offset(-24, 0);
   final double _offsetPerDigit = 4.57;
-  final Paint _paint = Paint();
 
   Paragraph _paragraph;
   double _radians;
@@ -29,8 +28,6 @@ class DistancePainter extends material.CustomPainter {
     if (drawColor == null) {
       drawColor = Colors.drawColor;
     }
-
-    _paint.color = drawColor;
 
     if (distance > 0) {
       _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
@@ -76,8 +73,6 @@ class DistancePainter extends material.CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.translate(_position.dx, _position.dy);
     canvas.rotate(_radians);
-
-    canvas.drawCircle(Offset(0, 0), 1, _paint);
 
     canvas.drawParagraph(_paragraph, _zeroPoint);
   }
