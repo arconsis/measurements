@@ -68,7 +68,7 @@ class _MeasureState extends State<MeasureArea> {
         logger.log("upEvent $event");
       },
       // TODO should work when re-enable measure
-      // TODO combine Streams to avoid double execution on updates
+      // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
       child: StreamBuilder(stream: _bloc.distancesStream,
           builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
             return StreamBuilder(stream: _bloc.pointsStream,
@@ -98,7 +98,7 @@ class _MeasureState extends State<MeasureArea> {
             .expand((pair) => pair)
             .toList();
 
-        logger.log("drawing with distance");
+        logger.log("drawing with distance: $holders");
       } else {
         painters = holders
             .map((Holder holder) => _pointPainter(holder.first, holder.second))
