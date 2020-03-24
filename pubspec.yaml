@@ -5,7 +5,7 @@ author: arconsis IT-Solutions GmbH
 homepage: "https://github.com/ChristianNavolskyi/measurements"
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   flutter:

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/PointerHandler.dart';
 import 'package:measurements/overlay/distance_painter.dart';
 import 'package:measurements/overlay/measure_painter.dart';
+import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 
 class MeasureArea extends StatefulWidget {
@@ -21,6 +21,7 @@ class _MeasureState extends State<MeasureArea> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
   Offset fromPoint, toPoint;
+  double width, height;
   MeasurementBloc _bloc;
   PointerHandler handler;
   GlobalKey listenerKey = GlobalKey();
@@ -42,8 +43,11 @@ class _MeasureState extends State<MeasureArea> {
 
   void _updateSize() {
     RenderBox box = listenerKey.currentContext.findRenderObject();
+    Size size = box.size;
 
-    _bloc.viewWidth = box.size.width;
+    width = size.width;
+    height = size.height;
+    _bloc.viewWidth = width;
   }
 
   @override
@@ -70,15 +74,11 @@ class _MeasureState extends State<MeasureArea> {
                       last = points?.data?.last;
 
                   if (widget.showDistanceOnLine && distanceSnapshot.hasData) {
-                    Offset difference = last - first;
-                    Offset midPoint = first + difference / 2.0;
-                    double radians = difference.direction;
-
                     logger.log("drawing with distance");
                     return Stack(
                       children: <Widget>[
                         _pointPainter(first, last),
-                        _distancePainter(midPoint, distanceSnapshot?.data, radians),
+                        _distancePainter(first, last, distanceSnapshot?.data, width, height),
                       ],);
                   }
 
@@ -89,12 +89,14 @@ class _MeasureState extends State<MeasureArea> {
     );
   }
 
-  CustomPaint _distancePainter(Offset midPoint, double distance, double radians) {
+  CustomPaint _distancePainter(Offset first, Offset last, double distance, double width, double height) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
-          position: midPoint,
+          start: first,
+          end: last,
           distance: distance,
-          radians: radians,
+          width: width,
+          height: height,
           drawColor: widget.paintColor
       ),
     );
@@ -103,8 +105,8 @@ class _MeasureState extends State<MeasureArea> {
   CustomPaint _pointPainter(Offset first, Offset last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
-          fromPoint: first,
-          toPoint: last,
+          start: first,
+          end: last,
           paintColor: widget.paintColor
       ),
       child: widget.child,

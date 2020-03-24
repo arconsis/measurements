@@ -1,31 +1,48 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
 import 'package:measurements/util/colors.dart';
+import 'package:measurements/util/logger.dart';
 
 
 class DistancePainter extends material.CustomPainter {
-  static final double twoPiDegree = 2 * pi / 360;
-  final Offset position;
+  final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
+
   final double distance;
-  final double radians;
-  Color drawColor;
+  final double width, height;
 
-  final Offset zeroPoint = Offset(0, 0);
-  final Paint _drawPaint = Paint();
+  final Offset _zeroPoint = Offset(0, 0);
+
   Paragraph _paragraph;
+  double _radians;
+  Offset _position;
 
-  DistancePainter({this.position, this.distance, this.radians = 0, this.drawColor}) {
+  DistancePainter({@material.required Offset start,
+    @material.required Offset end,
+    @material.required this.distance,
+    @material.required this.width,
+    @material.required this.height,
+    Color drawColor}) {
     if (drawColor == null) {
       drawColor = Colors.drawColor;
     }
 
-    _drawPaint.color = drawColor;
+    Offset center = Offset(width / 2.0, height / 2.0);
+
+    Offset difference = end - start;
+    _position = start + difference / 2.0;
+    _radians = difference.direction;
+
+    Offset positionToCenter = center - _position;
+
+    Offset offset = difference.normal();
+    offset *= offset
+        .cosAlpha(positionToCenter)
+        .sign;
 
     ParagraphBuilder paragraphBuilder = ParagraphBuilder(
       ParagraphStyle(
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.start,
         textDirection: TextDirection.ltr,
         maxLines: 1,
         fontSize: 20.0,
@@ -33,26 +50,45 @@ class DistancePainter extends material.CustomPainter {
         fontStyle: FontStyle.normal,
       ),
     );
-    paragraphBuilder.pushStyle(TextStyle(color: drawColor,),);
+    paragraphBuilder.pushStyle(TextStyle(color: drawColor),);
     paragraphBuilder.addText("${distance?.toStringAsFixed(2)} mm");
 
     _paragraph = paragraphBuilder.build();
-    _paragraph.layout(ParagraphConstraints(width: 150.0));
+    _paragraph.layout(ParagraphConstraints(width: 300));
+
+    _position += offset * 12;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.translate(position.dx, position.dy);
-    canvas.rotate(radians);
+    canvas.translate(_position.dx, _position.dy);
+    canvas.rotate(_radians);
 
-    canvas.drawCircle(zeroPoint, 15, _drawPaint);
-    canvas.drawParagraph(_paragraph, zeroPoint);
+    canvas.drawParagraph(_paragraph, _zeroPoint);
   }
 
   @override
   bool shouldRepaint(material.CustomPainter oldDelegate) {
     DistancePainter old = oldDelegate as DistancePainter;
 
-    return distance != old.distance || position != old.position;
+    return distance != old.distance || _position != old._position;
+  }
+}
+
+extension OffsetExtension on Offset {
+  Offset normal() {
+    Offset normalized = this.normalize();
+    return Offset(-normalized.dy, normalized.dx);
+  }
+
+  Offset normalize() {
+    return this / this.distance;
+  }
+
+  double cosAlpha(Offset other) {
+    Offset thisNormalized = this.normalize();
+    Offset otherNormalized = other.normalize();
+
+    return thisNormalized.dx * otherNormalized.dx + thisNormalized.dy * otherNormalized.dy;
   }
 }
