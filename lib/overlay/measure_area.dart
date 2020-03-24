@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/PointerHandler.dart';
+import 'package:measurements/overlay/distance_painter.dart';
 import 'package:measurements/overlay/measure_painter.dart';
-import 'package:measurements/util/Logger.dart';
+import 'package:measurements/util/logger.dart';
 
 class MeasureArea extends StatefulWidget {
   MeasureArea({Key key, this.paintColor, this.child, this.showDistanceOnLine}) : super(key: key);
@@ -17,6 +18,8 @@ class MeasureArea extends StatefulWidget {
 }
 
 class _MeasureState extends State<MeasureArea> {
+  final Logger logger = Logger(LogDistricts.MEASURE_AREA);
+
   Offset fromPoint, toPoint;
   MeasurementBloc _bloc;
   PointerHandler handler;
@@ -49,32 +52,60 @@ class _MeasureState extends State<MeasureArea> {
       key: listenerKey,
       onPointerDown: (PointerDownEvent event) {
         handler.registerDownEvent(event);
-        Logger.log("downEvent", LogDistricts.MEASURE_AREA);
+        logger.log("downEvent");
       },
       onPointerMove: (PointerMoveEvent event) {
         handler.registerMoveEvent(event);
-        Logger.log("moveEvent", LogDistricts.MEASURE_AREA);
+        logger.log("moveEvent");
       },
       onPointerUp: (PointerUpEvent event) {
         handler.registerUpEvent(event);
-        Logger.log("upEvent", LogDistricts.MEASURE_AREA);
+        logger.log("upEvent");
       },
       child: StreamBuilder(stream: _bloc.distanceStream,
           builder: (BuildContext context, AsyncSnapshot<double> distanceSnapshot) {
             return StreamBuilder(stream: _bloc.pointStream,
                 builder: (BuildContext context, AsyncSnapshot<Set<Offset>> points) {
-                  return CustomPaint(
-                    foregroundPainter: MeasurePainter(
-                        fromPoint: points?.data?.first,
-                        toPoint: points?.data?.last,
-                        distance: distanceSnapshot.data,
-                        showDistanceOnLine: widget.showDistanceOnLine,
-                        paintColor: widget.paintColor
-                    ),
-                    child: widget.child,
-                  );
+                  Offset first = points?.data?.first,
+                      last = points?.data?.last;
+
+                  if (widget.showDistanceOnLine && distanceSnapshot.hasData) {
+                    Offset midPoint = first + (last - first) / 2.0;
+                    logger.log("drawing with distance");
+
+                    return Stack(
+                      children: <Widget>[
+                        _pointPainter(first, last),
+                        _distancePainter(midPoint, distanceSnapshot),
+                      ],);
+                  }
+
+                  logger.log("drawing only points");
+
+                  return _pointPainter(first, last);
                 });
           }),
+    );
+  }
+
+  CustomPaint _distancePainter(Offset midPoint, AsyncSnapshot<double> distanceSnapshot) {
+    return CustomPaint(
+      foregroundPainter: DistancePainter(
+          position: midPoint,
+          distance: distanceSnapshot?.data,
+          drawColor: widget.paintColor
+      ),
+    );
+  }
+
+  CustomPaint _pointPainter(Offset first, Offset last) {
+    return CustomPaint(
+      foregroundPainter: MeasurePainter(
+          fromPoint: first,
+          toPoint: last,
+          paintColor: widget.paintColor
+      ),
+      child: widget.child,
     );
   }
 

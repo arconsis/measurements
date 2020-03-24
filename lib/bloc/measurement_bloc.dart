@@ -4,9 +4,10 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/util/Logger.dart';
+import 'package:measurements/util/logger.dart';
 
 class MeasurementBloc extends BlocBase {
+  final Logger logger = Logger(LogDistricts.BLOC);
 
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
 
@@ -58,7 +59,7 @@ class MeasurementBloc extends BlocBase {
   MeasurementBloc(this._documentSize, this._outputSink) {
     _fromPointController.stream.listen((Offset fromPoint) {
       _fromPoint = fromPoint;
-      Logger.log("fromPoint: $_fromPoint", LogDistricts.BLOC);
+      logger.log("fromPoint: $_fromPoint");
 
       _updateDistance();
 
@@ -67,7 +68,7 @@ class MeasurementBloc extends BlocBase {
 
     _toPointController.stream.listen((Offset toPoint) {
       _toPoint = toPoint;
-      Logger.log("toPoint: $toPoint", LogDistricts.BLOC);
+      logger.log("toPoint: $toPoint");
 
       _updateDistance();
 
@@ -95,7 +96,7 @@ class MeasurementBloc extends BlocBase {
         _didUpdateOrientation = false;
 
         _viewWidth = viewWidth;
-        Logger.log("viewWidth: $_viewWidth", LogDistricts.BLOC);
+        logger.log("viewWidth: $_viewWidth");
 
         _updateTransformationFactor();
         _updatePointsToOrientation();
@@ -104,14 +105,14 @@ class MeasurementBloc extends BlocBase {
 
     _scaleController.stream.listen((double scale) {
       _scale = scale;
-      Logger.log("scale: $scale", LogDistricts.BLOC);
+      logger.log("scale: $scale");
 
       _updateTransformationFactor();
     });
 
     _zoomLevelController.stream.listen((double zoomLevel) {
       _zoomLevel = zoomLevel;
-      Logger.log("zoomLevel: $zoomLevel", LogDistricts.BLOC);
+      logger.log("zoomLevel: $zoomLevel");
 
       _updateTransformationFactor();
     });
@@ -145,7 +146,7 @@ class MeasurementBloc extends BlocBase {
       _lastOrientation = null;
       _lastViewWidth = null;
 
-      Logger.log("updated points to orientation", LogDistricts.BLOC);
+      logger.log("updated points to orientation");
     }
   }
 

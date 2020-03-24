@@ -7,7 +7,11 @@ enum LogDistricts {
 class Logger {
   static final List<LogDistricts> _activeDistricts = [LogDistricts.BLOC, LogDistricts.MEASURE_AREA];
 
-  static log(String message, LogDistricts district) {
+  final LogDistricts district;
+
+  Logger(this.district);
+
+  log(String message) {
     if (_activeDistricts.contains(district)) {
       print("measurements: ($district) " + message);
     }
