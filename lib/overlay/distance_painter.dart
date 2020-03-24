@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
@@ -11,7 +12,9 @@ class DistancePainter extends material.CustomPainter {
   final double distance;
   final double width, height;
 
-  final Offset _zeroPoint = Offset(0, 0);
+  Offset _zeroPoint = Offset(-24, 0);
+  final double _offsetPerDigit = 4.57;
+  final Paint _paint = Paint();
 
   Paragraph _paragraph;
   double _radians;
@@ -27,11 +30,21 @@ class DistancePainter extends material.CustomPainter {
       drawColor = Colors.drawColor;
     }
 
+    _paint.color = drawColor;
+
+    if (distance > 0) {
+      _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
+    }
+
     Offset center = Offset(width / 2.0, height / 2.0);
 
     Offset difference = end - start;
     _position = start + difference / 2.0;
     _radians = difference.direction;
+
+    if (_radians.abs() >= pi / 2.0) {
+      _radians += pi;
+    }
 
     Offset positionToCenter = center - _position;
 
@@ -45,7 +58,7 @@ class DistancePainter extends material.CustomPainter {
         textAlign: TextAlign.start,
         textDirection: TextDirection.ltr,
         maxLines: 1,
-        fontSize: 20.0,
+//        fontSize: 20.0,
         height: 0.5,
         fontStyle: FontStyle.normal,
       ),
@@ -63,6 +76,8 @@ class DistancePainter extends material.CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.translate(_position.dx, _position.dy);
     canvas.rotate(_radians);
+
+    canvas.drawCircle(Offset(0, 0), 1, _paint);
 
     canvas.drawParagraph(_paragraph, _zeroPoint);
   }
