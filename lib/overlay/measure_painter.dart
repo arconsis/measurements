@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
 import 'package:measurements/util/colors.dart';
+import 'package:measurements/util/logger.dart';
 
 class MeasurePainter extends material.CustomPainter {
+  final Logger logger = Logger(LogDistricts.MEASURE_PAINTER);
   final Offset start, end;
 
   final Paint _drawPaint = Paint();
@@ -14,6 +16,8 @@ class MeasurePainter extends material.CustomPainter {
     }
 
     _drawPaint.color = paintColor;
+
+    logger.log("drawing from $start to $end");
   }
 
   @override

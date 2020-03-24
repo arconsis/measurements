@@ -17,16 +17,16 @@ class _MyAppState extends State<MyApp> {
   bool measure = false;
   bool showDistanceOnLine = false;
 
-  StreamController<double> distanceStream;
+  StreamController<List<double>> distanceStream;
 
   @override
   void initState() {
     super.initState();
 
-    distanceStream = StreamController<double>();
-    distanceStream.stream.listen((double distance) {
+    distanceStream = StreamController<List<double>>();
+    distanceStream.stream.listen((List<double> distance) {
       setState(() {
-        this.title = "Distance: ${distance.toStringAsFixed(2)} mm";
+        this.title = "Measurement#: ${distance.length}";
       });
     });
   }

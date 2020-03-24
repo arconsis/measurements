@@ -5,8 +5,14 @@ import 'package:measurements/bloc/measurement_bloc.dart';
 
 enum ActionType {
   NEW_POINT,
-  MOVE_FIRST_POINT,
-  MOVE_SECOND_POINT,
+  UPDATE_POINT,
+}
+
+class Action {
+  int index;
+  ActionType type;
+
+  Action(this.type, {this.index});
 }
 
 class PointerHandler {
@@ -15,7 +21,7 @@ class PointerHandler {
   PointerHandler(this._bloc);
 
   Offset fromPoint, toPoint;
-  ActionType currentAction;
+  Action currentAction;
 
   void registerDownEvent(PointerDownEvent event) {
     Offset eventPoint = event.localPosition;
@@ -28,52 +34,47 @@ class PointerHandler {
     }
 
     if (min(distanceToFirstPoint, distanceToSecondPoint) > 40.0) {
-      currentAction = ActionType.NEW_POINT;
+      currentAction = Action(ActionType.NEW_POINT);
     } else if (distanceToFirstPoint < distanceToSecondPoint) {
-      currentAction = ActionType.MOVE_FIRST_POINT;
+//      currentAction = ActionType.MOVE_FIRST_POINT;
     } else {
-      currentAction = ActionType.MOVE_SECOND_POINT;
+//      currentAction = ActionType.MOVE_SECOND_POINT;
     }
 
-    switch (currentAction) {
-      case ActionType.MOVE_FIRST_POINT:
-        fromPoint = eventPoint;
-
-        _bloc.fromPoint = fromPoint;
-        break;
-      case ActionType.MOVE_SECOND_POINT:
-        toPoint = eventPoint;
-
-        _bloc.toPoint = toPoint;
-        break;
+    switch (currentAction.type) {
+//      case ActionType.MOVE_FIRST_POINT:
+//        fromPoint = eventPoint;
+//
+//        _bloc.fromPoint = fromPoint;
+//        break;
+//      case ActionType.MOVE_SECOND_POINT:
+//        toPoint = eventPoint;
+//
+//        _bloc.toPoint = toPoint;
+//        break;
       case ActionType.NEW_POINT:
       default:
-        fromPoint = eventPoint;
-        toPoint = eventPoint;
-
-        _bloc.fromPoint = fromPoint;
-        _bloc.toPoint = toPoint;
+        int index = _bloc.addPoint(eventPoint);
+        currentAction.index = index;
         break;
     }
   }
 
   void _updatePoints(Offset eventPoint) {
-    switch (currentAction) {
-      case ActionType.MOVE_FIRST_POINT:
-        fromPoint = eventPoint;
-
-        _bloc.fromPoint = fromPoint;
-        break;
-      case ActionType.MOVE_SECOND_POINT:
-        toPoint = eventPoint;
-
-        _bloc.toPoint = toPoint;
-        break;
+    switch (currentAction.type) {
+//      case ActionType.MOVE_FIRST_POINT:
+//        fromPoint = eventPoint;
+//
+//        _bloc.fromPoint = fromPoint;
+//        break;
+//      case ActionType.MOVE_SECOND_POINT:
+//        toPoint = eventPoint;
+//
+//        _bloc.toPoint = toPoint;
+//        break;
       case ActionType.NEW_POINT:
       default:
-        toPoint = eventPoint;
-
-        _bloc.toPoint = toPoint;
+        _bloc.updatePoint(eventPoint, currentAction.index);
         break;
     }
   }

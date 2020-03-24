@@ -5,16 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:measurements/util/utils.dart';
 
 class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
   final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
 
-  final _fromPointController = StreamController<Offset>();
-  final _toPointController = StreamController<Offset>();
-  final _pointsController = StreamController<Set<Offset>>();
-  final _distanceController = StreamController<double>.broadcast();
+  final _pointsController = StreamController<List<Offset>>.broadcast();
+  final _distanceController = StreamController<List<double>>.broadcast();
 
   final _orientationController = StreamController<Orientation>();
   final _viewWidthController = StreamController<double>();
@@ -24,12 +23,11 @@ class MeasurementBloc extends BlocBase {
 
 
   Size _documentSize;
-  Sink<double> _outputSink;
+  Sink<List<double>> _outputSink;
   double _scale;
   double _zoomLevel = 1.0;
 
-  Offset _fromPoint;
-  Offset _toPoint;
+  List<Offset> _points = List();
 
   bool _didUpdateOrientation = true;
   Orientation _orientation;
@@ -40,13 +38,22 @@ class MeasurementBloc extends BlocBase {
   double _transformationFactor;
   double _originalSizeZoomLevel;
 
-  set fromPoint(Offset point) => _fromPointController.add(point);
+  int addPoint(Offset point) {
+    _points.add(point);
+    _pointsController.add(_points);
 
-  set toPoint(Offset point) => _toPointController.add(point);
+    logger.log("points: $_points");
+    return _points.length - 1;
+  }
 
-  Stream<Set<Offset>> get pointStream => _pointsController.stream;
+  void updatePoint(Offset point, int index) {
+    _points.replaceRange(index, index + 1, {point});
+    _pointsController.add(_points);
+  }
 
-  Stream<double> get distanceStream => _distanceController.stream;
+  Stream<List<Offset>> get pointsStream => _pointsController.stream;
+
+  Stream<List<double>> get distancesStream => _distanceController.stream;
 
   set orientation(Orientation orientation) => _orientationController.add(orientation);
 
@@ -57,26 +64,15 @@ class MeasurementBloc extends BlocBase {
   set zoomLevel(double zoomLevel) => _zoomLevelController.add(zoomLevel);
 
   MeasurementBloc(this._documentSize, this._outputSink) {
-    _fromPointController.stream.listen((Offset fromPoint) {
-      _fromPoint = fromPoint;
-      logger.log("fromPoint: $_fromPoint");
+    _pointsController.stream.listen((List<Offset> points) {
+      _points = points;
+      logger.log("points: $_points");
 
-      _updateDistance();
-
-      _pointsController.add({_fromPoint, _toPoint});
+      _updateDistances();
     });
 
-    _toPointController.stream.listen((Offset toPoint) {
-      _toPoint = toPoint;
-      logger.log("toPoint: $toPoint");
-
-      _updateDistance();
-
-      _pointsController.add({_fromPoint, _toPoint});
-    });
-
-    _distanceController.stream.listen((double distance) {
-      _outputSink.add(distance);
+    _distanceController.stream.listen((List<double> distances) {
+      _outputSink.add(distances);
     });
 
     _orientationController.stream.listen((Orientation orientation) {
@@ -118,11 +114,13 @@ class MeasurementBloc extends BlocBase {
     });
   }
 
-  void _updateDistance() {
-    if (_transformationFactor != null && _transformationFactor != 0.0 && _fromPoint != null && _toPoint != null) {
-      double distance = (_fromPoint - _toPoint)?.distance;
+  void _updateDistances() {
+    if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
+      List<double> distances = List();
 
-      _distanceController.add(distance * _transformationFactor);
+      _points.doInBetween((start, end) => distances.add((start - end).distance * _transformationFactor));
+
+      _distanceController.add(distances);
     }
   }
 
@@ -134,13 +132,11 @@ class MeasurementBloc extends BlocBase {
 
   void _updatePointsToOrientation() {
     if (!_didUpdateOrientation && _lastOrientation != null && _lastViewWidth != null) {
-      Offset fromPoint = _fromPoint;
-      Offset toPoint = _toPoint;
-
       double scale = _viewWidth / _lastViewWidth;
 
-      _fromPointController.add(fromPoint * scale);
-      _toPointController.add(toPoint * scale);
+      List<Offset> scaledPoints = _points.map((Offset point) => point * scale).toList(growable: false);
+
+      _pointsController.add(scaledPoints);
 
       _didUpdateOrientation = true;
       _lastOrientation = null;
@@ -164,8 +160,6 @@ class MeasurementBloc extends BlocBase {
 
   @override
   void dispose() {
-    _fromPointController?.close();
-    _toPointController?.close();
     _pointsController?.close();
     _distanceController?.close();
 

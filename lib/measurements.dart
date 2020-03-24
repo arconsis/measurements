@@ -23,7 +23,7 @@ class MeasurementView extends StatefulWidget {
   final bool measure;
   final bool showDistanceOnLine;
   final Color measurePaintColor;
-  final Sink<double> outputSink;
+  final Sink<List<double>> outputSink;
 
   @override
   _MeasurementViewState createState() => _MeasurementViewState();
