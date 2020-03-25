@@ -1,6 +1,6 @@
 # measurements
 
-A new flutter plugin project.
+A new flutter plugin project from arconsis.
 
 ## Getting Started
 
