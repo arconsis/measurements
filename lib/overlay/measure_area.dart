@@ -8,10 +8,9 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
 class MeasureArea extends StatefulWidget {
-  MeasureArea({Key key, this.paintColor, this.child, this.showDistanceOnLine}) : super(key: key);
+  MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
 
   final Color paintColor;
-  final bool showDistanceOnLine;
   final Widget child;
 
   @override
@@ -28,12 +27,12 @@ class _MeasureState extends State<MeasureArea> {
   GlobalKey listenerKey = GlobalKey();
 
   @override
-  void initState() {
+  void didChangeDependencies() {
     _bloc = BlocProvider.of(context);
     handler = PointerHandler(_bloc);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateSize());
 
-    super.initState();
+    super.didChangeDependencies();
   }
 
   @override
@@ -54,39 +53,52 @@ class _MeasureState extends State<MeasureArea> {
   @override
   Widget build(BuildContext context) {
     return Listener(
-      key: listenerKey,
-      onPointerDown: (PointerDownEvent event) {
-        handler.registerDownEvent(event);
-        logger.log("downEvent $event");
-      },
-      onPointerMove: (PointerMoveEvent event) {
-        handler.registerMoveEvent(event);
-        logger.log("moveEvent $event");
-      },
-      onPointerUp: (PointerUpEvent event) {
-        handler.registerUpEvent(event);
-        logger.log("upEvent $event");
-      },
-      // TODO should work when re-enable measure
-      // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
-      child: StreamBuilder(stream: _bloc.distancesStream,
-          builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
-            return StreamBuilder(stream: _bloc.pointsStream,
-                builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
-                  return _buildOverlays(points, distanceSnapshot);
+        key: listenerKey,
+        onPointerDown: (PointerDownEvent event) {
+          handler.registerDownEvent(event);
+          logger.log("downEvent $event");
+        },
+        onPointerMove: (PointerMoveEvent event) {
+          handler.registerMoveEvent(event);
+          logger.log("moveEvent $event");
+        },
+        onPointerUp: (PointerUpEvent event) {
+          handler.registerUpEvent(event);
+          logger.log("upEvent $event");
+        },
+        // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
+        child: StreamBuilder(
+          initialData: _bloc.measure,
+          stream: _bloc.measureStream,
+          builder: (BuildContext context, AsyncSnapshot<bool> measure) {
+            return StreamBuilder(
+                initialData: _bloc.showDistance,
+                stream: _bloc.showDistanceStream,
+                builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
+                  return StreamBuilder(
+                      initialData: _bloc.distances,
+                      stream: _bloc.distancesStream,
+                      builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
+                        return StreamBuilder(
+                            initialData: _bloc.points,
+                            stream: _bloc.pointsStream,
+                            builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
+                              return _buildOverlays(points, showDistance, distanceSnapshot);
+                            });
+                      });
                 });
-          }),
+          },)
     );
   }
 
-  Widget _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<List<double>> distanceSnapshot) {
-    List<Widget> painters;
+  Widget _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) {
+    List<Widget> painters = List();
 
     if (points.hasData && points.data.length >= 2) {
       List<Holder> holders = List();
       points.data.doInBetween((start, end) => holders.add(Holder(start, end)));
 
-      if (widget.showDistanceOnLine && distanceSnapshot.hasData) {
+      if (_canDrawDistances(showDistance, distanceSnapshot)) {
         holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
 
         painters = holders
@@ -107,12 +119,19 @@ class _MeasureState extends State<MeasureArea> {
         logger.log("drawing multiple points ${points.data}");
       }
     } else {
-      Offset first = points?.data?.first,
-          last = points?.data?.last;
+      Offset first, last;
 
-      painters = [_pointPainter(first, last)];
+      if (points.data.isNotEmpty) {
+        first = points?.data?.first;
+        last = points?.data?.last;
+      }
 
-      logger.log("drawing one point ${points.data}");
+      if (first != null && last != null) {
+        painters = [_pointPainter(first, last)];
+        logger.log("drawing one point ${points.data}");
+      } else {
+        logger.log("drawing no points");
+      }
     }
 
     List<Widget> children = List();
@@ -121,6 +140,9 @@ class _MeasureState extends State<MeasureArea> {
 
     return Stack(children: children,);
   }
+
+  bool _canDrawDistances(AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) =>
+      showDistance.hasData && showDistance.data && distanceSnapshot.hasData && width != null && height != null;
 
   CustomPaint _distancePainter(Offset first, Offset last, double distance, double width, double height) {
     return CustomPaint(
@@ -143,12 +165,6 @@ class _MeasureState extends State<MeasureArea> {
           paintColor: widget.paintColor
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _bloc?.dispose();
-    super.dispose();
   }
 }
 

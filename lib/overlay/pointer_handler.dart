@@ -1,24 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 
-enum ActionType {
-  NEW_POINT,
-  UPDATE_POINT,
-}
-
-class Action {
-  int index;
-  ActionType type;
-
-  Action(this.type, {this.index});
-}
-
 class PointerHandler {
   MeasurementBloc _bloc;
 
   PointerHandler(this._bloc);
 
-  Action currentAction;
+  int _currentIndex = -1;
 
   void registerDownEvent(PointerDownEvent event) {
     Offset eventPoint = event.localPosition;
@@ -28,45 +16,33 @@ class PointerHandler {
       Offset closestPoint = _bloc.getPoint(closestIndex);
 
       if ((closestPoint - eventPoint).distance > 40.0) {
-        addNewPoint(eventPoint);
+        _addNewPoint(eventPoint);
       } else {
-        currentAction = Action(ActionType.UPDATE_POINT, index: closestIndex);
+        _currentIndex = closestIndex;
 
         _bloc.updatePoint(eventPoint, closestIndex);
       }
     } else {
-      addNewPoint(eventPoint);
+      _addNewPoint(eventPoint);
     }
   }
 
-  void addNewPoint(Offset eventPoint) {
-    currentAction = Action(ActionType.NEW_POINT);
-
-    int index = _bloc.addPoint(eventPoint);
-    currentAction.index = index;
+  void _addNewPoint(Offset eventPoint) {
+    _currentIndex = _bloc.addPoint(eventPoint);
   }
 
-  void _updatePoints(Offset eventPoint) {
-    switch (currentAction.type) {
-      case ActionType.UPDATE_POINT:
-        _bloc.updatePoint(eventPoint, currentAction.index);
-        break;
-      case ActionType.NEW_POINT:
-      default:
-        _bloc.updatePoint(eventPoint, currentAction.index);
-        break;
+  void _updatePoint(Offset eventPoint) {
+    if (_currentIndex >= 0) {
+      _bloc.updatePoint(eventPoint, _currentIndex);
     }
-  }
-
-  void _updateEventPoint(PointerEvent event) {
-    _updatePoints(event.localPosition);
   }
 
   void registerMoveEvent(PointerMoveEvent event) {
-    _updateEventPoint(event);
+    _updatePoint(event.localPosition);
   }
 
   void registerUpEvent(PointerUpEvent event) {
-    _updateEventPoint(event);
+    _updatePoint(event.localPosition);
+    _currentIndex = -1;
   }
 }

@@ -55,7 +55,6 @@ class DistancePainter extends material.CustomPainter {
         textAlign: TextAlign.start,
         textDirection: TextDirection.ltr,
         maxLines: 1,
-//        fontSize: 20.0,
         height: 0.5,
         fontStyle: FontStyle.normal,
       ),

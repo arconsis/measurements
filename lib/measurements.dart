@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/measure_area.dart';
+import 'package:measurements/util/logger.dart';
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
@@ -30,27 +31,34 @@ class MeasurementView extends StatefulWidget {
 }
 
 class _MeasurementViewState extends State<MeasurementView> {
+  Logger logger = Logger(LogDistricts.MEASUREMENT);
   MeasurementBloc _bloc;
 
   @override
-  void initState() {
-    _bloc = MeasurementBloc(widget.documentSize, widget.outputSink);
-    setWidgetArgumentsToBloc();
+  void didChangeDependencies() {
+    logger.log("didChangeDependencies");
 
-    super.initState();
+    _bloc = MeasurementBloc(widget.documentSize, widget.outputSink);
+    _setWidgetArgumentsToBloc();
+    super.didChangeDependencies();
   }
 
   @override
   void didUpdateWidget(MeasurementView oldWidget) {
-    setWidgetArgumentsToBloc();
+    logger.log("didUpdateWidget");
 
+    _setWidgetArgumentsToBloc();
     super.didUpdateWidget(oldWidget);
   }
 
-  void setWidgetArgumentsToBloc() {
+  void _setWidgetArgumentsToBloc() {
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
     _bloc
       ..zoomLevel = widget.zoom
-      ..scale = widget.scale;
+      ..scale = widget.scale
+      ..showDistance = widget.showDistanceOnLine
+      ..measuring = widget.measure
+    );
   }
 
   @override
@@ -69,8 +77,6 @@ class _MeasurementViewState extends State<MeasurementView> {
     if (widget.measure) {
       return MeasureArea(
           paintColor: widget.measurePaintColor,
-          // TODO show distance over bloc
-          showDistanceOnLine: widget.showDistanceOnLine,
           child: widget.child
       );
     } else {

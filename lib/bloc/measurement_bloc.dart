@@ -20,14 +20,18 @@ class MeasurementBloc extends BlocBase {
 
   final _scaleController = StreamController<double>();
   final _zoomLevelController = StreamController<double>();
-
+  final _showDistanceController = StreamController<bool>.broadcast();
+  final _enableMeasurementController = StreamController<bool>.broadcast();
 
   Size _documentSize;
   Sink<List<double>> _outputSink;
   double _scale;
   double _zoomLevel = 1.0;
+  bool _showDistance;
+  bool _enableMeasure;
 
   List<Offset> _points = List();
+  List<double> _distances = List();
 
   bool _didUpdateOrientation = true;
   Orientation _orientation;
@@ -39,21 +43,29 @@ class MeasurementBloc extends BlocBase {
   double _originalSizeZoomLevel;
 
   int addPoint(Offset point) {
+    if (!_enableMeasure) return -1;
+
     _points.add(point);
     _pointsController.add(_points);
 
-    logger.log("points: $_points");
+    logger.log("Added points: $_points");
     return _points.length - 1;
   }
 
   void updatePoint(Offset point, int index) {
+    if (!_enableMeasure) return;
+
     _points.replaceRange(index, index + 1, {point});
     _pointsController.add(_points);
+
+    logger.log("updated point $index: $_points");
   }
 
   int getClosestPointIndex(Offset reference) {
+    if (!_enableMeasure) return -1;
+
     int index = 0;
-    
+
     List<CompareHolder> sortedPoints = _points
         .map((Offset point) => CompareHolder(index++, (reference - point).distance))
         .toList();
@@ -69,23 +81,45 @@ class MeasurementBloc extends BlocBase {
 
   Stream<List<double>> get distancesStream => _distanceController.stream;
 
-  set orientation(Orientation orientation) => _orientationController.add(orientation);
+  Stream<bool> get showDistanceStream => _showDistanceController.stream;
 
-  set viewWidth(double width) => _viewWidthController.add(width);
+  Stream<bool> get measureStream => _enableMeasurementController.stream;
 
-  set scale(double scale) => _scaleController.add(scale);
 
-  set zoomLevel(double zoomLevel) => _zoomLevelController.add(zoomLevel);
+  List<Offset> get points => _points;
+
+  List<double> get distances => _distances;
+
+  bool get showDistance => _showDistance;
+
+  bool get measure => _enableMeasure;
+
+
+  set orientation(Orientation orientation) => _orientation != orientation ? _orientationController.add(orientation) : null;
+
+  set viewWidth(double width) => _viewWidth != width ? _viewWidthController.add(width) : null;
+
+  set scale(double scale) => _scale != scale ? _scaleController.add(scale) : null;
+
+  set zoomLevel(double zoomLevel) => _zoomLevel != zoomLevel ? _zoomLevelController.add(zoomLevel) : null;
+
+  set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
+
+  set measuring(bool measure) => _enableMeasure != measure ? _enableMeasurementController.add(measure) : null;
+
 
   MeasurementBloc(this._documentSize, this._outputSink) {
-    _pointsController.stream.listen((List<Offset> points) {
+    logger.log("Creating Bloc");
+
+    pointsStream.listen((List<Offset> points) {
       _points = points;
       logger.log("points: $_points");
 
       _updateDistances();
     });
 
-    _distanceController.stream.listen((List<double> distances) {
+    distancesStream.listen((List<double> distances) {
+      _distances = distances;
       _outputSink.add(distances);
     });
 
@@ -126,6 +160,16 @@ class MeasurementBloc extends BlocBase {
 
       _updateTransformationFactor();
     });
+
+    showDistanceStream.listen((bool show) {
+      _showDistance = show;
+      logger.log("showDistance: $_showDistance");
+    });
+
+    measureStream.listen((bool measure) {
+      _enableMeasure = measure;
+      logger.log("enableMeasure: $_enableMeasure");
+    });
   }
 
   void _updateDistances() {
@@ -148,7 +192,7 @@ class MeasurementBloc extends BlocBase {
     if (!_didUpdateOrientation && _lastOrientation != null && _lastViewWidth != null) {
       double scale = _viewWidth / _lastViewWidth;
 
-      List<Offset> scaledPoints = _points.map((Offset point) => point * scale).toList(growable: false);
+      List<Offset> scaledPoints = _points.map((Offset point) => point * scale).toList();
 
       _pointsController.add(scaledPoints);
 
@@ -174,6 +218,8 @@ class MeasurementBloc extends BlocBase {
 
   @override
   void dispose() {
+    logger.log("Disposing Bloc");
+
     _pointsController?.close();
     _distanceController?.close();
 
@@ -182,6 +228,8 @@ class MeasurementBloc extends BlocBase {
 
     _scaleController?.close();
     _zoomLevelController?.close();
+    _showDistanceController?.close();
+    _enableMeasurementController?.close();
   }
 }
 
