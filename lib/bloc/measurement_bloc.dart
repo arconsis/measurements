@@ -120,7 +120,7 @@ class MeasurementBloc extends BlocBase {
 
     distancesStream.listen((List<double> distances) {
       _distances = distances;
-      _outputSink.add(distances);
+      _outputSink?.add(distances);
     });
 
     _orientationController.stream.listen((Orientation orientation) {

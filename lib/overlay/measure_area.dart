@@ -20,7 +20,6 @@ class MeasureArea extends StatefulWidget {
 class _MeasureState extends State<MeasureArea> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
-  Offset fromPoint, toPoint;
   double width, height;
   MeasurementBloc _bloc;
   PointerHandler handler;
