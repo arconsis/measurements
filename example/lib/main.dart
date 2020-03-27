@@ -65,8 +65,7 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body:
-        Center(
+        body: Center(
           child: MeasurementView(
             child: Image.asset("assets/images/example_portrait.png", package: "measurements",),
             scale: 1 / 2.0,

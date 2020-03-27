@@ -12,7 +12,7 @@ class MeasurementView extends StatefulWidget {
     this.scale = 1.0,
     this.zoom = 1.0,
     this.measure = false,
-    this.showDistanceOnLine,
+    this.showDistanceOnLine = false,
     this.outputSink,
     this.measurePaintColor,
   });
