@@ -13,6 +13,7 @@ class Logger {
     LogDistricts.MEASUREMENT,
     LogDistricts.MEASURE_PAINTER,
     LogDistricts.DISTANCE_PAINTER,
+    LogDistricts.MAGNIFYING_PAINTER,
     LogDistricts.BLOC
   ];
 

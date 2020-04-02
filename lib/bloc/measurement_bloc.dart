@@ -15,13 +15,7 @@ class MeasurementBloc extends BlocBase {
   final _pointsController = StreamController<List<Offset>>.broadcast();
   final _distanceController = StreamController<List<double>>.broadcast();
 
-  final _orientationController = StreamController<Orientation>();
-  final _viewWidthController = StreamController<double>();
-
-  final _scaleController = StreamController<double>();
-  final _zoomLevelController = StreamController<double>();
   final _showDistanceController = StreamController<bool>.broadcast();
-  final _enableMeasurementController = StreamController<bool>.broadcast();
   final _backgroundImageController = StreamController<ui.Image>.broadcast();
 
   Size _documentSize;
@@ -85,10 +79,7 @@ class MeasurementBloc extends BlocBase {
 
   Stream<bool> get showDistanceStream => _showDistanceController.stream;
 
-  Stream<bool> get measureStream => _enableMeasurementController.stream;
-
   Stream<ui.Image> get backgroundStream => _backgroundImageController.stream;
-
 
   List<Offset> get points => _points;
 
@@ -96,22 +87,58 @@ class MeasurementBloc extends BlocBase {
 
   bool get showDistance => _showDistance;
 
-  bool get measure => _enableMeasure;
-
   ui.Image get backgroundImage => _currentBackgroundImage;
 
 
-  set orientation(Orientation orientation) => _orientation != orientation ? _orientationController.add(orientation) : null;
+  set orientation(Orientation orientation) {
+    if (_orientation != orientation) {
+      _lastOrientation = _orientation;
+      _didUpdateOrientation = false;
 
-  set viewWidth(double width) => _viewWidth != width ? _viewWidthController.add(width) : null;
+      _orientation = orientation;
+      logger.log("oriantation: $orientation");
 
-  set scale(double scale) => _scale != scale ? _scaleController.add(scale) : null;
+      _updatePointsToOrientation();
+    }
+  }
 
-  set zoomLevel(double zoomLevel) => _zoomLevel != zoomLevel ? _zoomLevelController.add(zoomLevel) : null;
+  set viewWidth(double width) {
+    if (width != _viewWidth) {
+      _lastViewWidth = _viewWidth;
+      _didUpdateOrientation = false;
+
+      _viewWidth = width;
+      logger.log("viewWidth: $_viewWidth");
+
+      _updateTransformationFactor();
+      _updatePointsToOrientation();
+    }
+  }
+
+  set scale(double scale) {
+    if (_scale != scale) {
+      _scale = scale;
+      logger.log("scale: $_scale");
+
+      _updateTransformationFactor();
+    }
+  }
+
+  set zoomLevel(double zoomLevel) {
+    _zoomLevel = zoomLevel;
+    logger.log("zoomLevel: $zoomLevel");
+
+    _updateTransformationFactor();
+  }
+
+  set measuring(bool measure) {
+    if (_enableMeasure != measure) {
+      _enableMeasure = measure;
+      logger.log("enableMeasure: $_enableMeasure");
+    }
+  }
 
   set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
-
-  set measuring(bool measure) => _enableMeasure != measure ? _enableMeasurementController.add(measure) : null;
 
   set backgroundImage(ui.Image image) => _currentBackgroundImage != image ? _backgroundImageController.add(image) : null;
 
@@ -128,46 +155,9 @@ class MeasurementBloc extends BlocBase {
 
     distancesStream.listen((List<double> distances) {
       _distances = distances;
-      logger.log("Distances: $distances");
+      logger.log("distances: $_distances");
+
       _outputSink?.add(distances);
-    });
-
-    _orientationController.stream.listen((Orientation orientation) {
-      if (_orientation != orientation) {
-        _lastOrientation = _orientation;
-        _didUpdateOrientation = false;
-
-        _orientation = orientation;
-
-        _updatePointsToOrientation();
-      }
-    });
-
-    _viewWidthController.stream.listen((double viewWidth) {
-      if (viewWidth != _viewWidth) {
-        _lastViewWidth = _viewWidth;
-        _didUpdateOrientation = false;
-
-        _viewWidth = viewWidth;
-        logger.log("viewWidth: $_viewWidth");
-
-        _updateTransformationFactor();
-        _updatePointsToOrientation();
-      }
-    });
-
-    _scaleController.stream.listen((double scale) {
-      _scale = scale;
-      logger.log("scale: $scale");
-
-      _updateTransformationFactor();
-    });
-
-    _zoomLevelController.stream.listen((double zoomLevel) {
-      _zoomLevel = zoomLevel;
-      logger.log("zoomLevel: $zoomLevel");
-
-      _updateTransformationFactor();
     });
 
     showDistanceStream.listen((bool show) {
@@ -175,13 +165,8 @@ class MeasurementBloc extends BlocBase {
       logger.log("showDistance: $_showDistance");
     });
 
-    measureStream.listen((bool measure) {
-      _enableMeasure = measure;
-      logger.log("enableMeasure: $_enableMeasure");
-    });
-
     _backgroundImageController.stream.listen((ui.Image currentImage) {
-      logger.log("Background image size: ${Size(currentImage.width.toDouble(), currentImage.height.toDouble())}");
+      logger.log("background image size: ${Size(currentImage.width.toDouble(), currentImage.height.toDouble())}");
       _currentBackgroundImage = currentImage;
     });
   }
@@ -232,19 +217,13 @@ class MeasurementBloc extends BlocBase {
 
   @override
   void dispose() {
-    logger.log("Disposing Bloc");
-
     _pointsController?.close();
     _distanceController?.close();
 
-    _orientationController?.close();
-    _viewWidthController?.close();
-
-    _scaleController?.close();
-    _zoomLevelController?.close();
     _showDistanceController?.close();
-    _enableMeasurementController?.close();
     _backgroundImageController?.close();
+
+    logger.log("disposed");
   }
 }
 

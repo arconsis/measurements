@@ -202,4 +202,8 @@ void main() {
     expect(paintFinder, findsNWidgets(2));
     expect(distances, expectedDistances);
   });
+
+  testWidgets("Measurement should show another CustomPainter when gesture is active", (WidgetTester tester) async {
+    expect(false, true);
+  });
 }

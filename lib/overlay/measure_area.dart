@@ -87,47 +87,53 @@ class _MeasureState extends State<MeasureArea> {
             fingerPosition = event.localPosition;
           });
         },
-        // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
+
         child: Stack(
           children: <Widget>[
-            widget.child,
-            StreamBuilder(
-              initialData: _bloc.measure,
-              stream: _bloc.measureStream,
-              builder: (BuildContext context, AsyncSnapshot<bool> measure) {
-                return StreamBuilder(
-                    initialData: _bloc.showDistance,
-                    stream: _bloc.showDistanceStream,
-                    builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
-                      return StreamBuilder(
-                          initialData: _bloc.distances,
-                          stream: _bloc.distancesStream,
-                          builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
-                            return StreamBuilder(
-                                initialData: _bloc.points,
-                                stream: _bloc.pointsStream,
-                                builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
-                                  return _buildOverlays(points, showDistance, distanceSnapshot);
-                                });
-                          });
-                    });
-              },),
-            if (showMagnifyingGlass) StreamBuilder(
-              initialData: _bloc.backgroundImage,
-              stream: _bloc.backgroundStream,
-              builder: (BuildContext context, AsyncSnapshot<ui.Image> image) {
-                if (image.hasData) {
-                  return _buildMagnifyingGlass(image);
-                } else {
-                  return Opacity(opacity: 0.0,);
-                }
-              },)
+            _backgroundAndMeasurements(),
+            if (showMagnifyingGlass) _magnifyingGlass()
           ],
         )
     );
   }
 
-  Widget _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) {
+  StreamBuilder<ui.Image> _magnifyingGlass() {
+    return StreamBuilder(
+      initialData: _bloc.backgroundImage,
+      stream: _bloc.backgroundStream,
+      builder: (BuildContext context, AsyncSnapshot<ui.Image> image) {
+        if (image.hasData) {
+          return _buildMagnifyingGlass(image);
+        } else {
+          return Opacity(opacity: 0.0,);
+        }
+      },
+    );
+  }
+
+  StreamBuilder<bool> _backgroundAndMeasurements() {
+    return StreamBuilder(
+        initialData: _bloc.showDistance,
+        stream: _bloc.showDistanceStream,
+        builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
+          return StreamBuilder(
+              initialData: _bloc.distances,
+              stream: _bloc.distancesStream,
+              builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
+                return StreamBuilder(
+                    initialData: _bloc.points,
+                    stream: _bloc.pointsStream,
+                    builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
+                      List<Widget> children = [widget.child];
+                      children.addAll(_buildOverlays(points, showDistance, distanceSnapshot));
+
+                      return Stack(children: children,);
+                    });
+              });
+        });
+  }
+
+  List<Widget> _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) {
     List<Widget> painters = List();
 
     if (points.hasData && points.data.length >= 2) {
@@ -170,7 +176,7 @@ class _MeasureState extends State<MeasureArea> {
       }
     }
 
-    return Stack(children: painters,);
+    return painters;
   }
 
   bool _canDrawDistances(AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) =>
