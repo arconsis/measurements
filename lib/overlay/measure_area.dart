@@ -8,6 +8,7 @@ import 'package:measurements/overlay/magnifying_painter.dart';
 import 'package:measurements/overlay/measure_painter.dart';
 import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
 
 class MeasureArea extends StatefulWidget {
@@ -48,8 +49,11 @@ class _MeasureState extends State<MeasureArea> {
   void _updateSize() {
     RenderBox box = listenerKey.currentContext.findRenderObject();
 
-    viewSize = box.size;
-    viewCenter = Offset(viewSize.width / 2, viewSize.height / 2);
+    setState(() {
+      viewSize = box.size;
+      viewCenter = Offset(viewSize.width / 2, viewSize.height / 2);
+    });
+
     _bloc.viewWidth = viewSize.width;
   }
 
@@ -62,7 +66,7 @@ class _MeasureState extends State<MeasureArea> {
           logger.log("downEvent $event");
 
           setState(() {
-            fingerPosition = event.position;
+            fingerPosition = event.localPosition;
             showMagnifyingGlass = true;
           });
         },
@@ -71,7 +75,7 @@ class _MeasureState extends State<MeasureArea> {
           logger.log("moveEvent $event");
 
           setState(() {
-            fingerPosition = event.position;
+            fingerPosition = event.localPosition;
           });
         },
         onPointerUp: (PointerUpEvent event) {
@@ -80,7 +84,7 @@ class _MeasureState extends State<MeasureArea> {
 
           setState(() {
             showMagnifyingGlass = false;
-            fingerPosition = event.position;
+            fingerPosition = event.localPosition;
           });
         },
         // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
@@ -201,6 +205,7 @@ class _MeasureState extends State<MeasureArea> {
         center: viewCenter,
         viewSize: viewSize,
         image: image.data,
+        radius: magnificationRadius,
       ),
     );
   }

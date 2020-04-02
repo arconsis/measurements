@@ -180,6 +180,7 @@ class MeasurementBloc extends BlocBase {
     });
 
     _backgroundImageController.stream.listen((ui.Image currentImage) {
+      logger.log("Background image size: ${Size(currentImage.width.toDouble(), currentImage.height.toDouble())}");
       _currentBackgroundImage = currentImage;
     });
   }

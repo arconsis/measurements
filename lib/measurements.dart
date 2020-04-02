@@ -67,7 +67,7 @@ class _MeasurementViewState extends State<MeasurementView> {
   void _setBackgroundImageToBloc() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
-      _bloc.backgroundImage = await boundary.toImage(pixelRatio: 4.0);
+      _bloc.backgroundImage = await boundary.toImage(pixelRatio: 1.0);
     });
   }
 

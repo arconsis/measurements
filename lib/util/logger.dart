@@ -20,9 +20,13 @@ class Logger {
 
   Logger(this.district);
 
+  String _districtName(LogDistricts district) {
+    return district.toString().split(".")[1];
+  }
+
   log(String message) {
     if (_activeDistricts.contains(district)) {
-      print("measurements: ($district) " + message);
+      print("measurements: (${_districtName(district)}) $message");
     }
   }
 }
