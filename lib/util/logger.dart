@@ -4,6 +4,7 @@ enum LogDistricts {
   MEASURE_AREA,
   DISTANCE_PAINTER,
   MEASURE_PAINTER,
+  MAGNIFYING_PAINTER,
 }
 
 class Logger {

@@ -1,7 +1,10 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/distance_painter.dart';
+import 'package:measurements/overlay/magnifying_painter.dart';
 import 'package:measurements/overlay/measure_painter.dart';
 import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
@@ -20,10 +23,12 @@ class MeasureArea extends StatefulWidget {
 class _MeasureState extends State<MeasureArea> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
-  double width, height;
+  Offset viewCenter, fingerPosition;
+  Size viewSize;
   MeasurementBloc _bloc;
   PointerHandler handler;
   GlobalKey listenerKey = GlobalKey();
+  bool showMagnifyingGlass = false;
 
   @override
   void didChangeDependencies() {
@@ -42,11 +47,10 @@ class _MeasureState extends State<MeasureArea> {
 
   void _updateSize() {
     RenderBox box = listenerKey.currentContext.findRenderObject();
-    Size size = box.size;
 
-    width = size.width;
-    height = size.height;
-    _bloc.viewWidth = width;
+    viewSize = box.size;
+    viewCenter = Offset(viewSize.width / 2, viewSize.height / 2);
+    _bloc.viewWidth = viewSize.width;
   }
 
   @override
@@ -56,37 +60,66 @@ class _MeasureState extends State<MeasureArea> {
         onPointerDown: (PointerDownEvent event) {
           handler.registerDownEvent(event);
           logger.log("downEvent $event");
+
+          setState(() {
+            fingerPosition = event.position;
+            showMagnifyingGlass = true;
+          });
         },
         onPointerMove: (PointerMoveEvent event) {
           handler.registerMoveEvent(event);
           logger.log("moveEvent $event");
+
+          setState(() {
+            fingerPosition = event.position;
+          });
         },
         onPointerUp: (PointerUpEvent event) {
           handler.registerUpEvent(event);
           logger.log("upEvent $event");
+
+          setState(() {
+            showMagnifyingGlass = false;
+            fingerPosition = event.position;
+          });
         },
         // TODO combine Streams to avoid double execution on updates. Look at updates to streams in bloc
-        child: StreamBuilder(
-          initialData: _bloc.measure,
-          stream: _bloc.measureStream,
-          builder: (BuildContext context, AsyncSnapshot<bool> measure) {
-            return StreamBuilder(
-                initialData: _bloc.showDistance,
-                stream: _bloc.showDistanceStream,
-                builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
-                  return StreamBuilder(
-                      initialData: _bloc.distances,
-                      stream: _bloc.distancesStream,
-                      builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
-                        return StreamBuilder(
-                            initialData: _bloc.points,
-                            stream: _bloc.pointsStream,
-                            builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
-                              return _buildOverlays(points, showDistance, distanceSnapshot);
-                            });
-                      });
-                });
-          },)
+        child: Stack(
+          children: <Widget>[
+            widget.child,
+            StreamBuilder(
+              initialData: _bloc.measure,
+              stream: _bloc.measureStream,
+              builder: (BuildContext context, AsyncSnapshot<bool> measure) {
+                return StreamBuilder(
+                    initialData: _bloc.showDistance,
+                    stream: _bloc.showDistanceStream,
+                    builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
+                      return StreamBuilder(
+                          initialData: _bloc.distances,
+                          stream: _bloc.distancesStream,
+                          builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
+                            return StreamBuilder(
+                                initialData: _bloc.points,
+                                stream: _bloc.pointsStream,
+                                builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
+                                  return _buildOverlays(points, showDistance, distanceSnapshot);
+                                });
+                          });
+                    });
+              },),
+            if (showMagnifyingGlass) StreamBuilder(
+              initialData: _bloc.backgroundImage,
+              stream: _bloc.backgroundStream,
+              builder: (BuildContext context, AsyncSnapshot<ui.Image> image) {
+                if (image.hasData) {
+                  return _buildMagnifyingGlass(image);
+                } else {
+                  return Opacity(opacity: 0.0,);
+                }
+              },)
+          ],
+        )
     );
   }
 
@@ -104,7 +137,7 @@ class _MeasureState extends State<MeasureArea> {
             .map((Holder holder) =>
         [
           _pointPainter(holder.first, holder.second),
-          _distancePainter(holder.first, holder.second, holder.distance, width, height)
+          _distancePainter(holder.first, holder.second, holder.distance)
         ])
             .expand((pair) => pair)
             .toList();
@@ -133,24 +166,19 @@ class _MeasureState extends State<MeasureArea> {
       }
     }
 
-    List<Widget> children = List();
-    children.add(widget.child);
-    children.addAll(painters);
-
-    return Stack(children: children,);
+    return Stack(children: painters,);
   }
 
   bool _canDrawDistances(AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) =>
-      showDistance.hasData && showDistance.data && distanceSnapshot.hasData && width != null && height != null;
+      showDistance.hasData && showDistance.data && distanceSnapshot.hasData && viewCenter != null;
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double width, double height) {
+  CustomPaint _distancePainter(Offset first, Offset last, double distance) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
           start: first,
           end: last,
           distance: distance,
-          width: width,
-          height: height,
+          viewCenter: viewCenter,
           drawColor: widget.paintColor
       ),
     );
@@ -162,6 +190,17 @@ class _MeasureState extends State<MeasureArea> {
           start: first,
           end: last,
           paintColor: widget.paintColor
+      ),
+    );
+  }
+
+  Widget _buildMagnifyingGlass(AsyncSnapshot<ui.Image> image) {
+    return CustomPaint(
+      foregroundPainter: MagnifyingPainter(
+        fingerPosition: fingerPosition,
+        center: viewCenter,
+        viewSize: viewSize,
+        image: image.data,
       ),
     );
   }

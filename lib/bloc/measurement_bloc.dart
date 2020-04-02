@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
@@ -22,6 +22,7 @@ class MeasurementBloc extends BlocBase {
   final _zoomLevelController = StreamController<double>();
   final _showDistanceController = StreamController<bool>.broadcast();
   final _enableMeasurementController = StreamController<bool>.broadcast();
+  final _backgroundImageController = StreamController<ui.Image>.broadcast();
 
   Size _documentSize;
   Sink<List<double>> _outputSink;
@@ -29,6 +30,7 @@ class MeasurementBloc extends BlocBase {
   double _zoomLevel = 1.0;
   bool _showDistance;
   bool _enableMeasure;
+  ui.Image _currentBackgroundImage;
 
   List<Offset> _points = List();
   List<double> _distances = List();
@@ -85,6 +87,8 @@ class MeasurementBloc extends BlocBase {
 
   Stream<bool> get measureStream => _enableMeasurementController.stream;
 
+  Stream<ui.Image> get backgroundStream => _backgroundImageController.stream;
+
 
   List<Offset> get points => _points;
 
@@ -93,6 +97,8 @@ class MeasurementBloc extends BlocBase {
   bool get showDistance => _showDistance;
 
   bool get measure => _enableMeasure;
+
+  ui.Image get backgroundImage => _currentBackgroundImage;
 
 
   set orientation(Orientation orientation) => _orientation != orientation ? _orientationController.add(orientation) : null;
@@ -106,6 +112,8 @@ class MeasurementBloc extends BlocBase {
   set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
 
   set measuring(bool measure) => _enableMeasure != measure ? _enableMeasurementController.add(measure) : null;
+
+  set backgroundImage(ui.Image image) => _currentBackgroundImage != image ? _backgroundImageController.add(image) : null;
 
 
   MeasurementBloc(this._documentSize, this._outputSink) {
@@ -170,6 +178,10 @@ class MeasurementBloc extends BlocBase {
       _enableMeasure = measure;
       logger.log("enableMeasure: $_enableMeasure");
     });
+
+    _backgroundImageController.stream.listen((ui.Image currentImage) {
+      _currentBackgroundImage = currentImage;
+    });
   }
 
   void _updateDistances() {
@@ -230,6 +242,7 @@ class MeasurementBloc extends BlocBase {
     _zoomLevelController?.close();
     _showDistanceController?.close();
     _enableMeasurementController?.close();
+    _backgroundImageController?.close();
   }
 }
 
