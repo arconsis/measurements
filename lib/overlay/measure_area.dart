@@ -201,11 +201,12 @@ class _MeasureState extends State<MeasureArea> {
   Widget _buildMagnifyingGlass(AsyncSnapshot<ui.Image> image) {
     return CustomPaint(
       foregroundPainter: MagnifyingPainter(
-        fingerPosition: fingerPosition,
-        center: viewCenter,
-        viewSize: viewSize,
-        image: image.data,
-        radius: magnificationRadius,
+          fingerPosition: fingerPosition,
+          center: viewCenter,
+          viewSize: viewSize,
+          image: image.data,
+          radius: magnificationRadius,
+          imageScaleFactor: image.data.width / viewSize.width
       ),
     );
   }

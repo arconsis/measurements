@@ -128,6 +128,7 @@ class MeasurementBloc extends BlocBase {
 
     distancesStream.listen((List<double> distances) {
       _distances = distances;
+      logger.log("Distances: $distances");
       _outputSink?.add(distances);
     });
 
