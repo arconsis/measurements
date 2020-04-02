@@ -72,7 +72,7 @@ class _MeasureState extends State<MeasureArea> {
         },
         onPointerMove: (PointerMoveEvent event) {
           handler.registerMoveEvent(event);
-          logger.log("moveEvent $event");
+          logger.log("moveEvent $event}");
 
           setState(() {
             fingerPosition = event.localPosition;
@@ -91,7 +91,7 @@ class _MeasureState extends State<MeasureArea> {
         child: Stack(
           children: <Widget>[
             _backgroundAndMeasurements(),
-            if (showMagnifyingGlass) _magnifyingGlass()
+            if (false) _magnifyingGlass()
           ],
         )
     );
@@ -116,14 +116,20 @@ class _MeasureState extends State<MeasureArea> {
         initialData: _bloc.showDistance,
         stream: _bloc.showDistanceStream,
         builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
+          logger.log("StreamBuilder: showDistance");
+
           return StreamBuilder(
               initialData: _bloc.distances,
               stream: _bloc.distancesStream,
               builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
+                logger.log("StreamBuilder: distances");
+
                 return StreamBuilder(
                     initialData: _bloc.points,
                     stream: _bloc.pointsStream,
                     builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
+                      // TODO check why points are update three times!
+                      logger.log("StreamBuilder: points");
                       List<Widget> children = [widget.child];
                       children.addAll(_buildOverlays(points, showDistance, distanceSnapshot));
 

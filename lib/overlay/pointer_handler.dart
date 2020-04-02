@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
+import 'package:measurements/util/logger.dart';
 
 class PointerHandler {
+  final Logger logger = Logger(LogDistricts.POINTER_HANDLER);
   MeasurementBloc _bloc;
 
   PointerHandler(this._bloc);

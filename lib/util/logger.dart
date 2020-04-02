@@ -5,11 +5,13 @@ enum LogDistricts {
   DISTANCE_PAINTER,
   MEASURE_PAINTER,
   MAGNIFYING_PAINTER,
+  POINTER_HANDLER,
 }
 
 class Logger {
   static final List<LogDistricts> _activeDistricts = [
     LogDistricts.MEASURE_AREA,
+    LogDistricts.POINTER_HANDLER,
     LogDistricts.MEASUREMENT,
     LogDistricts.MEASURE_PAINTER,
     LogDistricts.DISTANCE_PAINTER,

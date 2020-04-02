@@ -18,11 +18,13 @@ final imageWidget = Image.asset(
 );
 
 Future<void> createApp(WidgetTester tester, MeasurementView measurementView, {Matcher measurementMatcher = findsOneWidget, bool checkSizeOfMeasureArea = true}) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
-      body: measurementView,
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: measurementView,
+      ),
     ),
-  ));
+  );
 
   final imageFinder = find.byWidget(imageWidget);
   final measureFinder = find.byType(typeOf<MeasureArea>());
@@ -201,9 +203,5 @@ void main() {
 
     expect(paintFinder, findsNWidgets(2));
     expect(distances, expectedDistances);
-  });
-
-  testWidgets("Measurement should show another CustomPainter when gesture is active", (WidgetTester tester) async {
-    expect(false, true);
   });
 }
