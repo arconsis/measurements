@@ -4,80 +4,85 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/point.dart';
 
 void main() {
-  const int id = 3;
-  const zoomLevel = 2;
-  const deviceWidth = 400 / 25.4;
-  const deviceHeight = 800 / 25.4;
-  const expectedDistance = 200;
+  const zoomLevel = 1.0;
+  const scale = 1.0;
+  const viewWidth = 400.0;
+  const dpm = 20.0;
+
+  const expectedZoomFactor = 10.0;
 
   const MethodChannel channel = MethodChannel('measurements');
-  const MethodChannel setZoomChannel = MethodChannel("measurement_pdf_set_zoom_$id");
-  const EventChannel getZoomChannel = EventChannel("measurement_pdf_zoom_$id");
 
-  StreamController<double> outputStreamController = StreamController<double>();
+  StreamController<List<double>> outputStreamController = StreamController();
+  List<double> actualDistances = List();
 
-  MeasurementBloc classUnderTest = MeasurementBloc(1 / 4.0, Size(200, 300), outputStreamController.sink);
+  MeasurementBloc classUnderTest;
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == "getPhysicalScreenSize") {
-        Map result = Map();
-
-        result["width"] = deviceWidth;
-        result["height"] = deviceHeight;
-
-        return result;
-      }
-
-      return Map();
-    });
-
-    setZoomChannel.setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == "setZoom") {
-        double zoomLevelArg = methodCall.arguments;
-
-        expect(zoomLevelArg, zoomLevel);
+      if (methodCall.method == "getPhysicalPixelsPerMM") {
+        return dpm;
+      } else {
+        return -1;
       }
     });
 
-    classUnderTest.viewWidth.add(400);
-    classUnderTest.viewId.add(id);
-
-    outputStreamController.stream.listen((double distance) {
-      expect(distance, expectedDistance);
+    outputStreamController.stream.listen((List<double> distances) {
+      actualDistances = distances;
+      print("Updated points $distances");
     });
   });
 
-  test("setZoomToOriginalSize", () async {
-    classUnderTest.zoomToOriginal();
+  setUp(() {
+    classUnderTest = MeasurementBloc(Size(200, 300), outputStreamController.sink);
+
+    classUnderTest.viewWidth = viewWidth;
+    classUnderTest.scale = scale;
+    classUnderTest.zoomLevel = zoomLevel;
+    classUnderTest.measuring = true;
   });
 
-  test("getDistanceFromHorizontalPoints", () async {
-    Point startPoint = Point(Offset(10, 10));
-    Point endPoint = Point(Offset(110, 10));
-
-    classUnderTest.fromPoint.add(startPoint);
-    classUnderTest.toPoint.add(endPoint);
-  });
-
-  test("getDistanceFromVerticalPoints", () async {
-    Point startPoint = Point(Offset(10, 10));
-    Point endPoint = Point(Offset(10, 110));
-
-    classUnderTest.fromPoint.add(startPoint);
-    classUnderTest.toPoint.add(endPoint);
+  tearDown(() {
+    classUnderTest.dispose();
   });
 
   tearDownAll(() {
-    classUnderTest.dispose();
     outputStreamController.close();
 
     channel.setMockMethodCallHandler(null);
-    setZoomChannel.setMockMethodCallHandler(null);
+  });
+
+  test("setZoomToOriginalSize", () async {
+    double zoomFactor = await classUnderTest.getZoomFactorForOriginalSize();
+
+    expect(zoomFactor, expectedZoomFactor);
+  });
+
+  test("getDistanceFromHorizontalPoints", () async {
+    Offset startPoint = Offset(10, 10);
+    Offset endPoint = Offset(110, 10);
+    List<double> expectedDistances = [50];
+
+    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
+
+    Timer(Duration(milliseconds: 500), () {
+      expect(actualDistances, expectedDistances);
+    });
+  });
+
+  test("getDistanceFromVerticalPoints", () async {
+    Offset startPoint = Offset(10, 10);
+    Offset endPoint = Offset(10, 110);
+    List<double> expectedDistances = [50];
+
+    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
+
+    Timer(Duration(milliseconds: 500), () {
+      expect(actualDistances, expectedDistances);
+    });
   });
 }

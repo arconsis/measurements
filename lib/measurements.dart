@@ -1,81 +1,87 @@
 import 'package:flutter/cupertino.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/overlay/measure_area.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/pdf_view.dart';
-
-typedef OnViewCreated(int id);
+import 'package:measurements/overlay/measure_area.dart';
+import 'package:measurements/util/logger.dart';
 
 class MeasurementView extends StatefulWidget {
   const MeasurementView({
     Key key,
-    this.filePath,
+    @required this.child,
     this.documentSize = const Size(210, 297),
     this.scale = 1.0,
+    this.zoom = 1.0,
     this.measure = false,
-    this.showOriginalSize = false,
-    this.onViewCreated,
+    this.showDistanceOnLine = false,
     this.outputSink,
     this.measurePaintColor,
   });
 
-  final String filePath;
+  final Widget child;
   final Size documentSize;
   final double scale;
-  final OnViewCreated onViewCreated;
+  final double zoom;
   final bool measure;
-  final bool showOriginalSize;
+  final bool showDistanceOnLine;
   final Color measurePaintColor;
-  final Sink<double> outputSink;
+  final Sink<List<double>> outputSink;
 
   @override
   _MeasurementViewState createState() => _MeasurementViewState();
 }
 
 class _MeasurementViewState extends State<MeasurementView> {
+  Logger logger = Logger(LogDistricts.MEASUREMENT);
   MeasurementBloc _bloc;
 
-  bool showOriginalSizeLastState = false;
-
   @override
-  void initState() {
-    _bloc = MeasurementBloc(widget.scale, widget.documentSize, widget.outputSink);
+  void didChangeDependencies() {
+    logger.log("didChangeDependencies");
 
-    super.initState();
+    _bloc = MeasurementBloc(widget.documentSize, widget.outputSink);
+    _setWidgetArgumentsToBloc();
+    super.didChangeDependencies();
   }
 
-  void zoomIfWidgetParamChanged() {
-    if (widget.showOriginalSize && widget.showOriginalSize != showOriginalSizeLastState) {
-      _bloc.zoomToOriginal();
-    }
+  @override
+  void didUpdateWidget(MeasurementView oldWidget) {
+    logger.log("didUpdateWidget");
 
-    showOriginalSizeLastState = widget.showOriginalSize;
+    _setWidgetArgumentsToBloc();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _setWidgetArgumentsToBloc() {
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+    _bloc
+      ..zoomLevel = widget.zoom
+      ..scale = widget.scale
+      ..showDistance = widget.showDistanceOnLine
+      ..measuring = widget.measure
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    zoomIfWidgetParamChanged();
-
     return BlocProvider(
-      bloc: _bloc,
-      child: Stack(
-        children: <Widget>[
-          _showPdf(),
-          _overlay(),
-        ],
-      ),
+        bloc: _bloc,
+        child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
+          _bloc.orientation = orientation;
+
+          return _overlay();
+        },)
     );
   }
 
-  Widget _showPdf() {
-    return PdfView(filePath: widget.filePath, onViewCreated: widget.onViewCreated);
-  }
-
   Widget _overlay() {
-    if (widget.measure)
-      return MeasureArea(paintColor: widget.measurePaintColor);
-    else
-      return Opacity(opacity: 0.0);
+    if (widget.measure) {
+      return MeasureArea(
+          paintColor: widget.measurePaintColor,
+          child: widget.child
+      );
+    } else {
+      return widget.child;
+    }
   }
 
   @override

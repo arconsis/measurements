@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
-import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,42 +12,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _filePath;
-  int viewId;
-
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
   bool measure = false;
-  bool showOriginalSize = false;
+  bool showDistanceOnLine = false;
 
-  StreamController<double> distanceStream;
+  StreamController<List<double>> distanceStream;
 
   @override
   void initState() {
     super.initState();
-    loadPdf();
 
-    distanceStream = StreamController<double>();
-    distanceStream.stream.listen((double distance) {
+    distanceStream = StreamController<List<double>>();
+    distanceStream.stream.listen((List<double> distance) {
       setState(() {
-        this.title = "Distance: ${distance.toStringAsFixed(2)} mm";
+        this.title = "Measurement#: ${distance.length}";
       });
-    });
-  }
-
-  Future<void> loadPdf() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final File file = File(directory.path + "/TechDraw_Workbench_Example.pdf");
-
-    if (!file.existsSync()) {
-      final stream = await http.get('http://192.168.2.133:8000/TechDraw_Workbench_Example.pdf');
-      file.writeAsBytes(stream.bodyBytes);
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      _filePath = file.path;
     });
   }
 
@@ -64,20 +41,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-
-    if (_filePath == null) {
-      child = Text("Pdf not loaded yet");
-    } else {
-      child = MeasurementView(
-          filePath: _filePath,
-          onViewCreated: (int id) => print("measure_flutter: PDF View Id: $id"),
-          scale: 1 / 2.0,
-          outputSink: distanceStream.sink,
-          measure: measure,
-          showOriginalSize: showOriginalSize);
-    }
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -89,20 +52,30 @@ class _MyAppState extends State<MyApp> {
                   title = originalTitle;
                 });
               },
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))
+              ),
               IconButton(onPressed: () {
                 setState(() {
-                  showOriginalSize = !showOriginalSize;
+                  showDistanceOnLine = !showDistanceOnLine;
                 });
               },
-                  icon: Icon(Icons.adjust, color: getButtonColor(showOriginalSize))),
+                  icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
+              ),
               Text(title),
             ],
           ),
         ),
-        body: child,
-
-      ),
+        body: Center(
+          child: MeasurementView(
+            child: Image.asset("assets/images/example_portrait.png", package: "measurements",),
+            scale: 1 / 2.0,
+            outputSink: distanceStream.sink,
+            showDistanceOnLine: showDistanceOnLine,
+            measure: measure,
+          ),
+        ),
+      )
+      ,
     );
   }
 

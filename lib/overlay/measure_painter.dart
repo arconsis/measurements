@@ -1,34 +1,38 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:measurements/overlay/point.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:measurements/util/colors.dart';
+import 'package:measurements/util/logger.dart';
 
-class MeasurePainter extends CustomPainter {
-  final Color defaultColor = Color(0xFFAADD22);
+class MeasurePainter extends material.CustomPainter {
+  final Logger logger = Logger(LogDistricts.MEASURE_PAINTER);
+  final Offset start, end;
 
-  MeasurePainter({this.fromPoint, this.toPoint, this.paintColor}) {
+  final Paint _drawPaint = Paint();
+
+  MeasurePainter({@material.required this.start, @material.required this.end, Color paintColor}) {
     if (paintColor == null) {
-      paintColor = defaultColor;
+      paintColor = Colors.drawColor;
     }
 
-    drawPaint.color = paintColor;
-  }
+    _drawPaint.color = paintColor;
 
-  Point fromPoint, toPoint;
-  Color paintColor;
-  Paint drawPaint = Paint();
+    logger.log("drawing from $start to $end");
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(fromPoint.position, 10, drawPaint);
-    canvas.drawCircle(toPoint.position, 10, drawPaint);
+    canvas.drawCircle(start, 10, _drawPaint);
+    canvas.drawCircle(end, 10, _drawPaint);
 
-    drawPaint.strokeWidth = 5.0;
-    canvas.drawLine(fromPoint.position, toPoint.position, drawPaint);
+    _drawPaint.strokeWidth = 5.0;
+    canvas.drawLine(start, end, _drawPaint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(material.CustomPainter oldDelegate) {
+    MeasurePainter old = oldDelegate as MeasurePainter;
+
+    return old.start != start || old.end != end;
   }
 }
