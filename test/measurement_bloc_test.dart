@@ -12,13 +12,13 @@ void main() {
   const dpm = 20.0;
 
   const expectedZoomFactor = 10.0;
-  const expectedDistance = 50;
 
   const MethodChannel channel = MethodChannel('measurements');
 
-  StreamController<double> outputStreamController = StreamController<double>();
+  StreamController<List<double>> outputStreamController = StreamController();
+  List<double> actualDistances = List();
 
-  MeasurementBloc classUnderTest = MeasurementBloc(Size(200, 300), outputStreamController.sink);
+  MeasurementBloc classUnderTest;
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -31,13 +31,29 @@ void main() {
       }
     });
 
+    outputStreamController.stream.listen((List<double> distances) {
+      actualDistances = distances;
+      print("Updated points $distances");
+    });
+  });
+
+  setUp(() {
+    classUnderTest = MeasurementBloc(Size(200, 300), outputStreamController.sink);
+
     classUnderTest.viewWidth = viewWidth;
     classUnderTest.scale = scale;
     classUnderTest.zoomLevel = zoomLevel;
+    classUnderTest.measuring = true;
+  });
 
-    outputStreamController.stream.listen((double distance) {
-      expect(distance, expectedDistance);
-    });
+  tearDown(() {
+    classUnderTest.dispose();
+  });
+
+  tearDownAll(() {
+    outputStreamController.close();
+
+    channel.setMockMethodCallHandler(null);
   });
 
   test("setZoomToOriginalSize", () async {
@@ -49,23 +65,24 @@ void main() {
   test("getDistanceFromHorizontalPoints", () async {
     Offset startPoint = Offset(10, 10);
     Offset endPoint = Offset(110, 10);
+    List<double> expectedDistances = [50];
 
-    classUnderTest.fromPoint = startPoint;
-    classUnderTest.toPoint = endPoint;
+    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
+
+    Timer(Duration(milliseconds: 500), () {
+      expect(actualDistances, expectedDistances);
+    });
   });
 
   test("getDistanceFromVerticalPoints", () async {
     Offset startPoint = Offset(10, 10);
     Offset endPoint = Offset(10, 110);
+    List<double> expectedDistances = [50];
 
-    classUnderTest.fromPoint = startPoint;
-    classUnderTest.toPoint = endPoint;
-  });
+    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
 
-  tearDownAll(() {
-    classUnderTest.dispose();
-    outputStreamController.close();
-
-    channel.setMockMethodCallHandler(null);
+    Timer(Duration(milliseconds: 500), () {
+      expect(actualDistances, expectedDistances);
+    });
   });
 }
