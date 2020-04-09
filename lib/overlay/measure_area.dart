@@ -151,16 +151,16 @@ class _MeasureState extends State<MeasureArea> {
       if (_canDrawDistances(showDistance, distanceSnapshot)) {
         holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
 
-        painters.add(_pointPainter(holders));
-
         holders.forEach((Holder holder) {
+          painters.add(_pointPainter(holder.start, holder.end));
           if (holder.distance != null) painters.add(_distancePainter(holder.start, holder.end, holder.distance));
         });
 
-
         logger.log("drawing with distance: $holders");
       } else {
-        painters = [_pointPainter(holders)];
+        painters = holders
+            .map((Holder holder) => _pointPainter(holder.start, holder.end))
+            .toList();
 
         logger.log("drawing multiple points ${points.data}");
       }
@@ -173,7 +173,7 @@ class _MeasureState extends State<MeasureArea> {
       }
 
       if (first != null && last != null) {
-        painters = [_pointPainter([Holder(first, last)])];
+        painters = [_pointPainter(first, last)];
         logger.log("drawing one point ${points.data}");
       } else {
         logger.log("drawing no points");
@@ -198,10 +198,11 @@ class _MeasureState extends State<MeasureArea> {
     );
   }
 
-  CustomPaint _pointPainter(List<Holder> holders) {
+  CustomPaint _pointPainter(Offset first, Offset last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
-          pointHolders: holders,
+          start: first,
+          end: last,
           paintColor: widget.paintColor
       ),
     );

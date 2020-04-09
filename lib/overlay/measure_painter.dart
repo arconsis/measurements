@@ -1,17 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measurements/overlay/Holder.dart';
 import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
 
 class MeasurePainter extends material.CustomPainter {
   final Logger logger = Logger(LogDistricts.MEASURE_PAINTER);
-  final List<Holder> pointHolders;
+  final Offset start, end;
 
   final Paint _drawPaint = Paint();
 
-  MeasurePainter({@material.required this.pointHolders, Color paintColor}) {
+  MeasurePainter({@material.required this.start, @material.required this.end, Color paintColor}) {
     if (paintColor == null) {
       paintColor = Colors.drawColor;
     }
@@ -19,27 +18,21 @@ class MeasurePainter extends material.CustomPainter {
     _drawPaint.color = paintColor;
     _drawPaint.strokeWidth = 5.0;
 
-    logger.log("drawing points: $pointHolders");
+    logger.log("drawing from $start to $end");
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    Holder currentHolder;
+    canvas.drawCircle(start, 10, _drawPaint);
+    canvas.drawCircle(end, 10, _drawPaint);
 
-    for (int i = 0; i < pointHolders.length; i++) {
-      currentHolder = pointHolders[i];
-
-      canvas.drawCircle(currentHolder.start, 10, _drawPaint);
-      canvas.drawCircle(currentHolder.end, 10, _drawPaint);
-
-      canvas.drawLine(currentHolder.start, currentHolder.end, _drawPaint);
-    }
+    canvas.drawLine(start, end, _drawPaint);
   }
 
   @override
   bool shouldRepaint(material.CustomPainter oldDelegate) {
     MeasurePainter old = oldDelegate as MeasurePainter;
 
-    return old.pointHolders.length != pointHolders.length || old.pointHolders != pointHolders;
+    return old.start != start || old.end != end;
   }
 }
