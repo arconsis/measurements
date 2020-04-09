@@ -10,8 +10,6 @@ import 'package:measurements/util/utils.dart';
 class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
-  final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
-
   final _pointsController = StreamController<List<Offset>>.broadcast();
   final _distanceController = StreamController<List<double>>.broadcast();
 
@@ -202,18 +200,6 @@ class MeasurementBloc extends BlocBase {
 
       logger.log("updated points to orientation");
     }
-  }
-
-  Future<double> getZoomFactorForOriginalSize() async {
-    if (_originalSizeZoomLevel == null) {
-      double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
-
-      double screenWidth = _viewWidth / dpm;
-
-      _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
-    }
-
-    return _originalSizeZoomLevel;
   }
 
   @override
