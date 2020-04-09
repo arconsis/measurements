@@ -3,13 +3,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/painters/distance_painter.dart';
-import 'package:measurements/overlay/painters/magnifying_painter.dart';
-import 'package:measurements/overlay/painters/measure_painter.dart';
 import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
+
+import 'distance_painter.dart';
+import 'magnifying_painter.dart';
+import 'measure_painter.dart';
 
 class MeasureArea extends StatefulWidget {
   MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);

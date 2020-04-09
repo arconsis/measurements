@@ -52,13 +52,11 @@ class MeasurementBloc extends BlocBase {
   void updatePoint(Offset point, int index) {
     if (!_enableMeasure) return;
 
-    _points.replaceRange(index, index + 1, {point});
+    _points.setRange(index, index + 1, [point]);
 
-//    final time = measure(() {
-//      if (index > 0) _distances.replaceRange(max(0, index - 1), min(_distances.length, index), {null});
-//      _distances.replaceRange(max(0, index), min(_distances.length, index + 1), {null});
-//    });
-//    logger.log("replacing distances with null took: $time");
+    measure(logger, "replacing distances with null took: ", () {
+      _distances.setRange(max(0, index - 1), min(_distances.length, index + 1), [null, null]);
+    });
 
     _distanceController.add(_distances);
     _pointsController.add(_points);
