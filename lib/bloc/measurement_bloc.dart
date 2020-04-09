@@ -185,9 +185,7 @@ class MeasurementBloc extends BlocBase {
       _distances = distances;
       logger.log("distances: $_distances");
 
-      measure(logger, "adding to output sink took: ", () {
-        _outputSink?.add(distances);
-      });
+      _outputSink?.add(distances);
     });
 
     showDistanceStream.listen((bool show) {
@@ -195,7 +193,7 @@ class MeasurementBloc extends BlocBase {
       logger.log("showDistance: $_showDistance");
     });
 
-    _backgroundImageController.stream.listen((ui.Image currentImage) {
+    backgroundStream.listen((ui.Image currentImage) {
       logger.log("background image size: ${Size(currentImage.width.toDouble(), currentImage.height.toDouble())}");
       _currentBackgroundImage = currentImage;
     });
