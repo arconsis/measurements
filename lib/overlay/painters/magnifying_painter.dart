@@ -6,7 +6,8 @@ import 'package:measurements/util/logger.dart';
 
 class MagnifyingPainter extends CustomPainter {
   final Logger logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
-  final double borderRadiusOffset = 2;
+  final double borderRadiusOffset = 2,
+      fingerRadiusOffset = 50;
 
   final double radius;
   final Offset fingerPosition;
@@ -19,11 +20,7 @@ class MagnifyingPainter extends CustomPainter {
   Rect imageTargetRect, imageSourceRect;
 
   MagnifyingPainter({@required this.fingerPosition, @required Offset center, @required Size viewSize, @required this.radius, @required this.image, double imageScaleFactor}) {
-    if (fingerPosition.dx > center.dx || fingerPosition.dy > center.dy) {
-      drawPosition = Offset(viewSize.width / 4, viewSize.height / 10);
-    } else {
-      drawPosition = Offset(viewSize.width * 3 / 4, viewSize.height / 10);
-    }
+    drawPosition = fingerPosition + Offset(0, -(radius + fingerRadiusOffset));
 
     double diameter = 2 * radius;
 
