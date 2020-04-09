@@ -53,12 +53,6 @@ class MeasurementBloc extends BlocBase {
     if (!_enableMeasure) return;
 
     _points.setRange(index, index + 1, [point]);
-
-    measure(logger, "replacing distances with null took: ", () {
-      _distances.setRange(max(0, index - 1), min(_distances.length, index + 1), [null, null]);
-    });
-
-    _distanceController.add(_distances);
     _pointsController.add(_points);
 
     logger.log("updated point $index: $_points");
@@ -78,7 +72,14 @@ class MeasurementBloc extends BlocBase {
     return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
   }
 
-  void movementFinished() async {
+  void movementStarted(int index) {
+    _distances.setRange(max(0, index - 1), min(_distances.length, index + 1), [null, null]);
+    _distanceController.add(_distances);
+
+    logger.log("started moving points with index: $index");
+  }
+
+  void movementFinished() {
     if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
       List<double> distances = List();
 
@@ -112,8 +113,8 @@ class MeasurementBloc extends BlocBase {
 
   List<Offset> get points => _points;
 
-  List<double> get distances => _distances;
 
+  List<double> get distances => _distances;
 
   bool get showDistance => _showDistance;
 
@@ -160,13 +161,13 @@ class MeasurementBloc extends BlocBase {
     _updateTransformationFactor();
   }
 
+
   set measuring(bool measure) {
     if (_enableMeasure != measure) {
       _enableMeasure = measure;
       logger.log("enableMeasure: $_enableMeasure");
     }
   }
-
 
   set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
 
@@ -180,11 +181,13 @@ class MeasurementBloc extends BlocBase {
       logger.log("points: $_points");
     });
 
-    distancesStream.listen((List<double> distances) {
+    distancesStream.listen((List<double> distances) async {
       _distances = distances;
       logger.log("distances: $_distances");
 
-      _outputSink?.add(distances);
+      measure(logger, "adding to output sink took: ", () {
+        _outputSink?.add(distances);
+      });
     });
 
     showDistanceStream.listen((bool show) {

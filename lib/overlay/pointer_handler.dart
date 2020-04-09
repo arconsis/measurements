@@ -27,6 +27,8 @@ class PointerHandler {
     } else {
       _addNewPoint(eventPoint);
     }
+
+    _bloc.movementStarted(_currentIndex);
   }
 
   void _addNewPoint(Offset eventPoint) {

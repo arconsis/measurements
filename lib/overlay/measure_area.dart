@@ -8,6 +8,7 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
 
+import 'Holder.dart';
 import 'distance_painter.dart';
 import 'magnifying_painter.dart';
 import 'measure_painter.dart';
@@ -150,16 +151,16 @@ class _MeasureState extends State<MeasureArea> {
       if (_canDrawDistances(showDistance, distanceSnapshot)) {
         holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
 
+        painters.add(_pointPainter(holders));
+
         holders.forEach((Holder holder) {
-          painters.add(_pointPainter(holder.first, holder.second));
-          if (holder.distance != null) painters.add(_distancePainter(holder.first, holder.second, holder.distance));
+          if (holder.distance != null) painters.add(_distancePainter(holder.start, holder.end, holder.distance));
         });
+
 
         logger.log("drawing with distance: $holders");
       } else {
-        painters = holders
-            .map((Holder holder) => _pointPainter(holder.first, holder.second))
-            .toList();
+        painters = [_pointPainter(holders)];
 
         logger.log("drawing multiple points ${points.data}");
       }
@@ -172,7 +173,7 @@ class _MeasureState extends State<MeasureArea> {
       }
 
       if (first != null && last != null) {
-        painters = [_pointPainter(first, last)];
+        painters = [_pointPainter([Holder(first, last)])];
         logger.log("drawing one point ${points.data}");
       } else {
         logger.log("drawing no points");
@@ -197,11 +198,10 @@ class _MeasureState extends State<MeasureArea> {
     );
   }
 
-  CustomPaint _pointPainter(Offset first, Offset last) {
+  CustomPaint _pointPainter(List<Holder> holders) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
-          start: first,
-          end: last,
+          pointHolders: holders,
           paintColor: widget.paintColor
       ),
     );
@@ -218,17 +218,5 @@ class _MeasureState extends State<MeasureArea> {
           imageScaleFactor: image.data.width / viewSize.width
       ),
     );
-  }
-}
-
-class Holder {
-  Offset first, second;
-  double distance;
-
-  Holder(this.first, this.second);
-
-  @override
-  String toString() {
-    return "First Point: $first - Second Point: $second - Distance: $distance";
   }
 }
