@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: MeasurementView(
-            child: Image.asset("assets/images/example_portrait.png", package: "measurements",),
+            child: Image.asset("assets/images/example_portrait.png",),
             scale: 1 / 2.0,
             outputSink: distanceStream.sink,
             showDistanceOnLine: showDistanceOnLine,
