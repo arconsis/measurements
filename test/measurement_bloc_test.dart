@@ -15,7 +15,7 @@ void main() {
 
   const MethodChannel channel = MethodChannel('measurements');
 
-  StreamController<List<double>> outputStreamController = StreamController();
+  Function(List<double>) distanceCallback;
   List<double> actualDistances = List();
 
   MeasurementBloc classUnderTest;
@@ -31,14 +31,14 @@ void main() {
       }
     });
 
-    outputStreamController.stream.listen((List<double> distances) {
+    distanceCallback = (List<double> distances) {
       actualDistances = distances;
       print("Updated points $distances");
-    });
+    };
   });
 
   setUp(() {
-    classUnderTest = MeasurementBloc(Size(200, 300), outputStreamController.sink);
+    classUnderTest = MeasurementBloc(Size(200, 300), distanceCallback);
 
     classUnderTest.viewWidth = viewWidth;
     classUnderTest.scale = scale;
@@ -51,8 +51,6 @@ void main() {
   });
 
   tearDownAll(() {
-    outputStreamController.close();
-
     channel.setMockMethodCallHandler(null);
   });
 

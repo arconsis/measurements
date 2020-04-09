@@ -41,21 +41,16 @@ void checkWidgetHasCorrectSize(Size size) {
   expect(size.height, equals(imageHeight));
 }
 
-StreamController<List<double>> distanceController;
+Function(List<double>) distanceCallback;
 List<double> distances;
 
 void main() {
   setUpAll(() {
-    distanceController = StreamController<List<double>>();
     distances = List();
 
-    distanceController.stream.listen((List<double> data) {
+    distanceCallback = (List<double> data) {
       distances = data;
-    });
-  });
-
-  tearDownAll(() {
-    distanceController?.close();
+    };
   });
 
   testWidgets("Measurement should show child without extras", (WidgetTester tester) async {
@@ -80,7 +75,7 @@ void main() {
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
-      outputSink: distanceController.sink,
+      distanceCallback: distanceCallback,
     );
 
     await createApp(tester, measurementView);
@@ -109,7 +104,7 @@ void main() {
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
-      outputSink: distanceController.sink,
+      distanceCallback: distanceCallback,
     );
 
     await createApp(tester, measurementView);
@@ -146,7 +141,7 @@ void main() {
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
-      outputSink: distanceController.sink,
+      distanceCallback: distanceCallback,
     );
 
     await createApp(tester, measurementView);
@@ -182,7 +177,7 @@ void main() {
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
-      outputSink: distanceController.sink,
+      distanceCallback: distanceCallback,
       scale: 1 / 2.0,
       zoom: 2.0,
     );

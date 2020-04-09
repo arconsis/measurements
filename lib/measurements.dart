@@ -13,7 +13,7 @@ class MeasurementView extends StatefulWidget {
     this.zoom = 1.0,
     this.measure = false,
     this.showDistanceOnLine = false,
-    this.outputSink,
+    this.distanceCallback,
     this.measurePaintColor,
   });
 
@@ -24,7 +24,7 @@ class MeasurementView extends StatefulWidget {
   final bool measure;
   final bool showDistanceOnLine;
   final Color measurePaintColor;
-  final Sink<List<double>> outputSink;
+  final Function(List<double>) distanceCallback;
 
   @override
   _MeasurementViewState createState() => _MeasurementViewState();
@@ -38,7 +38,7 @@ class _MeasurementViewState extends State<MeasurementView> {
   void didChangeDependencies() {
     logger.log("didChangeDependencies");
 
-    _bloc = MeasurementBloc(widget.documentSize, widget.outputSink);
+    _bloc = MeasurementBloc(widget.documentSize, widget.distanceCallback);
     _setWidgetArgumentsToBloc();
     super.didChangeDependencies();
   }

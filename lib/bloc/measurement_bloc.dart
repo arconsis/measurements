@@ -24,7 +24,7 @@ class MeasurementBloc extends BlocBase {
   final _enableMeasurementController = StreamController<bool>.broadcast();
 
   Size _documentSize;
-  Sink<List<double>> _outputSink;
+  Function(List<double>) _distanceCallback;
   double _scale;
   double _zoomLevel = 1.0;
   bool _showDistance;
@@ -108,7 +108,7 @@ class MeasurementBloc extends BlocBase {
   set measuring(bool measure) => _enableMeasure != measure ? _enableMeasurementController.add(measure) : null;
 
 
-  MeasurementBloc(this._documentSize, this._outputSink) {
+  MeasurementBloc(this._documentSize, this._distanceCallback) {
     logger.log("Creating Bloc");
 
     pointsStream.listen((List<Offset> points) {
@@ -120,7 +120,7 @@ class MeasurementBloc extends BlocBase {
 
     distancesStream.listen((List<double> distances) {
       _distances = distances;
-      _outputSink?.add(distances);
+      if (_distanceCallback != null) _distanceCallback(distances);
     });
 
     _orientationController.stream.listen((Orientation orientation) {
