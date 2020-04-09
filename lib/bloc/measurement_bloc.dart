@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -52,6 +53,14 @@ class MeasurementBloc extends BlocBase {
     if (!_enableMeasure) return;
 
     _points.replaceRange(index, index + 1, {point});
+
+//    final time = measure(() {
+//      if (index > 0) _distances.replaceRange(max(0, index - 1), min(_distances.length, index), {null});
+//      _distances.replaceRange(max(0, index), min(_distances.length, index + 1), {null});
+//    });
+//    logger.log("replacing distances with null took: $time");
+
+    _distanceController.add(_distances);
     _pointsController.add(_points);
 
     logger.log("updated point $index: $_points");
@@ -71,6 +80,28 @@ class MeasurementBloc extends BlocBase {
     return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
   }
 
+  void movementFinished() async {
+    if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
+      List<double> distances = List();
+
+      _points.doInBetween((start, end) => distances.add((start - end).distance * _transformationFactor));
+
+      _distanceController.add(distances);
+    }
+  }
+
+  Future<double> getZoomFactorForOriginalSize() async {
+    if (_originalSizeZoomLevel == null) {
+      double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
+
+      double screenWidth = _viewWidth / dpm;
+
+      _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
+    }
+
+    return _originalSizeZoomLevel;
+  }
+
   Offset getPoint(int index) => _points[index];
 
   Stream<List<Offset>> get pointsStream => _pointsController.stream;
@@ -85,10 +116,10 @@ class MeasurementBloc extends BlocBase {
 
   List<double> get distances => _distances;
 
+
   bool get showDistance => _showDistance;
 
   ui.Image get backgroundImage => _currentBackgroundImage;
-
 
   set orientation(Orientation orientation) {
     if (_orientation != orientation) {
@@ -138,10 +169,10 @@ class MeasurementBloc extends BlocBase {
     }
   }
 
+
   set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
 
   set backgroundImage(ui.Image image) => _currentBackgroundImage != image ? _backgroundImageController.add(image) : null;
-
 
   MeasurementBloc(this._documentSize, this._outputSink) {
     logger.log("Creating Bloc");
@@ -149,8 +180,6 @@ class MeasurementBloc extends BlocBase {
     pointsStream.listen((List<Offset> points) {
       _points = points;
       logger.log("points: $_points");
-
-      _updateDistances();
     });
 
     distancesStream.listen((List<double> distances) {
@@ -169,16 +198,6 @@ class MeasurementBloc extends BlocBase {
       logger.log("background image size: ${Size(currentImage.width.toDouble(), currentImage.height.toDouble())}");
       _currentBackgroundImage = currentImage;
     });
-  }
-
-  void _updateDistances() {
-    if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
-      List<double> distances = List();
-
-      _points.doInBetween((start, end) => distances.add((start - end).distance * _transformationFactor));
-
-      _distanceController.add(distances);
-    }
   }
 
   void _updateTransformationFactor() {
@@ -201,18 +220,6 @@ class MeasurementBloc extends BlocBase {
 
       logger.log("updated points to orientation");
     }
-  }
-
-  Future<double> getZoomFactorForOriginalSize() async {
-    if (_originalSizeZoomLevel == null) {
-      double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
-
-      double screenWidth = _viewWidth / dpm;
-
-      _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
-    }
-
-    return _originalSizeZoomLevel;
   }
 
   @override

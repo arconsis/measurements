@@ -3,9 +3,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/distance_painter.dart';
-import 'package:measurements/overlay/magnifying_painter.dart';
-import 'package:measurements/overlay/measure_painter.dart';
+import 'package:measurements/overlay/painters/distance_painter.dart';
+import 'package:measurements/overlay/painters/magnifying_painter.dart';
+import 'package:measurements/overlay/painters/measure_painter.dart';
 import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
@@ -91,7 +91,7 @@ class _MeasureState extends State<MeasureArea> {
         child: Stack(
           children: <Widget>[
             _backgroundAndMeasurements(),
-            if (false) _magnifyingGlass()
+            if (showMagnifyingGlass) _magnifyingGlass()
           ],
         )
     );
@@ -149,14 +149,10 @@ class _MeasureState extends State<MeasureArea> {
       if (_canDrawDistances(showDistance, distanceSnapshot)) {
         holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
 
-        painters = holders
-            .map((Holder holder) =>
-        [
-          _pointPainter(holder.first, holder.second),
-          _distancePainter(holder.first, holder.second, holder.distance)
-        ])
-            .expand((pair) => pair)
-            .toList();
+        holders.forEach((Holder holder) {
+          painters.add(_pointPainter(holder.first, holder.second));
+          if (holder.distance != null) painters.add(_distancePainter(holder.first, holder.second, holder.distance));
+        });
 
         logger.log("drawing with distance: $holders");
       } else {

@@ -28,3 +28,9 @@ extension IterableExtension on Iterable {
     }
   }
 }
+
+Duration measure(Function() f) {
+  final start = DateTime.now();
+  f();
+  return DateTime.now().difference(start);
+}

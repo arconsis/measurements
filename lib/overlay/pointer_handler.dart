@@ -46,5 +46,6 @@ class PointerHandler {
   void registerUpEvent(PointerUpEvent event) {
     _updatePoint(event.localPosition);
     _currentIndex = -1;
+    _bloc.movementFinished();
   }
 }
