@@ -12,7 +12,8 @@ class MeasurementView extends StatefulWidget {
   final bool measure;
   final bool showDistanceOnLine;
   final Color measurePaintColor;
-  final Function(List<double>, double) distanceCallback;
+  final Function(List<double>, double)
+      distanceCallback; // 132: added overall length to distance callback
 
   const MeasurementView({
     Key key,

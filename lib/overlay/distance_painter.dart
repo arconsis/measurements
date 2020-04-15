@@ -5,7 +5,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
 
-
+//132: how do you delete the points? bug when keeping mouse pressed. This one is also a widget. Calculations could be in the bloc to test them.
 class DistancePainter extends material.CustomPainter {
   final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
@@ -19,18 +19,20 @@ class DistancePainter extends material.CustomPainter {
   double _radians;
   Offset _position;
 
-  DistancePainter({@material.required Offset start,
-    @material.required Offset end,
-    @material.required this.distance,
-    @material.required this.width,
-    @material.required this.height,
-    Color drawColor}) {
+  DistancePainter(
+      {@material.required Offset start,
+      @material.required Offset end,
+      @material.required this.distance,
+      @material.required this.width,
+      @material.required this.height,
+      Color drawColor}) {
     if (drawColor == null) {
       drawColor = Colors.drawColor;
     }
 
     if (distance > 0) {
-      _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
+      _zeroPoint -=
+          Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
     }
 
     Offset center = Offset(width / 2.0, height / 2.0);
@@ -46,9 +48,7 @@ class DistancePainter extends material.CustomPainter {
     Offset positionToCenter = center - _position;
 
     Offset offset = difference.normal();
-    offset *= offset
-        .cosAlpha(positionToCenter)
-        .sign;
+    offset *= offset.cosAlpha(positionToCenter).sign;
 
     ParagraphBuilder paragraphBuilder = ParagraphBuilder(
       ParagraphStyle(
@@ -59,7 +59,9 @@ class DistancePainter extends material.CustomPainter {
         fontStyle: FontStyle.normal,
       ),
     );
-    paragraphBuilder.pushStyle(TextStyle(color: drawColor),);
+    paragraphBuilder.pushStyle(
+      TextStyle(color: drawColor),
+    );
     paragraphBuilder.addText("${distance?.toStringAsFixed(2)} mm");
 
     _paragraph = paragraphBuilder.build();
@@ -98,6 +100,7 @@ extension OffsetExtension on Offset {
     Offset thisNormalized = this.normalize();
     Offset otherNormalized = other.normalize();
 
-    return thisNormalized.dx * otherNormalized.dx + thisNormalized.dy * otherNormalized.dy;
+    return thisNormalized.dx * otherNormalized.dx +
+        thisNormalized.dy * otherNormalized.dy;
   }
 }

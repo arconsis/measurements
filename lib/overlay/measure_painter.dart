@@ -4,7 +4,6 @@ import 'package:flutter/material.dart' as material;
 import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
 
-//132: how do you delete the points? bug when keeping mouse pressed. This one is also a widget. Calculations could be in the bloc.
 class MeasurePainter extends material.CustomPainter {
   final Logger logger = Logger(LogDistricts.MEASURE_PAINTER);
   final Offset start, end;

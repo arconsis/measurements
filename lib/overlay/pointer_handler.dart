@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 
 class PointerHandler {
-  //132: this could be a repository or inside bloc, only screens have bloc references. bloc may call repo, bloc adapts ui with stream
+  //132: this could be a repository or inside bloc, only screens have bloc references. bloc may call repo, bloc adapts ui with stream. repositories should be injected
   MeasurementBloc _bloc;
 
   PointerHandler(this._bloc);

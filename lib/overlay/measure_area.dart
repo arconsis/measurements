@@ -9,6 +9,7 @@ import 'package:measurements/util/utils.dart';
 
 //132: make a folder "widgets" for every UI element and a folder "repositories" for non-ui business logic.
 class MeasureArea extends StatefulWidget {
+  // 132: this widget should be entirely stateless and get a reference of the bloc by its parent
   MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
 
   final Color paintColor;
@@ -23,7 +24,8 @@ class _MeasureState extends State<MeasureArea> {
 
   double width, height; // 132: do not keep state inside UI. This is bloc only.
   MeasurementBloc _bloc;
-  PointerHandler handler; //132: remove handler from ui.
+  PointerHandler
+      handler; //132: remove handler from ui. it needs to be inside bloc
   GlobalKey listenerKey = GlobalKey();
 
   @override
@@ -77,7 +79,7 @@ class _MeasureState extends State<MeasureArea> {
                 builder:
                     (BuildContext context, AsyncSnapshot<bool> showDistance) {
                   return StreamBuilder(
-                      initialData: _bloc.distances,
+                      initialData: List<double>.of([]),
                       stream: _bloc.distancesStream,
                       builder: (BuildContext context,
                           AsyncSnapshot<List<double>> distanceSnapshot) {
@@ -86,13 +88,8 @@ class _MeasureState extends State<MeasureArea> {
                             stream: _bloc.pointsStream,
                             builder: (BuildContext context,
                                 AsyncSnapshot<List<Offset>> points) {
-                              if (points.hasData) {
-                                return _buildOverlays(
-                                    points, showDistance, distanceSnapshot);
-                              } else {
-                                return _buildOverlays(
-                                    points, showDistance, distanceSnapshot);
-                              }
+                              return _buildOverlays(
+                                  points, showDistance, distanceSnapshot);
                             });
                       });
                 });
@@ -101,6 +98,7 @@ class _MeasureState extends State<MeasureArea> {
   }
 
   Widget _buildOverlays(
+      //132: business logic. Should be in bloc or repository
       AsyncSnapshot<List<Offset>> points,
       AsyncSnapshot<bool> showDistance,
       AsyncSnapshot<List<double>> distanceSnapshot) {
@@ -168,6 +166,7 @@ class _MeasureState extends State<MeasureArea> {
       Offset first, Offset last, double distance, double width, double height) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
+          //132: this one should get bloc, too
           start: first,
           end: last,
           distance: distance,

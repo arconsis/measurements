@@ -12,8 +12,9 @@ class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
 //  final _pointsController = StreamController<List<Offset>>.broadcast();
-  final _pointsController = //132: example with behaviour subject
+  final _pointsController = //132: example with behaviour subject. it woul be better to not use behaviour subject, but use a repository holding the List with points
       BehaviorSubject<List<Offset>>.seeded(List<Offset>.of([]));
+// 132: some controllers can be combined using a custom model representing all of these values (less rebuilding)
 
   final _distanceController = StreamController<List<double>>.broadcast();
 
@@ -25,7 +26,7 @@ class MeasurementBloc extends BlocBase {
   final _showDistanceController = StreamController<bool>.broadcast();
   final _enableMeasurementController = StreamController<bool>.broadcast();
 
-  // 132: it is not good practice to have so man class variables inside bloc
+  // 132: it is not good practice to have so man class variables inside bloc. class variables are best inside repository.
   Size _documentSize;
   Function(List<double>, double) _distanceCallback;
   double _scale;
@@ -90,7 +91,7 @@ class MeasurementBloc extends BlocBase {
     //132: this method is too huge
     logger.log("Creating Bloc");
 
-/*    pointsStream.listen((List<Offset> points) {
+/*    pointsStream.listen((List<Offset> points) { // 132: do not listen inside of bloc to its own streams. only UI listens to bloc
       _points = points;
       logger.log("points: $_points");
 
