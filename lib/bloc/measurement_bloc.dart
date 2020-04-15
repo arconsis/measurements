@@ -12,8 +12,9 @@ class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
 //  final _pointsController = StreamController<List<Offset>>.broadcast();
-  final _pointsController = BehaviorSubject<List<Offset>>.seeded(
-      [Offset(0, 0)]); //132: test with behaviour subject
+  final _pointsController =
+      BehaviorSubject<List<Offset>>.seeded(List<Offset>.of([]));
+  //132: test with behaviour subject, where did you get the initial value?
   final _distanceController = StreamController<List<double>>.broadcast();
 
   final _orientationController = StreamController<Orientation>();

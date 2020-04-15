@@ -81,12 +81,17 @@ class _MeasureState extends State<MeasureArea> {
                       builder: (BuildContext context,
                           AsyncSnapshot<List<double>> distanceSnapshot) {
                         return StreamBuilder(
-                            initialData: [Offset(0, 0)],
+                            //132: we do not need initial value here
                             stream: _bloc.pointsStream,
                             builder: (BuildContext context,
                                 AsyncSnapshot<List<Offset>> points) {
-                              return _buildOverlays(
-                                  points, showDistance, distanceSnapshot);
+                              if (points.hasData) {
+                                return _buildOverlays(
+                                    points, showDistance, distanceSnapshot);
+                              } else {
+                                return _buildOverlays(
+                                    points, showDistance, distanceSnapshot);
+                              }
                             });
                       });
                 });
@@ -128,7 +133,7 @@ class _MeasureState extends State<MeasureArea> {
     } else {
       Offset first, last;
 
-      if (points.data.isNotEmpty) {
+      if (points.data != null && points.data.isNotEmpty) {
         first = points?.data?.first;
         last = points?.data?.last;
       }
