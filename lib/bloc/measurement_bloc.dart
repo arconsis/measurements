@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart'; // 132: importing from darts widget library should be avoided in bloc
+
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
@@ -12,9 +12,9 @@ class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
 //  final _pointsController = StreamController<List<Offset>>.broadcast();
-  final _pointsController =
+  final _pointsController = //132: example with behaviour subject
       BehaviorSubject<List<Offset>>.seeded(List<Offset>.of([]));
-  //132: test with behaviour subject, where did you get the initial value?
+
   final _distanceController = StreamController<List<double>>.broadcast();
 
   final _orientationController = StreamController<Orientation>();
@@ -161,7 +161,8 @@ class MeasurementBloc extends BlocBase {
         .add([..._pointsController.value, point]); //132: adding new points List
     _updateDistances();
     logger.log("Added points: ${_pointsController.value}");
-    return _pointsController.value.length - 1;
+    return _pointsController.value.length -
+        1; //132: illegal. only private functions may return values inside bloc (for other calling functions)
   }
 
   void updatePoint(Offset point, int index) {

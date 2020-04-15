@@ -32,7 +32,7 @@ class MeasurementView extends StatefulWidget {
 
 class _MeasurementViewState extends State<MeasurementView> {
   Logger logger = Logger(LogDistricts.MEASUREMENT);
-  MeasurementBloc _bloc;
+  MeasurementBloc _bloc; // 132: bloc should be only here
 
   @override
   void didChangeDependencies() {
@@ -51,7 +51,7 @@ class _MeasurementViewState extends State<MeasurementView> {
     super.didUpdateWidget(oldWidget);
   }
 
-// 132: this should be set with a function
+// 132: this should be set with a function, addPostFrameCallback should be avoided
   void _setWidgetArgumentsToBloc() {
     WidgetsBinding.instance.addPostFrameCallback((_) => _bloc
       ..zoomLevel = widget.zoom
@@ -77,7 +77,9 @@ class _MeasurementViewState extends State<MeasurementView> {
   Widget _overlay() {
     if (widget.measure) {
       return MeasureArea(
-          paintColor: widget.measurePaintColor, child: widget.child);
+          //132: this widget should get reference of states bloc
+          paintColor: widget.measurePaintColor,
+          child: widget.child);
     } else {
       return widget.child;
     }

@@ -7,6 +7,7 @@ import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
+//132: make a folder "widgets" for every UI element and a folder "repositories" for non-ui business logic.
 class MeasureArea extends StatefulWidget {
   MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
 
@@ -20,9 +21,9 @@ class MeasureArea extends StatefulWidget {
 class _MeasureState extends State<MeasureArea> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
-  double width, height;
+  double width, height; // 132: do not keep state inside UI. This is bloc only.
   MeasurementBloc _bloc;
-  PointerHandler handler;
+  PointerHandler handler; //132: remove handler from ui.
   GlobalKey listenerKey = GlobalKey();
 
   @override
@@ -185,6 +186,7 @@ class _MeasureState extends State<MeasureArea> {
 }
 
 class Holder {
+  //132: why do we need this?
   Offset first, second;
   double distance;
 
