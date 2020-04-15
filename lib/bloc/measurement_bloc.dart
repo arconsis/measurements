@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
-  final _pointsController = StreamController<List<Offset>>.broadcast();
+//  final _pointsController = StreamController<List<Offset>>.broadcast();
+  final _pointsController = BehaviorSubject<List<Offset>>.seeded(
+      [Offset(0, 0)]); //132: test with behaviour subject
   final _distanceController = StreamController<List<double>>.broadcast();
 
   final _orientationController = StreamController<Orientation>();
@@ -21,14 +24,15 @@ class MeasurementBloc extends BlocBase {
   final _showDistanceController = StreamController<bool>.broadcast();
   final _enableMeasurementController = StreamController<bool>.broadcast();
 
+  // 132: it is not good practice to have so man class variables inside bloc
   Size _documentSize;
-  Function(List<double>) _distanceCallback;
+  Function(List<double>, double) _distanceCallback;
   double _scale;
   double _zoomLevel = 1.0;
   bool _showDistance;
   bool _enableMeasure;
 
-  List<Offset> _points = List();
+  // List<Offset> _points = List();
   List<double> _distances = List();
 
   bool _didUpdateOrientation = true;
@@ -40,40 +44,8 @@ class MeasurementBloc extends BlocBase {
   double _transformationFactor;
   double _originalSizeZoomLevel;
 
-  int addPoint(Offset point) {
-    if (!_enableMeasure) return -1;
-
-    _points.add(point);
-    _pointsController.add(_points);
-
-    logger.log("Added points: $_points");
-    return _points.length - 1;
-  }
-
-  void updatePoint(Offset point, int index) {
-    if (!_enableMeasure) return;
-
-    _points.replaceRange(index, index + 1, {point});
-    _pointsController.add(_points);
-
-    logger.log("updated point $index: $_points");
-  }
-
-  int getClosestPointIndex(Offset reference) {
-    if (!_enableMeasure) return -1;
-
-    int index = 0;
-
-    List<CompareHolder> sortedPoints = _points
-        .map((Offset point) => CompareHolder(index++, (reference - point).distance))
-        .toList();
-
-    sortedPoints.sort((CompareHolder a, CompareHolder b) => a.distance.compareTo(b.distance));
-
-    return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
-  }
-
-  Offset getPoint(int index) => _points[index];
+// 132: getters and setters need to be on top
+  Offset getPoint(int index) => _pointsController.value[index];
 
   Stream<List<Offset>> get pointsStream => _pointsController.stream;
 
@@ -83,42 +55,52 @@ class MeasurementBloc extends BlocBase {
 
   Stream<bool> get measureStream => _enableMeasurementController.stream;
 
-
-  List<Offset> get points => _points;
+  // List<Offset> get points => _points;
 
   List<double> get distances => _distances;
 
-  bool get showDistance => _showDistance;
+  bool get showDistance =>
+      _showDistance; // 132: blocs may only expose streams and methods
 
   bool get measure => _enableMeasure;
 
+  set orientation(Orientation orientation) => _orientation != orientation
+      ? _orientationController.add(orientation)
+      : null;
 
-  set orientation(Orientation orientation) => _orientation != orientation ? _orientationController.add(orientation) : null;
+  set viewWidth(double width) =>
+      _viewWidth != width ? _viewWidthController.add(width) : null;
 
-  set viewWidth(double width) => _viewWidth != width ? _viewWidthController.add(width) : null;
+  set scale(double scale) =>
+      _scale != scale ? _scaleController.add(scale) : null;
 
-  set scale(double scale) => _scale != scale ? _scaleController.add(scale) : null;
+  set zoomLevel(double zoomLevel) =>
+      _zoomLevel != zoomLevel ? _zoomLevelController.add(zoomLevel) : null;
 
-  set zoomLevel(double zoomLevel) => _zoomLevel != zoomLevel ? _zoomLevelController.add(zoomLevel) : null;
+  set showDistance(bool show) =>
+      _showDistance != show ? _showDistanceController.add(show) : null;
 
-  set showDistance(bool show) => _showDistance != show ? _showDistanceController.add(show) : null;
+  set measuring(bool measure) => _enableMeasure != measure
+      ? _enableMeasurementController.add(measure)
+      : null;
 
-  set measuring(bool measure) => _enableMeasure != measure ? _enableMeasurementController.add(measure) : null;
-
-
+// 132: constructor needs to be on top too
   MeasurementBloc(this._documentSize, this._distanceCallback) {
+    //132: this method is too huge
     logger.log("Creating Bloc");
 
-    pointsStream.listen((List<Offset> points) {
+/*    pointsStream.listen((List<Offset> points) {
       _points = points;
       logger.log("points: $_points");
 
       _updateDistances();
-    });
+    });*/
 
     distancesStream.listen((List<double> distances) {
+      //132: do only listen from external repositories. why are you listening here?
       _distances = distances;
-      if (_distanceCallback != null) _distanceCallback(distances);
+      if (_distanceCallback != null)
+        _distanceCallback(distances, sumAllDistances(distances));
     });
 
     _orientationController.stream.listen((Orientation orientation) {
@@ -170,11 +152,57 @@ class MeasurementBloc extends BlocBase {
     });
   }
 
+  int addPoint(Offset point) {
+    if (!_enableMeasure) return -1;
+
+//    _points.add(point);
+    _pointsController
+        .add([..._pointsController.value, point]); //132: adding new points List
+    _updateDistances();
+    logger.log("Added points: ${_pointsController.value}");
+    return _pointsController.value.length - 1;
+  }
+
+  void updatePoint(Offset point, int index) {
+    if (!_enableMeasure) return;
+
+    List<Offset> points = [..._pointsController.value, point]
+      ..replaceRange(index, index + 1, {point});
+    _pointsController.add(points);
+    _updateDistances();
+    logger.log("updated point $index: $points");
+  }
+
+  int getClosestPointIndex(Offset reference) {
+    if (!_enableMeasure) return -1;
+
+    int index = 0;
+
+    List<CompareHolder> sortedPoints = _pointsController.value
+        .map((Offset point) =>
+            CompareHolder(index++, (reference - point).distance))
+        .toList();
+
+    sortedPoints.sort(
+        (CompareHolder a, CompareHolder b) => a.distance.compareTo(b.distance));
+
+    return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
+  }
+
+  double sumAllDistances(List<double> distances) {
+    double overallDistance = 0;
+    distances.forEach((singleDistance) => overallDistance += singleDistance);
+    return overallDistance;
+  }
+
   void _updateDistances() {
-    if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
+    if (_transformationFactor != null &&
+        _transformationFactor != 0.0 &&
+        _pointsController.value.length >= 2) {
       List<double> distances = List();
 
-      _points.doInBetween((start, end) => distances.add((start - end).distance * _transformationFactor));
+      _pointsController.value.doInBetween((start, end) =>
+          distances.add((start - end).distance * _transformationFactor));
 
       _distanceController.add(distances);
     }
@@ -182,15 +210,19 @@ class MeasurementBloc extends BlocBase {
 
   void _updateTransformationFactor() {
     if (_scale != null && _zoomLevel != null && _viewWidth != null) {
-      _transformationFactor = _documentSize.width / (_scale * _viewWidth * _zoomLevel);
+      _transformationFactor =
+          _documentSize.width / (_scale * _viewWidth * _zoomLevel);
     }
   }
 
   void _updatePointsToOrientation() {
-    if (!_didUpdateOrientation && _lastOrientation != null && _lastViewWidth != null) {
+    if (!_didUpdateOrientation &&
+        _lastOrientation != null &&
+        _lastViewWidth != null) {
       double scale = _viewWidth / _lastViewWidth;
 
-      List<Offset> scaledPoints = _points.map((Offset point) => point * scale).toList();
+      List<Offset> scaledPoints =
+          _pointsController.value.map((Offset point) => point * scale).toList();
 
       _pointsController.add(scaledPoints);
 

@@ -5,6 +5,15 @@ import 'package:measurements/overlay/measure_area.dart';
 import 'package:measurements/util/logger.dart';
 
 class MeasurementView extends StatefulWidget {
+  final Widget child;
+  final Size documentSize;
+  final double scale;
+  final double zoom; //132: variables need to be above constructor
+  final bool measure;
+  final bool showDistanceOnLine;
+  final Color measurePaintColor;
+  final Function(List<double>, double) distanceCallback;
+
   const MeasurementView({
     Key key,
     @required this.child,
@@ -16,15 +25,6 @@ class MeasurementView extends StatefulWidget {
     this.distanceCallback,
     this.measurePaintColor,
   });
-
-  final Widget child;
-  final Size documentSize;
-  final double scale;
-  final double zoom;
-  final bool measure;
-  final bool showDistanceOnLine;
-  final Color measurePaintColor;
-  final Function(List<double>) distanceCallback;
 
   @override
   _MeasurementViewState createState() => _MeasurementViewState();
@@ -51,34 +51,33 @@ class _MeasurementViewState extends State<MeasurementView> {
     super.didUpdateWidget(oldWidget);
   }
 
+// 132: this should be set with a function
   void _setWidgetArgumentsToBloc() {
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-    _bloc
+    WidgetsBinding.instance.addPostFrameCallback((_) => _bloc
       ..zoomLevel = widget.zoom
       ..scale = widget.scale
       ..showDistance = widget.showDistanceOnLine
-      ..measuring = widget.measure
-    );
+      ..measuring = widget.measure);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
         bloc: _bloc,
-        child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-          _bloc.orientation = orientation;
+        child: OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            _bloc.orientation =
+                orientation; //132: illegal. setting only by functions
 
-          return _overlay();
-        },)
-    );
+            return _overlay();
+          },
+        ));
   }
 
   Widget _overlay() {
     if (widget.measure) {
       return MeasureArea(
-          paintColor: widget.measurePaintColor,
-          child: widget.child
-      );
+          paintColor: widget.measurePaintColor, child: widget.child);
     } else {
       return widget.child;
     }

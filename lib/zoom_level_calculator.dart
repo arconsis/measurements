@@ -6,4 +6,4 @@ Future<double> getZoomLevel(double viewWidthInLogicalPixels, double documentWidt
   double screenWidth = viewWidthInLogicalPixels / dpm;
 
   return documentWidthInMM / (screenWidth * scaleOfDisplayedObject);
-}
+}// 132: this is nowhere used

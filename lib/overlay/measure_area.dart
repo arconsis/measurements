@@ -73,24 +73,31 @@ class _MeasureState extends State<MeasureArea> {
             return StreamBuilder(
                 initialData: _bloc.showDistance,
                 stream: _bloc.showDistanceStream,
-                builder: (BuildContext context, AsyncSnapshot<bool> showDistance) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<bool> showDistance) {
                   return StreamBuilder(
                       initialData: _bloc.distances,
                       stream: _bloc.distancesStream,
-                      builder: (BuildContext context, AsyncSnapshot<List<double>> distanceSnapshot) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<double>> distanceSnapshot) {
                         return StreamBuilder(
-                            initialData: _bloc.points,
+                            initialData: [Offset(0, 0)],
                             stream: _bloc.pointsStream,
-                            builder: (BuildContext context, AsyncSnapshot<List<Offset>> points) {
-                              return _buildOverlays(points, showDistance, distanceSnapshot);
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<Offset>> points) {
+                              return _buildOverlays(
+                                  points, showDistance, distanceSnapshot);
                             });
                       });
                 });
-          },)
-    );
+          },
+        ));
   }
 
-  Widget _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) {
+  Widget _buildOverlays(
+      AsyncSnapshot<List<Offset>> points,
+      AsyncSnapshot<bool> showDistance,
+      AsyncSnapshot<List<double>> distanceSnapshot) {
     List<Widget> painters = List();
 
     if (points.hasData && points.data.length >= 2) {
@@ -98,14 +105,15 @@ class _MeasureState extends State<MeasureArea> {
       points.data.doInBetween((start, end) => holders.add(Holder(start, end)));
 
       if (_canDrawDistances(showDistance, distanceSnapshot)) {
-        holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
+        holders.zip(distanceSnapshot.data,
+            (Holder holder, double distance) => holder.distance = distance);
 
         painters = holders
-            .map((Holder holder) =>
-        [
-          _pointPainter(holder.first, holder.second),
-          _distancePainter(holder.first, holder.second, holder.distance, width, height)
-        ])
+            .map((Holder holder) => [
+                  _pointPainter(holder.first, holder.second),
+                  _distancePainter(holder.first, holder.second, holder.distance,
+                      width, height)
+                ])
             .expand((pair) => pair)
             .toList();
 
@@ -137,13 +145,21 @@ class _MeasureState extends State<MeasureArea> {
     children.add(widget.child);
     children.addAll(painters);
 
-    return Stack(children: children,);
+    return Stack(
+      children: children,
+    );
   }
 
-  bool _canDrawDistances(AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) =>
-      showDistance.hasData && showDistance.data && distanceSnapshot.hasData && width != null && height != null;
+  bool _canDrawDistances(AsyncSnapshot<bool> showDistance,
+          AsyncSnapshot<List<double>> distanceSnapshot) =>
+      showDistance.hasData &&
+      showDistance.data &&
+      distanceSnapshot.hasData &&
+      width != null &&
+      height != null;
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double width, double height) {
+  CustomPaint _distancePainter(
+      Offset first, Offset last, double distance, double width, double height) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
           start: first,
@@ -151,18 +167,14 @@ class _MeasureState extends State<MeasureArea> {
           distance: distance,
           width: width,
           height: height,
-          drawColor: widget.paintColor
-      ),
+          drawColor: widget.paintColor),
     );
   }
 
   CustomPaint _pointPainter(Offset first, Offset last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
-          start: first,
-          end: last,
-          paintColor: widget.paintColor
-      ),
+          start: first, end: last, paintColor: widget.paintColor),
     );
   }
 }

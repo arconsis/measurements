@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 
 class PointerHandler {
+  //132: this could be a repository or inside bloc
   MeasurementBloc _bloc;
 
   PointerHandler(this._bloc);
@@ -13,7 +14,8 @@ class PointerHandler {
 
     int closestIndex = _bloc.getClosestPointIndex(eventPoint);
     if (closestIndex >= 0) {
-      Offset closestPoint = _bloc.getPoint(closestIndex);
+      Offset closestPoint = _bloc
+          .getPoint(closestIndex); // 132: blocs only expose data by streams
 
       if ((closestPoint - eventPoint).distance > 40.0) {
         _addNewPoint(eventPoint);

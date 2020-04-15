@@ -15,15 +15,15 @@ class _MyAppState extends State<MyApp> {
   bool measure = false;
   bool showDistanceOnLine = false;
 
-  Function(List<double>) distanceCallback;
+  Function(List<double>, double) distanceCallback;
 
   @override
   void initState() {
     super.initState();
 
-    distanceCallback = (List<double> distance) {
+    distanceCallback = (List<double> singleDistances, double overallDistance) {
       setState(() {
-        this.title = "Measurement#: ${distance.length}";
+        this.title = "Measured Distance: ${overallDistance.round()}";
       });
     };
   }
@@ -43,36 +43,40 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Row(
             children: <Widget>[
-              IconButton(onPressed: () {
-                setState(() {
-                  measure = !measure;
-                  title = originalTitle;
-                });
-              },
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))
-              ),
-              IconButton(onPressed: () {
-                setState(() {
-                  showDistanceOnLine = !showDistanceOnLine;
-                });
-              },
-                  icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
-              ),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      measure = !measure;
+                      title = originalTitle;
+                    });
+                  },
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      showDistanceOnLine = !showDistanceOnLine;
+                    });
+                  },
+                  icon: Icon(Icons.vertical_align_bottom,
+                      color: getButtonColor(showDistanceOnLine))),
               Text(title),
             ],
           ),
         ),
         body: Center(
           child: MeasurementView(
-            child: Image.asset("assets/images/example_portrait.png", package: "measurements",),
+            child: Image.asset(
+              //132: how can I zoom?
+              "assets/images/example_portrait.png",
+              package: "measurements",
+            ),
             scale: 1 / 2.0,
             distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,
             measure: measure,
           ),
         ),
-      )
-      ,
+      ),
     );
   }
 }
