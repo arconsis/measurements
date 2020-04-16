@@ -79,10 +79,15 @@ class _MeasureState extends State<MeasureArea> {
                 builder:
                     (BuildContext context, AsyncSnapshot<bool> showDistance) {
                   return StreamBuilder(
-                      initialData: List<double>.of([]),
+                      //  initialData: List<double>.of([]),
                       stream: _bloc.distancesStream,
                       builder: (BuildContext context,
                           AsyncSnapshot<List<double>> distanceSnapshot) {
+                        if (distanceSnapshot.hasData) {
+                          return Text('jjj');
+                        } else {
+                          SizedBox.shrink();
+                        }
                         return StreamBuilder(
                             //132: we do not need initial value here
                             stream: _bloc.pointsStream,
