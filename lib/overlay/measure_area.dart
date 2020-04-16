@@ -8,6 +8,7 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
 
+import 'holder.dart';
 import 'painters/distance_painter.dart';
 import 'painters/magnifying_painter.dart';
 import 'painters/measure_painter.dart';
@@ -150,19 +151,15 @@ class _MeasureState extends State<MeasureArea> {
       if (_canDrawDistances(showDistance, distanceSnapshot)) {
         holders.zip(distanceSnapshot.data, (Holder holder, double distance) => holder.distance = distance);
 
-        painters = holders
-            .map((Holder holder) =>
-        [
-          _pointPainter(holder.first, holder.second),
-          _distancePainter(holder.first, holder.second, holder.distance)
-        ])
-            .expand((pair) => pair)
-            .toList();
+        holders.forEach((Holder holder) {
+          painters.add(_pointPainter(holder.start, holder.end));
+          if (holder.distance != null) painters.add(_distancePainter(holder.start, holder.end, holder.distance));
+        });
 
         logger.log("drawing with distance: $holders");
       } else {
         painters = holders
-            .map((Holder holder) => _pointPainter(holder.first, holder.second))
+            .map((Holder holder) => _pointPainter(holder.start, holder.end))
             .toList();
 
         logger.log("drawing multiple points ${points.data}");
@@ -222,17 +219,5 @@ class _MeasureState extends State<MeasureArea> {
           imageScaleFactor: image.data.width / viewSize.width
       ),
     );
-  }
-}
-
-class Holder {
-  Offset first, second;
-  double distance;
-
-  Holder(this.first, this.second);
-
-  @override
-  String toString() {
-    return "First Point: $first - Second Point: $second - Distance: $distance";
   }
 }

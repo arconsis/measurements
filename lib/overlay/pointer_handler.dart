@@ -27,6 +27,8 @@ class PointerHandler {
     } else {
       _addNewPoint(eventPoint);
     }
+
+    _bloc.movementStarted(_currentIndex);
   }
 
   void _addNewPoint(Offset eventPoint) {
@@ -46,5 +48,6 @@ class PointerHandler {
   void registerUpEvent(PointerUpEvent event) {
     _updatePoint(event.localPosition);
     _currentIndex = -1;
+    _bloc.movementFinished();
   }
 }

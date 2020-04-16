@@ -8,14 +8,8 @@ import 'package:measurements/bloc/measurement_bloc.dart';
 void main() {
   const zoomLevel = 1.0;
   const scale = 1.0;
-  const viewWidth = 400.0;
-  const dpm = 20.0;
 
-  const expectedZoomFactor = 10.0;
-
-  const MethodChannel channel = MethodChannel('measurements');
-
-  StreamController<List<double>> outputStreamController = StreamController();
+  Function(List<double>) distanceCallback;
   List<double> actualDistances = List();
 
   MeasurementBloc classUnderTest;
@@ -23,24 +17,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == "getPhysicalPixelsPerMM") {
-        return dpm;
-      } else {
-        return -1;
-      }
-    });
-
-    outputStreamController.stream.listen((List<double> distances) {
+    distanceCallback = (List<double> distances) {
       actualDistances = distances;
       print("Updated points $distances");
-    });
+    };
   });
 
   setUp(() {
-    classUnderTest = MeasurementBloc(Size(200, 300), outputStreamController.sink);
+    classUnderTest = MeasurementBloc(Size(200, 300), distanceCallback);
 
-    classUnderTest.viewWidth = viewWidth;
     classUnderTest.scale = scale;
     classUnderTest.zoomLevel = zoomLevel;
     classUnderTest.measuring = true;
@@ -48,18 +33,6 @@ void main() {
 
   tearDown(() {
     classUnderTest.dispose();
-  });
-
-  tearDownAll(() {
-    outputStreamController.close();
-
-    channel.setMockMethodCallHandler(null);
-  });
-
-  test("setZoomToOriginalSize", () async {
-    double zoomFactor = await classUnderTest.getZoomFactorForOriginalSize();
-
-    expect(zoomFactor, expectedZoomFactor);
   });
 
   test("getDistanceFromHorizontalPoints", () async {

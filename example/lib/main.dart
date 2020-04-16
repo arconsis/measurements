@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
@@ -14,21 +12,20 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = false;
-  bool showDistanceOnLine = false;
+  bool measure = true;
+  bool showDistanceOnLine = true;
 
-  StreamController<List<double>> distanceStream;
+  Function(List<double>) distanceCallback;
 
   @override
   void initState() {
     super.initState();
 
-    distanceStream = StreamController<List<double>>();
-    distanceStream.stream.listen((List<double> distance) {
+    distanceCallback = (List<double> distance) {
       setState(() {
         this.title = "Measurement#: ${distance.length}";
       });
-    });
+    };
   }
 
   Color getButtonColor(bool selected) {
@@ -69,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           child: MeasurementView(
             child: Image.asset("assets/images/example_portrait.png",),
             scale: 1 / 2.0,
-            outputSink: distanceStream.sink,
+            distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,
             measure: measure,
           ),
@@ -77,11 +74,5 @@ class _MyAppState extends State<MyApp> {
       )
       ,
     );
-  }
-
-  @override
-  void dispose() {
-    distanceStream.close();
-    super.dispose();
   }
 }
