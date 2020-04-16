@@ -21,6 +21,3 @@ flutter:
   plugin:
     androidPackage: com.arconsis.measurements
     pluginClass: MeasurementsPlugin
-  assets:
-    - assets/images/example_portrait.png
-    - assets/images/example_landscape.png

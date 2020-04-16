@@ -8,10 +8,10 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
 
-import 'Holder.dart';
-import 'distance_painter.dart';
-import 'magnifying_painter.dart';
-import 'measure_painter.dart';
+import 'holder.dart';
+import 'painters/distance_painter.dart';
+import 'painters/magnifying_painter.dart';
+import 'painters/measure_painter.dart';
 
 class MeasureArea extends StatefulWidget {
   MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
