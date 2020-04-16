@@ -16,7 +16,7 @@ class Logger {
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.MAGNIFYING_PAINTER,
-    LogDistricts.BLOC
+//    LogDistricts.BLOC
   ];
 
   final LogDistricts district;

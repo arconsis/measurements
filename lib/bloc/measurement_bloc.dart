@@ -36,6 +36,7 @@ class MeasurementBloc extends BlocBase {
   double _viewWidth;
   double _lastViewWidth;
 
+  bool _editing = false;
   double _transformationFactor;
   double _originalSizeZoomLevel;
 
@@ -73,6 +74,8 @@ class MeasurementBloc extends BlocBase {
   }
 
   void movementStarted(int index) {
+    _editing = true;
+
     _distances.setRange(max(0, index - 1), min(_distances.length, index + 1), [null, null]);
     _distanceController.add(_distances);
 
@@ -80,6 +83,8 @@ class MeasurementBloc extends BlocBase {
   }
 
   void movementFinished() {
+    _editing = false;
+
     if (_transformationFactor != null && _transformationFactor != 0.0 && _points.length >= 2) {
       List<double> distances = List();
 
@@ -185,7 +190,9 @@ class MeasurementBloc extends BlocBase {
       _distances = distances;
       logger.log("distances: $_distances");
 
-      _outputSink?.add(distances);
+      if (!_editing) {
+        _outputSink?.add(distances);
+      }
     });
 
     showDistanceStream.listen((bool show) {
