@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
 import 'package:measurements/overlay/measure_area.dart';
@@ -33,6 +34,7 @@ class MeasurementView extends StatefulWidget {
 class _MeasurementViewState extends State<MeasurementView> {
   Logger logger = Logger(LogDistricts.MEASUREMENT);
   MeasurementBloc _bloc;
+  GlobalKey childKey = GlobalKey();
 
   @override
   void didChangeDependencies() {
@@ -48,6 +50,7 @@ class _MeasurementViewState extends State<MeasurementView> {
     logger.log("didUpdateWidget");
 
     _setWidgetArgumentsToBloc();
+    _setBackgroundImageToBloc();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -59,6 +62,15 @@ class _MeasurementViewState extends State<MeasurementView> {
       ..showDistance = widget.showDistanceOnLine
       ..measuring = widget.measure
     );
+  }
+
+  void _setBackgroundImageToBloc() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.measure) {
+        RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
+        _bloc.backgroundImage = await boundary.toImage(pixelRatio: 4.0);
+      }
+    });
   }
 
   @override
@@ -76,8 +88,10 @@ class _MeasurementViewState extends State<MeasurementView> {
   Widget _overlay() {
     if (widget.measure) {
       return MeasureArea(
-          paintColor: widget.measurePaintColor,
-          child: widget.child
+        paintColor: widget.measurePaintColor,
+        child: RepaintBoundary(
+          key: childKey,
+          child: widget.child,),
       );
     } else {
       return widget.child;

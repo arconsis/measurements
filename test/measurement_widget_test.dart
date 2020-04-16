@@ -18,11 +18,13 @@ final imageWidget = Image.asset(
 );
 
 Future<void> createApp(WidgetTester tester, MeasurementView measurementView, {Matcher measurementMatcher = findsOneWidget, bool checkSizeOfMeasureArea = true}) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
-      body: measurementView,
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: measurementView,
+      ),
     ),
-  ));
+  );
 
   final imageFinder = find.byWidget(imageWidget);
   final measureFinder = find.byType(typeOf<MeasureArea>());

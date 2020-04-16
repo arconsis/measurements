@@ -16,6 +16,7 @@ class MeasurePainter extends material.CustomPainter {
     }
 
     _drawPaint.color = paintColor;
+    _drawPaint.strokeWidth = 5.0;
 
     logger.log("drawing from $start to $end");
   }
@@ -25,7 +26,6 @@ class MeasurePainter extends material.CustomPainter {
     canvas.drawCircle(start, 10, _drawPaint);
     canvas.drawCircle(end, 10, _drawPaint);
 
-    _drawPaint.strokeWidth = 5.0;
     canvas.drawLine(start, end, _drawPaint);
   }
 

@@ -14,8 +14,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = false;
-  bool showDistanceOnLine = false;
+  bool measure = true;
+  bool showDistanceOnLine = true;
 
   StreamController<List<double>> distanceStream;
 
