@@ -10,11 +10,11 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** MeasurementsPlugin */
 class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
+	private val mmPerInch = 25.4
+
 	override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 		val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "measurements")
 		channel.setMethodCallHandler(MeasurementsPlugin())
-
-		flutterPluginBinding.platformViewRegistry.registerViewFactory("measurement_view", MeasurementViewFactory(flutterPluginBinding.binaryMessenger))
 	}
 
 	// This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -31,8 +31,6 @@ class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 		fun registerWith(registrar: Registrar) {
 			val channel = MethodChannel(registrar.messenger(), "measurements")
 			channel.setMethodCallHandler(MeasurementsPlugin())
-
-			registrar.platformViewRegistry().registerViewFactory("measurement_view", MeasurementViewFactory(registrar.messenger()))
 		}
 	}
 
@@ -40,17 +38,8 @@ class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	}
 
 	override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-		if (call.method == "getPhysicalScreenSize") {
-			val metrics = Resources.getSystem().displayMetrics
-
-			val screenWidth = metrics.widthPixels / metrics.xdpi
-			val screenHeight = metrics.heightPixels / metrics.ydpi
-
-			val screenSize = HashMap<String, Double>(2)
-			screenSize["width"] = screenWidth.toDouble()
-			screenSize["height"] = screenHeight.toDouble()
-
-			result.success(screenSize)
+		if (call.method == "getPhysicalPixelsPerMM") {
+			result.success(Resources.getSystem().displayMetrics.xdpi / mmPerInch)
 		} else {
 			result.notImplemented()
 		}

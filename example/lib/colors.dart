@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-const unselectedColor = Color.fromARGB(255, 156, 39, 176);
-const selectedColor = Color.fromARGB(255, 244, 67, 54);
+const unselectedColor = Color(0x55AADD22);
+const selectedColor = Color(0xFFAADD22);
