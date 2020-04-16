@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         body: Center(
-          child: MeasurementView(
+          child: Measurement(
             child: Image.asset("assets/images/example_portrait.png",),
             scale: 1 / 2.0,
             distanceCallback: distanceCallback,

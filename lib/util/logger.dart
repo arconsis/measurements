@@ -6,6 +6,8 @@ enum LogDistricts {
   MEASURE_PAINTER,
   MAGNIFYING_PAINTER,
   POINTER_HANDLER,
+  METADATA_REPOSITORY,
+  MEASUREMENT_REPOSITORY,
 }
 
 class Logger {
@@ -16,7 +18,9 @@ class Logger {
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.MAGNIFYING_PAINTER,
-//    LogDistricts.BLOC
+//    LogDistricts.BLOC,
+    LogDistricts.METADATA_REPOSITORY,
+    LogDistricts.MEASUREMENT_REPOSITORY,
   ];
 
   final LogDistricts district;

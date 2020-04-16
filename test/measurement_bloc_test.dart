@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measurements/bloc/measurement_bloc.dart';
+import 'package:measurements/bloc/measurement/measurement_bloc.dart';
 
 void main() {
   const zoomLevel = 1.0;
@@ -12,7 +12,7 @@ void main() {
   Function(List<double>) distanceCallback;
   List<double> actualDistances = List();
 
-  MeasurementBloc classUnderTest;
+  MeasurementBlocOld classUnderTest;
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -24,7 +24,7 @@ void main() {
   });
 
   setUp(() {
-    classUnderTest = MeasurementBloc(Size(200, 300), distanceCallback);
+    classUnderTest = MeasurementBlocOld(Size(200, 300), distanceCallback);
 
     classUnderTest.scale = scale;
     classUnderTest.zoomLevel = zoomLevel;

@@ -1,9 +1,8 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:measurements/bloc/bloc_provider.dart';
-import 'package:measurements/bloc/measurement_bloc.dart';
-import 'package:measurements/overlay/pointer_handler.dart';
+import 'package:measurements/measurement/bloc/measurement_bloc.dart';
+import 'package:measurements/measurement/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/size.dart';
 import 'package:measurements/util/utils.dart';
@@ -13,8 +12,21 @@ import 'painters/distance_painter.dart';
 import 'painters/magnifying_painter.dart';
 import 'painters/measure_painter.dart';
 
-class MeasureArea extends StatefulWidget {
-  MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
+class MeasureArea extends StatelessWidget {
+  final Color paintColor;
+  final Widget child;
+
+  MeasureArea({this.paintColor, @required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return null;
+  }
+}
+
+class MeasureAreaOld extends StatefulWidget {
+  MeasureAreaOld({Key key, this.paintColor, this.child}) : super(key: key);
 
   final Color paintColor;
   final Widget child;
@@ -23,7 +35,7 @@ class MeasureArea extends StatefulWidget {
   State<StatefulWidget> createState() => _MeasureState();
 }
 
-class _MeasureState extends State<MeasureArea> {
+class _MeasureState extends State<MeasureAreaOld> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
   Offset viewCenter, fingerPosition;
@@ -35,15 +47,14 @@ class _MeasureState extends State<MeasureArea> {
 
   @override
   void didChangeDependencies() {
-    _bloc = BlocProvider.of(context);
-    handler = PointerHandler(_bloc);
+//    handler = PointerHandler(_bloc);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateSize());
 
     super.didChangeDependencies();
   }
 
   @override
-  void didUpdateWidget(MeasureArea oldWidget) {
+  void didUpdateWidget(MeasureAreaOld oldWidget) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateSize());
     super.didUpdateWidget(oldWidget);
   }
@@ -56,7 +67,7 @@ class _MeasureState extends State<MeasureArea> {
       viewCenter = Offset(viewSize.width / 2, viewSize.height / 2);
     });
 
-    _bloc.viewWidth = viewSize.width;
+//    _bloc.viewWidth = viewSize.width;
   }
 
   @override
@@ -92,14 +103,14 @@ class _MeasureState extends State<MeasureArea> {
 
         child: Stack(
           children: <Widget>[
-            _backgroundAndMeasurements(),
-            if (showMagnifyingGlass) _magnifyingGlass()
+//            _backgroundAndMeasurements(),
+//            if (showMagnifyingGlass) _magnifyingGlass()
           ],
         )
     );
   }
 
-  StreamBuilder<ui.Image> _magnifyingGlass() {
+  /*StreamBuilder<ui.Image> _magnifyingGlass() {
     return StreamBuilder(
       initialData: _bloc.backgroundImage,
       stream: _bloc.backgroundStream,
@@ -139,7 +150,7 @@ class _MeasureState extends State<MeasureArea> {
                     });
               });
         });
-  }
+  }*/
 
   List<Widget> _buildOverlays(AsyncSnapshot<List<Offset>> points, AsyncSnapshot<bool> showDistance, AsyncSnapshot<List<double>> distanceSnapshot) {
     List<Widget> painters = List();

@@ -8,14 +8,19 @@ environment:
   sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
+  equatable: 1.1.1
   flutter:
     sdk: flutter
-  path_provider: 1.6.5
+  flutter_bloc: 3.2.0
+  get_it: 4.0.1
   image: 2.1.4
+  path_provider: 1.6.5
+  rxdart: 0.23.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
 flutter:
   plugin:

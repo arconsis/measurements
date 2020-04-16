@@ -3,11 +3,50 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:measurements/bloc/bloc_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
-class MeasurementBloc extends BlocBase {
+import '../measurement_event.dart';
+import '../measurement_state.dart';
+
+class MeasurementBloc extends Bloc<MeasurementEvent, MeasurementState> {
+  MeasurementRepository _measureRepository;
+  MetadataRepository _metadataRepository;
+
+  MeasurementBloc() {
+    GetIt.I.isReady<MeasurementRepository>().then((_) => _measureRepository = GetIt.I<MeasurementRepository>());
+    GetIt.I.isReady<MetadataRepository>().then((_) => _metadataRepository = GetIt.I<MetadataRepository>());
+  }
+
+  @override
+  MeasurementState get initialState => MeasurementEmptyState();
+
+  @override
+  Stream<MeasurementState> mapEventToState(MeasurementEvent event) async* {
+    if (event is MeasurementUpdatedEvent) {
+      if (event.showDistances) {
+        yield MeasurementOnlyPointsState(event.points);
+      } else {
+        yield MeasurementPointsWithDistancesState(event.points, event.distances);
+      }
+    } else if (event is MeasurementUserEvent) {
+      if (event is MeasurementDownEvent) {
+        _measureRepository.registerDownEvent(event.position);
+      } else if (event is MeasurementMoveEvent) {
+        _measureRepository.registerMoveEvent(event.position);
+      } else if (event is MeasurementUpEvent) {
+        _measureRepository.registerUpEvent(event.position);
+      }
+      yield MeasurementEditingState(await _metadataRepository.currentBackgroundImage.last, event.position);
+    }
+  }
+}
+
+class MeasurementBlocOld {
   final Logger logger = Logger(LogDistricts.BLOC);
 
   final _pointsController = StreamController<List<Offset>>.broadcast();
@@ -160,7 +199,7 @@ class MeasurementBloc extends BlocBase {
 
   set backgroundImage(ui.Image image) => _currentBackgroundImage != image ? _backgroundImageController.add(image) : null;
 
-  MeasurementBloc(this._documentSize, this._distanceCallback) {
+  MeasurementBlocOld(this._documentSize, this._distanceCallback) {
     logger.log("Creating Bloc");
 
     pointsStream.listen((List<Offset> points) {

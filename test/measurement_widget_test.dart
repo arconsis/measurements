@@ -27,7 +27,7 @@ Future<void> createApp(WidgetTester tester, MeasurementView measurementView, {Ma
   );
 
   final imageFinder = find.byWidget(imageWidget);
-  final measureFinder = find.byType(typeOf<MeasureArea>());
+  final measureFinder = find.byType(typeOf<MeasureAreaOld>());
 
   expect(imageFinder, findsOneWidget);
   expect(measureFinder, measurementMatcher);
