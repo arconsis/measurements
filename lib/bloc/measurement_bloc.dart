@@ -3,15 +3,12 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
 class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
-
-  final MethodChannel _deviceInfoChannel = MethodChannel("measurements");
 
   final _pointsController = StreamController<List<Offset>>.broadcast();
   final _distanceController = StreamController<List<double>>.broadcast();
@@ -20,7 +17,7 @@ class MeasurementBloc extends BlocBase {
   final _backgroundImageController = StreamController<ui.Image>.broadcast();
 
   Size _documentSize;
-  Sink<List<double>> _outputSink;
+  Function(List<double>) _distanceCallback;
   double _scale;
   double _zoomLevel = 1.0;
   bool _showDistance;
@@ -38,7 +35,6 @@ class MeasurementBloc extends BlocBase {
 
   bool _editing = false;
   double _transformationFactor;
-  double _originalSizeZoomLevel;
 
   int addPoint(Offset point) {
     if (!_enableMeasure) return -1;
@@ -94,18 +90,6 @@ class MeasurementBloc extends BlocBase {
     }
   }
 
-  Future<double> getZoomFactorForOriginalSize() async {
-    if (_originalSizeZoomLevel == null) {
-      double dpm = await _deviceInfoChannel.invokeMethod("getPhysicalPixelsPerMM");
-
-      double screenWidth = _viewWidth / dpm;
-
-      _originalSizeZoomLevel = _documentSize.width / (screenWidth * _scale);
-    }
-
-    return _originalSizeZoomLevel;
-  }
-
   Offset getPoint(int index) => _points[index];
 
   Stream<List<Offset>> get pointsStream => _pointsController.stream;
@@ -117,7 +101,6 @@ class MeasurementBloc extends BlocBase {
   Stream<ui.Image> get backgroundStream => _backgroundImageController.stream;
 
   List<Offset> get points => _points;
-
 
   List<double> get distances => _distances;
 
@@ -166,7 +149,6 @@ class MeasurementBloc extends BlocBase {
     _updateTransformationFactor();
   }
 
-
   set measuring(bool measure) {
     if (_enableMeasure != measure) {
       _enableMeasure = measure;
@@ -178,7 +160,7 @@ class MeasurementBloc extends BlocBase {
 
   set backgroundImage(ui.Image image) => _currentBackgroundImage != image ? _backgroundImageController.add(image) : null;
 
-  MeasurementBloc(this._documentSize, this._outputSink) {
+  MeasurementBloc(this._documentSize, this._distanceCallback) {
     logger.log("Creating Bloc");
 
     pointsStream.listen((List<Offset> points) {
@@ -188,11 +170,9 @@ class MeasurementBloc extends BlocBase {
 
     distancesStream.listen((List<double> distances) async {
       _distances = distances;
-      logger.log("distances: $_distances");
 
-      if (!_editing) {
-        _outputSink?.add(distances);
-      }
+      logger.log("distances: $_distances");
+      if (_distanceCallback != null && !_editing) _distanceCallback(distances);
     });
 
     showDistanceStream.listen((bool show) {
