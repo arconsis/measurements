@@ -10,7 +10,7 @@ class DistancePainter extends material.CustomPainter {
   final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
   final double distance;
-  final double width, height;
+  final Offset viewCenter;
 
   Offset _zeroPoint = Offset(-24, 0);
   final double _offsetPerDigit = 4.57;
@@ -22,8 +22,7 @@ class DistancePainter extends material.CustomPainter {
   DistancePainter({@material.required Offset start,
     @material.required Offset end,
     @material.required this.distance,
-    @material.required this.width,
-    @material.required this.height,
+    @material.required this.viewCenter,
     Color drawColor}) {
     if (drawColor == null) {
       drawColor = Colors.drawColor;
@@ -33,8 +32,6 @@ class DistancePainter extends material.CustomPainter {
       _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
     }
 
-    Offset center = Offset(width / 2.0, height / 2.0);
-
     Offset difference = end - start;
     _position = start + difference / 2.0;
     _radians = difference.direction;
@@ -43,7 +40,7 @@ class DistancePainter extends material.CustomPainter {
       _radians += pi;
     }
 
-    Offset positionToCenter = center - _position;
+    Offset positionToCenter = viewCenter - _position;
 
     Offset offset = difference.normal();
     offset *= offset

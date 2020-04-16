@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:measurements/bloc/measurement_bloc.dart';
+import 'package:measurements/util/logger.dart';
 
 class PointerHandler {
+  final Logger logger = Logger(LogDistricts.POINTER_HANDLER);
   MeasurementBloc _bloc;
 
   PointerHandler(this._bloc);
@@ -25,6 +27,8 @@ class PointerHandler {
     } else {
       _addNewPoint(eventPoint);
     }
+
+    _bloc.movementStarted(_currentIndex);
   }
 
   void _addNewPoint(Offset eventPoint) {
@@ -44,5 +48,6 @@ class PointerHandler {
   void registerUpEvent(PointerUpEvent event) {
     _updatePoint(event.localPosition);
     _currentIndex = -1;
+    _bloc.movementFinished();
   }
 }

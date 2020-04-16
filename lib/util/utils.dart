@@ -1,3 +1,5 @@
+import 'logger.dart';
+
 extension IterableExtension on Iterable {
   void doInBetween<T>(Function(T, T) function) {
     Iterator iterator = this.iterator;
@@ -27,4 +29,10 @@ extension IterableExtension on Iterable {
       function(thisCurrent, otherCurrent);
     }
   }
+}
+
+void measure(Logger logger, String text, Function() f) {
+  final start = DateTime.now();
+  f();
+  logger.log(text + DateTime.now().difference(start).toString());
 }
