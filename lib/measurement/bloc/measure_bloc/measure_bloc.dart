@@ -1,0 +1,44 @@
+import 'dart:ui';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
+import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
+import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/util/size.dart';
+
+class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
+  MeasurementRepository _measureRepository;
+  MetadataRepository _metadataRepository;
+
+  Image backgroundImage;
+  double imageScaleFactor;
+
+  MeasureBloc() {
+    _measureRepository = GetIt.I<MeasurementRepository>();
+
+    _metadataRepository = GetIt.I<MetadataRepository>();
+
+    _metadataRepository.backgroundImage.listen((image) => backgroundImage = image);
+    _metadataRepository.imageScaleFactor.listen((factor) => imageScaleFactor = factor);
+  }
+
+  @override
+  MeasureState get initialState => MeasureInactiveState();
+
+  @override
+  Stream<MeasureState> mapEventToState(MeasureEvent event) async* {
+    // TODO is there a nicer way to get the background image from the event? maybe transformEvents or onEvent
+    if (event is MeasureDownEvent) {
+      _measureRepository.registerDownEvent(event.position);
+      yield MeasureActiveState(event.position, backgroundImage, imageScaleFactor, magnificationRadius);
+    } else if (event is MeasureMoveEvent) {
+      _measureRepository.registerMoveEvent(event.position);
+      yield MeasureActiveState(event.position, backgroundImage, imageScaleFactor, magnificationRadius);
+    } else if (event is MeasureUpEvent) {
+      _measureRepository.registerUpEvent(event.position);
+      yield MeasureInactiveState();
+    }
+  }
+}

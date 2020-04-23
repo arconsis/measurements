@@ -40,7 +40,7 @@ void main() {
     Offset endPoint = Offset(110, 10);
     List<double> expectedDistances = [50];
 
-    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
+    classUnderTest.._addPoint(startPoint).._addPoint(endPoint);
 
     Timer(Duration(milliseconds: 500), () {
       expect(actualDistances, expectedDistances);
@@ -52,7 +52,7 @@ void main() {
     Offset endPoint = Offset(10, 110);
     List<double> expectedDistances = [50];
 
-    classUnderTest..addPoint(startPoint)..addPoint(endPoint);
+    classUnderTest.._addPoint(startPoint).._addPoint(endPoint);
 
     Timer(Duration(milliseconds: 500), () {
       expect(actualDistances, expectedDistances);

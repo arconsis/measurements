@@ -1,14 +1,17 @@
 import'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 
 import 'metadata_event.dart';
 import 'metadata_state.dart';
 
 class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
-  final MetadataRepository _repository;
+  MetadataRepository _repository;
   final _initialMeasure = false;
 
-  MetadataBloc(this._repository) {
+  MetadataBloc() {
+    _repository = GetIt.I<MetadataRepository>();
+
     _repository.measurement.listen((bool measure) {
       add(MetadataUpdatedEvent(measure));
     });
@@ -22,7 +25,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
     if (event is MetadataUpdatedEvent) {
       yield MetadataState(event.measure);
     } else if (event is MetadataStartedEvent) {
-      _repository.registerStartedEvent(
+      _repository.registerStartupValuesChange(
           event.measure,
           event.showDistances,
           event.callback,
@@ -31,9 +34,9 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
           event.documentSize
       );
     } else if (event is MetadataBackgroundEvent) {
-      _repository.registerBackgroundEvent(event.backgroundImage, event.width);
+      _repository.registerBackgroundChange(event.backgroundImage, event.size);
     } else if (event is MetadataOrientationEvent) {
-      _repository.registerOrientationEvent(event.orientation);
+      _repository.registerOrientationChange(event.orientation);
     }
   }
 }

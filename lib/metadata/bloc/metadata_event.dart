@@ -17,12 +17,12 @@ class MetadataOrientationEvent extends MetadataEvent {
 
 class MetadataBackgroundEvent extends MetadataEvent {
   final ui.Image backgroundImage;
-  final double width;
+  final Size size;
 
-  MetadataBackgroundEvent(this.backgroundImage, this.width);
+  MetadataBackgroundEvent(this.backgroundImage, this.size);
 
   @override
-  List<Object> get props => [backgroundImage, width];
+  List<Object> get props => [backgroundImage, size];
 }
 
 class MetadataStartedEvent extends MetadataEvent {

@@ -19,7 +19,7 @@ class MagnifyingPainter extends CustomPainter {
   RRect outerCircle, innerCircle;
   Rect imageTargetRect, imageSourceRect;
 
-  MagnifyingPainter({@required this.fingerPosition, @required Offset center, @required Size viewSize, @required this.radius, @required this.image, double imageScaleFactor}) {
+  MagnifyingPainter({@required this.fingerPosition, @required this.radius, @required this.image, double imageScaleFactor}) {
     drawPosition = fingerPosition + Offset(0, -(radius + fingerRadiusOffset));
 
     double diameter = 2 * radius;

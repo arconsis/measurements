@@ -14,9 +14,11 @@ class MetadataRepository {
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _showDistance = BehaviorSubject<bool>();
   final _enableMeasure = BehaviorSubject<bool>.seeded(false);
-  final _currentBackgroundImage = BehaviorSubject<Image>();
   final _orientation = BehaviorSubject<widget.Orientation>();
+  final _currentBackgroundImage = BehaviorSubject<Image>();
   final _viewWidth = BehaviorSubject<double>();
+  final _viewCenter = BehaviorSubject<Offset>();
+  final _imageScaleFactor = BehaviorSubject<double>();
   final _transformationFactor = BehaviorSubject<double>();
 
   MetadataRepository() {
@@ -25,23 +27,45 @@ class MetadataRepository {
 
   Stream<bool> get measurement => _enableMeasure.stream;
 
+  Stream<bool> get showDistances => _showDistance.stream;
 
-  void registerStartedEvent(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize) {
+  Stream<Function(List<double>)> get callback => _distanceCallback.stream;
+
+  Stream<double> get transformationFactor => _transformationFactor.stream;
+
+  Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
+
+  Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
+
+  Stream<Offset> get viewCenter => _viewCenter.stream;
+
+
+  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize) {
     _enableMeasure.add(measure);
     _showDistance.add(showDistance);
     _distanceCallback.add(callback);
     _scale.add(scale);
     _zoomLevel.add(zoom);
     _documentSize.add(documentSize);
+
+    _updateTransformationFactor();
   }
 
-  void registerBackgroundEvent(Image backgroundImage, double width) {
+  void registerBackgroundChange(Image backgroundImage, Size size) {
     _currentBackgroundImage.add(backgroundImage);
-    _viewWidth.add(width);
+    _viewWidth.add(size.width);
+    _viewCenter.add(Offset(size.width / 2, size.height / 2));
+    _imageScaleFactor.add(backgroundImage.width / size.width);
+
+    _updateTransformationFactor();
   }
 
-  void registerOrientationEvent(widget.Orientation orientation) {
+  void registerOrientationChange(widget.Orientation orientation) {
+    _logger.log("New orientation $orientation");
+
     _orientation.add(orientation);
+
+    // TODO add method and variables if needed (other repository has to do stuff here)
   }
 
   void dispose() {
@@ -51,9 +75,22 @@ class MetadataRepository {
     _zoomLevel.close();
     _showDistance.close();
     _enableMeasure.close();
-    _currentBackgroundImage.close();
     _orientation.close();
+    _currentBackgroundImage.close();
     _viewWidth.close();
+    _viewCenter.close();
+    _imageScaleFactor.close();
     _transformationFactor.close();
+  }
+
+  void _updateTransformationFactor() async {
+    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
+      double scale = await _scale.last;
+      double zoomLevel = await _zoomLevel.last;
+      double viewWidth = await _viewWidth.last;
+      double documentWidth = (await _documentSize.last).width;
+
+      _transformationFactor.add(documentWidth / (scale * viewWidth * zoomLevel));
+    }
   }
 }

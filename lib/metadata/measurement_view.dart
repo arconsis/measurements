@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/bloc/measurement_bloc.dart';
+import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
+import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 
@@ -33,14 +34,18 @@ class Measurement extends StatelessWidget {
     this.distanceCallback,
     this.measurePaintColor
   }) {
-    GetIt.I.registerSingleton(MetadataRepository());
-    GetIt.I.registerSingleton(MeasurementRepository());
+    if (GetIt.I<MetadataRepository>() == null) {
+      GetIt.I.registerSingleton(MetadataRepository());
+    }
+    if (GetIt.I<MetadataRepository>() == null) {
+      GetIt.I.registerSingleton(MeasurementRepository());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => MetadataBloc(GetIt.I.get<MetadataRepository>()),
+      create: (context) => MetadataBloc(),
       child: MeasurementView(
         child,
         documentSize,
@@ -113,7 +118,7 @@ class _MeasurementViewState extends State<MeasurementView> {
       if (widget.measure) {
         RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
 
-        BlocProvider.of(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size.width));
+        BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
       }
     });
   }
@@ -133,8 +138,11 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   Widget _overlay(MetadataState state) {
     if (state.measure) {
-      return BlocProvider(
-        create: (context) => MeasurementBloc(),
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => MeasureBloc(),),
+          BlocProvider(create: (context) => PointsBloc(),),
+        ],
         child: MeasureArea(
           paintColor: widget.measurePaintColor, // TODO can UI-only parameters be passed like this?
           child: RepaintBoundary(
