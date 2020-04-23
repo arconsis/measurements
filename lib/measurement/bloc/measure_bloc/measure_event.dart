@@ -9,6 +9,11 @@ abstract class MeasureEvent extends Equatable {
 
   @override
   List<Object> get props => [position];
+
+  @override
+  String toString() {
+    return super.toString() + " position: $position";
+  }
 }
 
 class MeasureDownEvent extends MeasureEvent {

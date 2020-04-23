@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/drawing_holder.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
@@ -12,8 +11,8 @@ import 'package:rxdart/rxdart.dart';
 class MeasurementRepository {
   final _logger = Logger(LogDistricts.MEASUREMENT_REPOSITORY);
 
-  final _points = BehaviorSubject<List<Offset>>();
-  final _distances = BehaviorSubject<List<double>>();
+  final _points = BehaviorSubject<List<Offset>>.seeded(List());
+  final _distances = BehaviorSubject<List<double>>.seeded(List());
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
 
   Function(List<double>) _callback;
@@ -21,10 +20,8 @@ class MeasurementRepository {
 
   int _currentIndex = -1;
 
-  MeasurementRepository() {
+  MeasurementRepository(MetadataRepository repository) {
     _logger.log("Created Repository");
-
-    MetadataRepository repository = GetIt.I<MetadataRepository>();
 
     repository.transformationFactor.listen((factor) => _transformationFactor = factor);
     repository.callback.listen((callback) => _callback = callback);
@@ -34,21 +31,21 @@ class MeasurementRepository {
 
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
-  void registerDownEvent(Offset position) async {
-    List<Offset> points = await _points.last;
+  void registerDownEvent(Offset position) {
+    List<Offset> points = _points.value;
     int closestIndex = _getClosestPointIndex(points, position);
 
     if (closestIndex >= 0) {
       Offset closestPoint = points[closestIndex];
 
       if ((closestPoint - position).distance > 40.0) {
-        _currentIndex = await _addNewPoint(points, position);
+        _currentIndex = _addNewPoint(points, position);
       } else {
         _currentIndex = closestIndex;
         _updatePoint(position, _currentIndex);
       }
     } else {
-      _currentIndex = await _addNewPoint(points, position);
+      _currentIndex = _addNewPoint(points, position);
     }
 
     _movementStarted(_currentIndex);
@@ -70,27 +67,27 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  void _registerNewPoints(List<Offset> points) async {
+  void _publishPoints(List<Offset> points) {
     _points.add(points);
-    _drawingHolder.add(DrawingHolder(points, await _distances.last));
+    _drawingHolder.add(DrawingHolder(points, _distances.value));
   }
 
-  Future<int> _addNewPoint(List<Offset> points, Offset point) async {
+  int _addNewPoint(List<Offset> points, Offset point) {
     points.add(point);
-    _registerNewPoints(points);
+    _publishPoints(points);
 
-    _logger.log("added point: $_points");
+    _logger.log("added point: $points");
     return points.length - 1;
   }
 
-  void _updatePoint(Offset point, int index) async {
+  void _updatePoint(Offset point, int index) {
     if (index >= 0) {
-      List<Offset> points = await _points.last;
+      List<Offset> points = _points.value;
 
       points.setRange(index, index + 1, [point]);
-      _registerNewPoints(points);
+      _publishPoints(points);
 
-      _logger.log("updated point $index: $_points");
+      _logger.log("updated point $index: $points");
     }
   }
 
@@ -106,26 +103,26 @@ class MeasurementRepository {
     return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
   }
 
-  void _movementStarted(int index) async {
-    List<double> distances = await _distances.last;
-
-    distances.setRange(max(0, index - 1), min(distances.length, index + 1), [null, null]);
+  void _publishDistances(List<double> distances) {
     _distances.add(distances);
-    _drawingHolder.add(DrawingHolder(await _points.last, distances));
+    _drawingHolder.add(DrawingHolder(_points.value, distances));
+  }
+
+  void _movementStarted(int index) {
+    List<double> distances = _distances.value;
+    distances.setRange(max(0, index - 1), min(distances.length, index + 1), [null, null]);
+    _publishDistances(distances);
 
     _logger.log("started moving point with index: $index");
   }
 
-  void _movementFinished() async {
-    List<Offset> points = await _points.last;
+  void _movementFinished() {
+    List<Offset> points = _points.value;
 
     if (_transformationFactor != null && _transformationFactor != 0.0 && points.length >= 2) {
       List<double> distances = List();
-
       points.doInBetween((start, end) => distances.add((start - end).distance * _transformationFactor));
-
-      _distances.add(distances);
-      _drawingHolder.add(DrawingHolder(points, distances));
+      _publishDistances(distances);
 
       if (_callback != null) {
         _callback(distances);

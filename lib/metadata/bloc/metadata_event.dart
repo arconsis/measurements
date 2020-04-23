@@ -13,6 +13,11 @@ class MetadataOrientationEvent extends MetadataEvent {
 
   @override
   List<Object> get props => [orientation];
+
+  @override
+  String toString() {
+    return super.toString() + " orientation: $orientation";
+  }
 }
 
 class MetadataBackgroundEvent extends MetadataEvent {
@@ -23,6 +28,12 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   List<Object> get props => [backgroundImage, size];
+
+
+  @override
+  String toString() {
+    return super.toString() + " size: $size -- backgroundImage: $backgroundImage";
+  }
 }
 
 class MetadataStartedEvent extends MetadataEvent {
@@ -38,6 +49,11 @@ class MetadataStartedEvent extends MetadataEvent {
 
   @override
   List<Object> get props => [documentSize, callback, scale, zoom, measure, showDistances, lineColor];
+
+  @override
+  String toString() {
+    return super.toString() + " documentSize: $documentSize -- scale: $scale -- zoom: $zoom -- measure: $measure -- showDistances: $showDistances";
+  }
 }
 
 class MetadataUpdatedEvent extends MetadataEvent {
@@ -47,4 +63,9 @@ class MetadataUpdatedEvent extends MetadataEvent {
 
   @override
   List<Object> get props => [measure];
+
+  @override
+  String toString() {
+    return super.toString() + " measure: $measure";
+  }
 }

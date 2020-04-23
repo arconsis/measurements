@@ -85,12 +85,12 @@ class MetadataRepository {
 
   void _updateTransformationFactor() async {
     if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
-      double scale = await _scale.last;
-      double zoomLevel = await _zoomLevel.last;
-      double viewWidth = await _viewWidth.last;
-      double documentWidth = (await _documentSize.last).width;
+      double scale = _scale.value;
+      double zoomLevel = _zoomLevel.value;
+      double viewWidth = _viewWidth.value;
+      double documentWidth = _documentSize.value.width;
 
-      _transformationFactor.add(documentWidth / (scale * viewWidth * zoomLevel));
+      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
     }
   }
 }

@@ -34,11 +34,11 @@ class Measurement extends StatelessWidget {
     this.distanceCallback,
     this.measurePaintColor
   }) {
-    if (GetIt.I<MetadataRepository>() == null) {
+    if (!GetIt.I.isRegistered<MetadataRepository>()) {
       GetIt.I.registerSingleton(MetadataRepository());
     }
-    if (GetIt.I<MetadataRepository>() == null) {
-      GetIt.I.registerSingleton(MeasurementRepository());
+    if (!GetIt.I.isRegistered<MeasurementRepository>()) {
+      GetIt.I.registerSingleton(MeasurementRepository(GetIt.I<MetadataRepository>()));
     }
   }
 
@@ -84,7 +84,7 @@ class MeasurementView extends StatefulWidget {
 }
 
 class _MeasurementViewState extends State<MeasurementView> {
-  Logger logger = Logger(LogDistricts.MEASUREMENT);
+  Logger logger = Logger(LogDistricts.MEASUREMENT_VIEW);
   GlobalKey childKey = GlobalKey();
 
   @override
@@ -108,49 +108,50 @@ class _MeasurementViewState extends State<MeasurementView> {
             widget.showDistanceOnLine,
             widget.measurePaintColor)
     );
-
     _setBackgroundImageToBloc();
+
     super.didUpdateWidget(oldWidget);
   }
 
-  void _setBackgroundImageToBloc() async {
+  void _setBackgroundImageToBloc() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (widget.measure) {
+      if (childKey.currentContext != null) {
+        // TODO is a heavy operation and is called after every movement of any point
         RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
 
-        BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
+        if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
+          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
+        }
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-      BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
-
-      return BlocBuilder<MetadataBloc, MetadataState>(
-          builder: (context, state) {
-            return _overlay(state);
-          }
-      );
-    });
+    return BlocBuilder<MetadataBloc, MetadataState>(
+        builder: (context, state) {
+          return _overlay(state);
+        }
+    );
   }
 
   Widget _overlay(MetadataState state) {
     if (state.measure) {
       return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => MeasureBloc(),),
-          BlocProvider(create: (context) => PointsBloc(),),
-        ],
-        child: MeasureArea(
-          paintColor: widget.measurePaintColor, // TODO can UI-only parameters be passed like this?
-          child: RepaintBoundary(
-            key: childKey,
-            child: widget.child,
-          ),
-        ),
-      );
+          providers: [
+            BlocProvider(create: (context) => MeasureBloc(),),
+            BlocProvider(create: (context) => PointsBloc(),),
+          ],
+          child: MeasureArea(
+            paintColor: widget.measurePaintColor, // TODO can UI-only parameters be passed like this?
+            child: RepaintBoundary(
+              key: childKey,
+              child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
+                BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
+                return widget.child;
+              }),
+            ),
+          ));
     } else {
       return widget.child;
     }

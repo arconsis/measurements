@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:measurements/util/logger.dart';
 
 class MeasurementBlocOld {
-  final Logger logger = Logger(LogDistricts.BLOC);
+//  final Logger logger = Logger(LogDistricts.BLOC);
 
   bool _didUpdateOrientation = true;
   Orientation _orientation;
@@ -16,7 +16,7 @@ class MeasurementBlocOld {
       _didUpdateOrientation = false;
 
       _orientation = orientation;
-      logger.log("oriantation: $orientation");
+//      logger.log("oriantation: $orientation");
 
       _updatePointsToOrientation();
     }
@@ -28,7 +28,7 @@ class MeasurementBlocOld {
       _didUpdateOrientation = false;
 
       _viewWidth = width;
-      logger.log("viewWidth: $_viewWidth");
+//      logger.log("viewWidth: $_viewWidth");
 
 //      _updateTransformationFactor();
       _updatePointsToOrientation();
@@ -47,7 +47,7 @@ class MeasurementBlocOld {
       _lastOrientation = null;
       _lastViewWidth = null;
 
-      logger.log("updated points to orientation");
+//      logger.log("updated points to orientation");
     }
   }
 }

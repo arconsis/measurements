@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/gestures.dart';
 
 abstract class PointsState extends Equatable {
 }
@@ -10,6 +11,20 @@ class PointsEmptyState extends PointsState {
   List<Object> get props => null;
 }
 
+class PointsSingleState extends PointsState {
+  final Offset point;
+
+  PointsSingleState(this.point);
+
+  @override
+  List<Object> get props => [point];
+
+  @override
+  String toString() {
+    return super.toString() + " point: $point";
+  }
+}
+
 class PointsOnlyState extends PointsState {
   final List<Offset> points;
 
@@ -17,6 +32,11 @@ class PointsOnlyState extends PointsState {
 
   @override
   List<Object> get props => [points];
+
+  @override
+  String toString() {
+    return super.toString() + " points: $points";
+  }
 }
 
 class PointsAndDistanceState extends PointsState {
@@ -28,4 +48,9 @@ class PointsAndDistanceState extends PointsState {
 
   @override
   List<Object> get props => [points, distances, viewCenter];
+
+  @override
+  String toString() {
+    return super.toString() + " points: $points -- distances: $distances -- viewCenter: $viewCenter";
+  }
 }

@@ -1,26 +1,32 @@
 enum LogDistricts {
-  BLOC,
-  MEASUREMENT,
+  MEASUREMENT_VIEW,
+  METADATA_BLOC,
+  METADATA_REPOSITORY,
+
   MEASURE_AREA,
+  MEASURE_BLOC,
+  POINTS_BLOC,
+  MEASUREMENT_REPOSITORY,
+
   DISTANCE_PAINTER,
   MEASURE_PAINTER,
   MAGNIFYING_PAINTER,
-  POINTER_HANDLER,
-  METADATA_REPOSITORY,
-  MEASUREMENT_REPOSITORY,
 }
 
 class Logger {
   static final List<LogDistricts> _activeDistricts = [
-//    LogDistricts.MEASURE_AREA,
-//    LogDistricts.POINTER_HANDLER,
-//    LogDistricts.MEASUREMENT,
+    LogDistricts.MEASUREMENT_VIEW,
+    LogDistricts.METADATA_BLOC,
+    LogDistricts.METADATA_REPOSITORY,
+//
+    LogDistricts.MEASURE_AREA,
+    LogDistricts.MEASURE_BLOC,
+    LogDistricts.POINTS_BLOC,
+    LogDistricts.MEASUREMENT_REPOSITORY,
+//
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.MAGNIFYING_PAINTER,
-//    LogDistricts.BLOC,
-    LogDistricts.METADATA_REPOSITORY,
-    LogDistricts.MEASUREMENT_REPOSITORY,
   ];
 
   final LogDistricts district;

@@ -2,23 +2,34 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 
-abstract class PointsEvent extends Equatable {}
-
-class PointsOnlyEvent extends PointsEvent {
+abstract class PointsEvent extends Equatable {
   final List<Offset> points;
 
-  PointsOnlyEvent(this.points);
+  PointsEvent(this.points);
 
   @override
   List<Object> get props => [points];
+
+  @override
+  String toString() {
+    return super.toString() + " points: $points";
+  }
+}
+
+class PointsOnlyEvent extends PointsEvent {
+  PointsOnlyEvent(List<Offset> points) : super(points);
 }
 
 class PointsAndDistancesEvent extends PointsEvent {
-  final List<Offset> points;
   final List<double> distances;
 
-  PointsAndDistancesEvent(this.points, this.distances);
+  PointsAndDistancesEvent(List<Offset> points, this.distances) : super(points);
 
   @override
   List<Object> get props => [points, distances];
+
+  @override
+  String toString() {
+    return super.toString() + " points: $points -- distances: $distances";
+  }
 }
