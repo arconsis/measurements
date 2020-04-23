@@ -8,8 +8,8 @@ import 'package:measurements/measurement/repository/measurement_repository.dart'
 
 import '../util/logger.dart';
 import 'bloc/metadata_bloc.dart';
-import 'metadata_event.dart';
-import 'metadata_state.dart';
+import 'bloc/metadata_event.dart';
+import 'bloc/metadata_state.dart';
 import 'repository/metadata_repository.dart';
 
 class Measurement extends StatelessWidget {
