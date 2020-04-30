@@ -113,6 +113,9 @@ class MeasurementView extends StatelessWidget {
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
           BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
+        } else {
+          _logger.log("image dimensions are 0");
+          _setBackgroundImageToBloc(context);
         }
       }
     });
@@ -133,14 +136,18 @@ class MeasurementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _logger.log("building");
     _setBackgroundImageToBloc(context);
     _setStartupArgumentsToBloc(context);
 
-    return BlocBuilder<MetadataBloc, MetadataState>(
-        builder: (context, state) {
-          return _overlay(state);
-        }
-    );
+    return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
+      BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
+      return BlocBuilder<MetadataBloc, MetadataState>(
+          builder: (context, state) {
+            return _overlay(state);
+          }
+      );
+    });
   }
 
   Widget _overlay(MetadataState state) {
@@ -154,10 +161,7 @@ class MeasurementView extends StatelessWidget {
             paintColor: measurePaintColor, // TODO can UI-only parameters be passed like this?
             child: RepaintBoundary(
               key: childKey,
-              child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-                BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
-                return child;
-              }),
+              child: child,
             ),
           ));
     } else {
