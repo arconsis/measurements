@@ -19,9 +19,10 @@ import 'repository/metadata_repository.dart';
  *  x slow movement of points - states are equal -> no update -> copy points and distances in measurement repository instead of using same object
  *  x metadata not loaded on start -> stateless measurementView and update arguments in build method
  *  x when distances are shown error during movement -> detect null values in distance list and don't paint distances there
- *  - onEvent and map is called multiple times for each point update
- *  - distance switch provided twice
- *  - switching between "showDistances" and "dontShowDistances" has no immediate effect
+ *  + onEvent and map is called multiple times for each point update -> only called on start and end if showing distances because movementStarted/Finished method
+ *  + distance switch provided twice -> correct because measurementView is build twice
+ *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
+ *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
  *
  * - features
  *  - orientation change not supported

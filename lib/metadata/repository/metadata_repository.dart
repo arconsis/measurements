@@ -42,21 +42,21 @@ class MetadataRepository {
 
 
   void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize) {
-    _enableMeasure.add(measure);
-    _showDistance.add(showDistance);
-    _distanceCallback.add(callback);
-    _scale.add(scale);
-    _zoomLevel.add(zoom);
-    _documentSize.add(documentSize);
+    _enableMeasure.value = measure;
+    _showDistance.value = showDistance;
+    _distanceCallback.value = callback;
+    _scale.value = scale;
+    _zoomLevel.value = zoom;
+    _documentSize.value = documentSize;
 
     _updateTransformationFactor();
   }
 
   void registerBackgroundChange(Image backgroundImage, Size size) {
-    _currentBackgroundImage.add(backgroundImage);
-    _viewWidth.add(size.width);
-    _viewCenter.add(Offset(size.width / 2, size.height / 2));
-    _imageScaleFactor.add(backgroundImage.width / size.width);
+    _currentBackgroundImage.value = backgroundImage;
+    _viewWidth.value = size.width;
+    _viewCenter.value = Offset(size.width / 2, size.height / 2);
+    _imageScaleFactor.value = backgroundImage.width / size.width;
 
     _updateTransformationFactor();
   }
@@ -64,7 +64,7 @@ class MetadataRepository {
   void registerOrientationChange(widget.Orientation orientation) {
     _logger.log("New orientation $orientation");
 
-    _orientation.add(orientation);
+    _orientation.value = orientation;
 
     // TODO add method and variables if needed (other repository has to do stuff here)
   }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_event.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
@@ -20,33 +21,28 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   Offset _viewCenter;
 
+  Function(List<Offset>) _pointsListener;
+  Function(DrawingHolder) _pointsAndDistanceListener;
+
   PointsBloc() {
+    _pointsListener = (points) => add(PointsOnlyEvent(points));
+    _pointsAndDistanceListener = (holder) => add(PointsAndDistancesEvent(holder.points, holder.distances));
+
     _measureRepository = GetIt.I<MeasurementRepository>();
-
-    _onlyPointsSubscription = _measureRepository.points.listen((points) {
-      add(PointsOnlyEvent(points));
-    });
-
-    _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen((holder) {
-      add(PointsAndDistancesEvent(holder.points, holder.distances));
-    });
-
     _metadataRepository = GetIt.I<MetadataRepository>();
 
     _metadataRepository.showDistances.listen((showDistances) {
+      _onlyPointsSubscription?.cancel();
+      _pointsAndDistancesSubscription?.cancel();
+
       if (showDistances) {
-        _pointsAndDistancesSubscription?.resume();
-        _onlyPointsSubscription?.pause();
-        _logger.log("now showing with distance");
+        _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
       } else {
-        _onlyPointsSubscription?.resume();
-        _pointsAndDistancesSubscription?.pause();
-        _logger.log("now showing without distance");
+        _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
       }
     });
 
     _metadataRepository.viewCenter.listen((center) {
-      _logger.log("updated viewCenter $center");
       _viewCenter = center;
     });
 
@@ -55,6 +51,12 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   PointsState get initialState => PointsEmptyState();
+
+  @override
+  void onEvent(PointsEvent event) {
+    _logger.log("received event: $event");
+    super.onEvent(event);
+  }
 
   @override
   Stream<PointsState> mapEventToState(PointsEvent event) async* {
