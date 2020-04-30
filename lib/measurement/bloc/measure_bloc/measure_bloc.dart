@@ -23,8 +23,14 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _metadataRepository.backgroundImage.listen((image) => backgroundImage = image);
-    _metadataRepository.imageScaleFactor.listen((factor) => imageScaleFactor = factor);
+    _metadataRepository.backgroundImage.listen((image) {
+      _logger.log("background updated $image");
+      backgroundImage = image;
+    });
+    _metadataRepository.imageScaleFactor.listen((factor) {
+      _logger.log("imageScale updated: $factor");
+      imageScaleFactor = factor;
+    });
 
     _logger.log("Created Bloc");
   }

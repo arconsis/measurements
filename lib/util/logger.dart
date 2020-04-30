@@ -15,14 +15,14 @@ enum LogDistricts {
 
 class Logger {
   static final List<LogDistricts> _activeDistricts = [
-//    LogDistricts.MEASUREMENT_VIEW,
+    LogDistricts.MEASUREMENT_VIEW,
     LogDistricts.METADATA_BLOC,
-//    LogDistricts.METADATA_REPOSITORY,
+    LogDistricts.METADATA_REPOSITORY,
 //
 //    LogDistricts.MEASURE_AREA,
     LogDistricts.MEASURE_BLOC,
     LogDistricts.POINTS_BLOC,
-//    LogDistricts.MEASUREMENT_REPOSITORY,
+    LogDistricts.MEASUREMENT_REPOSITORY,
 
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
@@ -39,7 +39,7 @@ class Logger {
 
   log(String message) {
     if (_activeDistricts.contains(district)) {
-      print("measurements: (${_districtName(district)}) $message");
+      print("${DateTime.now()} measurements: (${_districtName(district)}) $message");
     }
   }
 }

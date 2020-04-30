@@ -16,9 +16,9 @@ import 'repository/metadata_repository.dart';
 /*
  * TODO list:
  * - bug
- *  x slow movement of points - states are equal -> no update
- *  - metadata not loaded on start
- *  - when distances error during movement
+ *  x slow movement of points - states are equal -> no update -> copy points and distances in measurement repository instead of using same object
+ *  x metadata not loaded on start -> stateless measurementView and update arguments in build method
+ *  - when distances are shown error during movement
  *  - onEvent and map is called multiple times for each point update
  *  - distance switch provided twice
  *  - switching between "showDistances" and "dontShowDistances" has no immediate effect
@@ -83,7 +83,10 @@ class Measurement extends StatelessWidget {
   }
 }
 
-class MeasurementView extends StatefulWidget {
+class MeasurementView extends StatelessWidget {
+  final Logger logger = Logger(LogDistricts.MEASUREMENT_VIEW);
+  final GlobalKey childKey = GlobalKey();
+
   final Widget child;
   final Size documentSize;
   final double scale;
@@ -102,41 +105,7 @@ class MeasurementView extends StatefulWidget {
       this.distanceCallback,
       this.measurePaintColor);
 
-  @override
-  _MeasurementViewState createState() => _MeasurementViewState();
-}
-
-class _MeasurementViewState extends State<MeasurementView> {
-  Logger logger = Logger(LogDistricts.MEASUREMENT_VIEW);
-  GlobalKey childKey = GlobalKey();
-
-  @override
-  void didChangeDependencies() {
-    logger.log("didChangeDependencies");
-
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(MeasurementView oldWidget) {
-    logger.log("didUpdateWidget");
-
-    BlocProvider.of<MetadataBloc>(context).add(
-        MetadataStartedEvent(
-            widget.documentSize,
-            widget.distanceCallback,
-            widget.scale,
-            widget.zoom,
-            widget.measure,
-            widget.showDistanceOnLine,
-            widget.measurePaintColor)
-    );
-    _setBackgroundImageToBloc();
-
-    super.didUpdateWidget(oldWidget);
-  }
-
-  void _setBackgroundImageToBloc() {
+  void _setBackgroundImageToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (childKey.currentContext != null) {
         // TODO is a heavy operation and is called after every movement of any point
@@ -149,8 +118,24 @@ class _MeasurementViewState extends State<MeasurementView> {
     });
   }
 
+  void _setStartupArgumentsToBloc(BuildContext context) {
+    BlocProvider.of<MetadataBloc>(context).add(
+        MetadataStartedEvent(
+            documentSize,
+            distanceCallback,
+            scale,
+            zoom,
+            measure,
+            showDistanceOnLine,
+            measurePaintColor)
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _setBackgroundImageToBloc(context);
+    _setStartupArgumentsToBloc(context);
+
     return BlocBuilder<MetadataBloc, MetadataState>(
         builder: (context, state) {
           return _overlay(state);
@@ -166,17 +151,17 @@ class _MeasurementViewState extends State<MeasurementView> {
             BlocProvider(create: (context) => PointsBloc(),),
           ],
           child: MeasureArea(
-            paintColor: widget.measurePaintColor, // TODO can UI-only parameters be passed like this?
+            paintColor: measurePaintColor, // TODO can UI-only parameters be passed like this?
             child: RepaintBoundary(
               key: childKey,
               child: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
                 BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
-                return widget.child;
+                return child;
               }),
             ),
           ));
     } else {
-      return widget.child;
+      return child;
     }
   }
 }

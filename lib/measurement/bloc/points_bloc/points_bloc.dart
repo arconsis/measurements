@@ -46,7 +46,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     });
 
     _metadataRepository.viewCenter.listen((center) {
-      _logger.log("updated viewCenter");
+      _logger.log("updated viewCenter $center");
       _viewCenter = center;
     });
 

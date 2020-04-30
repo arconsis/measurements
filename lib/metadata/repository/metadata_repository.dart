@@ -8,18 +8,19 @@ import 'package:rxdart/subjects.dart';
 class MetadataRepository {
   final _logger = Logger(LogDistricts.METADATA_REPOSITORY);
 
-  final _documentSize = BehaviorSubject<Size>();
+  final _enableMeasure = BehaviorSubject<bool>.seeded(false);
+  final _showDistance = BehaviorSubject<bool>();
+  final _transformationFactor = BehaviorSubject<double>();
+  final _imageScaleFactor = BehaviorSubject<double>();
+  final _currentBackgroundImage = BehaviorSubject<Image>();
+  final _viewCenter = BehaviorSubject<Offset>();
   final _distanceCallback = BehaviorSubject<Function(List<double>)>();
+
+  final _documentSize = BehaviorSubject<Size>();
   final _scale = BehaviorSubject<double>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
-  final _showDistance = BehaviorSubject<bool>();
-  final _enableMeasure = BehaviorSubject<bool>.seeded(false);
   final _orientation = BehaviorSubject<widget.Orientation>();
-  final _currentBackgroundImage = BehaviorSubject<Image>();
   final _viewWidth = BehaviorSubject<double>();
-  final _viewCenter = BehaviorSubject<Offset>();
-  final _imageScaleFactor = BehaviorSubject<double>();
-  final _transformationFactor = BehaviorSubject<double>();
 
   MetadataRepository() {
     _logger.log("Created repository");
@@ -29,15 +30,15 @@ class MetadataRepository {
 
   Stream<bool> get showDistances => _showDistance.stream;
 
-  Stream<Function(List<double>)> get callback => _distanceCallback.stream;
-
   Stream<double> get transformationFactor => _transformationFactor.stream;
-
-  Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
+  Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
+
   Stream<Offset> get viewCenter => _viewCenter.stream;
+
+  Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
   void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize) {
