@@ -24,12 +24,10 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _measureRepository = GetIt.I<MeasurementRepository>();
 
     _onlyPointsSubscription = _measureRepository.points.listen((points) {
-      _logger.log("adding points only event");
       add(PointsOnlyEvent(points));
     });
 
     _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen((holder) {
-      _logger.log("adding points and distances event");
       add(PointsAndDistancesEvent(holder.points, holder.distances));
     });
 
@@ -57,12 +55,6 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   PointsState get initialState => PointsEmptyState();
-
-  @override
-  void onEvent(PointsEvent event) {
-    _logger.log("received event: $event");
-    super.onEvent(event);
-  }
 
   @override
   Stream<PointsState> mapEventToState(PointsEvent event) async* {

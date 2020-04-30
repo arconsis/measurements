@@ -33,10 +33,7 @@ class MeasureArea extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             BlocBuilder<PointsBloc, PointsState>(
-              builder: (context, state) {
-                _logger.log("builder state: $state");
-                return _pointsOverlay(state, child);
-              },
+              builder: (context, state) => _pointsOverlay(state, child),
             ),
             BlocBuilder<MeasureBloc, MeasureState>(
               builder: (context, state) => _magnificationOverlay(state),

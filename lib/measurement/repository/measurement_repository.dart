@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:measurements/measurement/bloc/measure_bloc/drawing_holder.dart';
+import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
@@ -32,7 +32,9 @@ class MeasurementRepository {
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
   void registerDownEvent(Offset position) {
-    List<Offset> points = _points.value;
+    List<Offset> points = List()
+      ..addAll(_points.value);
+
     int closestIndex = _getClosestPointIndex(points, position);
 
     if (closestIndex >= 0) {
@@ -82,7 +84,8 @@ class MeasurementRepository {
 
   void _updatePoint(Offset point, int index) {
     if (index >= 0) {
-      List<Offset> points = _points.value;
+      List<Offset> points = List()
+        ..addAll(_points.value);
 
       points.setRange(index, index + 1, [point]);
       _publishPoints(points);
@@ -109,7 +112,9 @@ class MeasurementRepository {
   }
 
   void _movementStarted(int index) {
-    List<double> distances = _distances.value;
+    List<double> distances = List()
+      ..addAll(_distances.value);
+
     distances.setRange(max(0, index - 1), min(distances.length, index + 1), [null, null]);
     _publishDistances(distances);
 

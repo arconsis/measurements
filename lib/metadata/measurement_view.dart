@@ -13,6 +13,29 @@ import 'bloc/metadata_event.dart';
 import 'bloc/metadata_state.dart';
 import 'repository/metadata_repository.dart';
 
+/*
+ * TODO list:
+ * - bug
+ *  x slow movement of points - states are equal -> no update
+ *  - metadata not loaded on start
+ *  - when distances error during movement
+ *  - onEvent and map is called multiple times for each point update
+ *  - distance switch provided twice
+ *  - switching between "showDistances" and "dontShowDistances" has no immediate effect
+ *
+ * - features
+ *  - orientation change not supported
+ *  - slow movement should move points with half distance
+ *  - delete points
+ *
+ * - improve
+ *  - state for painting with distances should contain holders
+ *  - add/update tests
+ *
+ * - comments from Christof
+ */
+
+
 class Measurement extends StatelessWidget {
   final Widget child;
   final Size documentSize;

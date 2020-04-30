@@ -16,7 +16,7 @@ class MeasureActiveState extends MeasureState {
   final double imageScaleFactor;
   final double magnificationRadius;
 
-  MeasureActiveState(this.position, this.backgroundImage, this.imageScaleFactor, this.magnificationRadius);
+  MeasureActiveState(this.position, {this.backgroundImage, this.imageScaleFactor, this.magnificationRadius});
 
   @override
   List<Object> get props => [position, backgroundImage, imageScaleFactor, magnificationRadius];

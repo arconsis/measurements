@@ -48,12 +48,25 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   }
 
   @override
+  Stream<MeasureState> transformStates(Stream<MeasureState> states) {
+    return states.map((MeasureState state) {
+      if (state is MeasureActiveState) {
+        return MeasureActiveState(
+            state.position,
+            backgroundImage: backgroundImage,
+            imageScaleFactor: imageScaleFactor,
+            magnificationRadius: magnificationRadius
+        );
+      } else {
+        return state;
+      }
+    });
+  }
+
+  @override
   Stream<MeasureState> mapEventToState(MeasureEvent event) async* {
-    // TODO is there a nicer way to get the background image from the event? maybe transformEvents or onEvent
-    if (event is MeasureDownEvent) {
-      yield MeasureActiveState(event.position, backgroundImage, imageScaleFactor, magnificationRadius);
-    } else if (event is MeasureMoveEvent) {
-      yield MeasureActiveState(event.position, backgroundImage, imageScaleFactor, magnificationRadius);
+    if (event is MeasureDownEvent || event is MeasureMoveEvent) {
+      yield MeasureActiveState(event.position);
     } else if (event is MeasureUpEvent) {
       yield MeasureInactiveState();
     }

@@ -5,4 +5,9 @@ class DrawingHolder {
   final List<double> distances;
 
   DrawingHolder(this.points, this.distances);
+
+  @override
+  String toString() {
+    return "DrawingHolder - points: $points, distances: $distances";
+  }
 }
