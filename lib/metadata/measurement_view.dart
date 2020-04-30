@@ -18,7 +18,7 @@ import 'repository/metadata_repository.dart';
  * - bug
  *  x slow movement of points - states are equal -> no update -> copy points and distances in measurement repository instead of using same object
  *  x metadata not loaded on start -> stateless measurementView and update arguments in build method
- *  - when distances are shown error during movement
+ *  x when distances are shown error during movement -> detect null values in distance list and don't paint distances there
  *  - onEvent and map is called multiple times for each point update
  *  - distance switch provided twice
  *  - switching between "showDistances" and "dontShowDistances" has no immediate effect
@@ -31,6 +31,7 @@ import 'repository/metadata_repository.dart';
  * - improve
  *  - state for painting with distances should contain holders
  *  - add/update tests
+ *  - carefully place logger calls
  *
  * - comments from Christof
  */
@@ -84,7 +85,7 @@ class Measurement extends StatelessWidget {
 }
 
 class MeasurementView extends StatelessWidget {
-  final Logger logger = Logger(LogDistricts.MEASUREMENT_VIEW);
+  final Logger _logger = Logger(LogDistricts.MEASUREMENT_VIEW);
   final GlobalKey childKey = GlobalKey();
 
   final Widget child;
@@ -108,7 +109,6 @@ class MeasurementView extends StatelessWidget {
   void _setBackgroundImageToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (childKey.currentContext != null) {
-        // TODO is a heavy operation and is called after every movement of any point
         RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {

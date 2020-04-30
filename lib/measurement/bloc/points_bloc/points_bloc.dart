@@ -66,7 +66,17 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       if (event is PointsOnlyEvent) {
         yield PointsOnlyState(event.points);
       } else if (event is PointsAndDistancesEvent) {
-        yield PointsAndDistanceState(event.points, event.distances, _viewCenter);
+        if (event.distances.contains(null)) {
+          List<int> nullIndices = List();
+          nullIndices.add(event.distances.indexOf(null));
+          nullIndices.add(event.distances.lastIndexOf(null));
+
+          yield PointsAndDistanceActiveState(event.points, event.distances, _viewCenter, nullIndices);
+        } else if (event.points.length - 1 > event.distances.length) {
+          yield PointsAndDistanceActiveState(event.points, event.distances, _viewCenter, [event.distances.length]);
+        } else {
+          yield PointsAndDistanceState(event.points, event.distances, _viewCenter);
+        }
       }
     }
   }

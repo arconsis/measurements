@@ -50,6 +50,8 @@ class MeasureArea extends StatelessWidget {
       widgets.add(_pointPainter(state.point, state.point));
     } else if (state is PointsOnlyState) {
       widgets.addAll(_onlyPoints(state));
+    } else if (state is PointsAndDistanceActiveState) {
+      widgets.addAll(_pointsAndDistancesWithSpace(state));
     } else if (state is PointsAndDistanceState) {
       widgets.addAll(_pointsAndDistances(state));
     }
@@ -61,6 +63,23 @@ class MeasureArea extends StatelessWidget {
     List<Widget> widgets = List();
 
     state.points.doInBetween((start, end) => widgets.add(_pointPainter(start, end)));
+
+    return widgets;
+  }
+
+  Iterable<Widget> _pointsAndDistancesWithSpace(PointsAndDistanceActiveState state) {
+    List<Widget> widgets = List();
+    List<Holder> holders = List();
+
+    state.points.doInBetween((start, end) => holders.add(Holder(start, end)));
+    state.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
+
+    holders.asMap().forEach((index, holder) {
+      widgets.add(_pointPainter(holder.start, holder.end));
+      if (!state.nullIndices.contains(index)) {
+        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.viewCenter));
+      }
+    });
 
     return widgets;
   }

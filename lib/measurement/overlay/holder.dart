@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 class Holder {
-  Offset start, end;
+  final Offset start, end;
   double distance;
 
   Holder(this.start, this.end);

@@ -54,3 +54,17 @@ class PointsAndDistanceState extends PointsState {
     return super.toString() + " points: $points -- distances: $distances -- viewCenter: $viewCenter";
   }
 }
+
+class PointsAndDistanceActiveState extends PointsAndDistanceState {
+  final List<int> nullIndices;
+
+  PointsAndDistanceActiveState(List<Offset> points, List<double> distances, Offset viewCenter, this.nullIndices) : super(points, distances, viewCenter);
+
+  @override
+  List<Object> get props => [points, distances, viewCenter, nullIndices];
+
+  @override
+  String toString() {
+    return super.toString() + " -- nullIndex: $nullIndices";
+  }
+}
