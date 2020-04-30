@@ -8,6 +8,6 @@ class DrawingHolder {
 
   @override
   String toString() {
-    return "DrawingHolder - points: $points, distances: $distances";
+    return super.toString() + " points: $points, distances: $distances";
   }
 }

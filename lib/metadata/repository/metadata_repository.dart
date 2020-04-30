@@ -91,6 +91,8 @@ class MetadataRepository {
       double documentWidth = _documentSize.value.width;
 
       _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
+
+      _logger.log("updated transformationFactor");
     }
   }
 }

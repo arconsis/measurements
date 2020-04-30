@@ -8,6 +8,6 @@ class Holder {
 
   @override
   String toString() {
-    return "First Point: $start - Second Point: $end - Distance: $distance";
+    return super.toString() + " First Point: $start - Second Point: $end - Distance: $distance";
   }
 }
