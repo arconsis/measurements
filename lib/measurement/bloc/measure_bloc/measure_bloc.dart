@@ -54,17 +54,21 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   }
 
   @override
-  Stream<MeasureState> transformStates(Stream<MeasureState> states) {
-    return states.map((MeasureState state) {
+  Stream<Transition<MeasureEvent, MeasureState>> transformTransitions(Stream<Transition<MeasureEvent, MeasureState>> transitions) {
+    return transitions.map((Transition<MeasureEvent, MeasureState> transition) {
+      final state = transition.nextState;
       if (state is MeasureActiveState) {
-        return MeasureActiveState(
-            state.position,
-            backgroundImage: backgroundImage,
-            imageScaleFactor: imageScaleFactor,
-            magnificationRadius: magnificationRadius
+        return Transition(currentState: transition.currentState,
+            event: transition.event,
+            nextState: MeasureActiveState(
+                state.position,
+                backgroundImage: backgroundImage,
+                imageScaleFactor: imageScaleFactor,
+                magnificationRadius: magnificationRadius
+            )
         );
       } else {
-        return state;
+        return transition;
       }
     });
   }

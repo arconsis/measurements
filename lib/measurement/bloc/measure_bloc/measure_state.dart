@@ -20,4 +20,9 @@ class MeasureActiveState extends MeasureState {
 
   @override
   List<Object> get props => [position, backgroundImage, imageScaleFactor, magnificationRadius];
+
+  @override
+  String toString() {
+    return super.toString() + " position: $position, backgroundImage: $backgroundImage, imageScaleFactor: $imageScaleFactor, magnificationRadius: $magnificationRadius)";
+  }
 }

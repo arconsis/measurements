@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
 
-void main() => runApp(MyApp());
+class MetadataRepository {}
+
+void main() {
+  GetIt.I.registerSingleton(MetadataRepository());
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override

@@ -33,9 +33,11 @@ import 'repository/metadata_repository.dart';
  *  - state for painting with distances should contain holders
  *  - add/update tests
  *  - carefully place logger calls
+ *  - initial frames on movement start are slow
  *
  * - comments from Christof
  * - mock repository behaviour or set hard the returned values?
+ * - remove GetIt? (Works even when app defined class with same name)
  */
 
 
