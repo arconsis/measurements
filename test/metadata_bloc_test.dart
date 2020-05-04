@@ -16,7 +16,6 @@ class MockImage extends Mock implements Image {}
 
 void main() {
   group("Metadata Bloc Test", () {
-    MetadataBloc metadataBloc;
     MetadataRepository mockedRepository;
     BehaviorSubject<bool> measurement;
     Image mockedImage;
@@ -42,31 +41,26 @@ void main() {
       measurement = BehaviorSubject();
       mockedRepository = MockMetadataRepository();
       GetIt.I.registerSingleton(mockedRepository);
-
-      when(mockedRepository.measurement).thenAnswer((_) => measurement.stream);
-      when(mockedRepository.registerStartupValuesChange(any, any, any, any, any, any)).thenAnswer((invocation) {
-        measurement.add(invocation.positionalArguments[0]);
-      });
-
-      metadataBloc = MetadataBloc();
     });
 
     tearDown(() {
       GetIt.I.unregister(instance: mockedRepository);
-      metadataBloc?.close();
       measurement?.close();
     });
 
     blocTest("initial state",
         skip: 0,
-        build: () async => metadataBloc,
+        build: () async {
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+          return MetadataBloc();
+        },
         expect: [MetadataState(false)]);
-
 
     group("metadata events", () {
       blocTest("started event should show measurements",
           build: () async {
-            return metadataBloc;
+            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+            return MetadataBloc();
           },
           act: (bloc) => bloc.add(startedEvent),
           expect: [MetadataState(true)]
@@ -74,13 +68,20 @@ void main() {
 
       blocTest("background registered",
           skip: 0,
-          build: () async => metadataBloc,
+          build: () async {
+            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+            return MetadataBloc();
+          },
           act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
           expect: [MetadataState(false)]
       );
 
       blocTest("started and background event",
-          build: () async => metadataBloc,
+          build: () async {
+            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+
+            return MetadataBloc();
+          },
           act: (bloc) {
             bloc.add(startedEvent);
             bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
@@ -92,7 +93,10 @@ void main() {
 
     group("UI events", () {
       blocTest("enable and disable measurement",
-          build: () async => metadataBloc,
+          build: () async {
+            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
+            return MetadataBloc();
+          },
           act: (bloc) {
             bloc.add(MetadataUpdatedEvent(true));
             bloc.add(MetadataUpdatedEvent(false));
