@@ -7,4 +7,9 @@ class MetadataState extends Equatable {
 
   @override
   List<Object> get props => [measure];
+
+  @override
+  String toString() {
+    return super.toString() + " measure: $measure";
+  }
 }

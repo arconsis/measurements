@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/overlay/measure_area.dart';
 
 Type typeOf<T>() => T;
 
@@ -17,17 +17,17 @@ final imageWidget = Image.asset(
   height: imageHeight,
 );
 
-Future<void> createApp(WidgetTester tester, MeasurementView measurementView, {Matcher measurementMatcher = findsOneWidget, bool checkSizeOfMeasureArea = true}) async {
+Future<void> createApp(WidgetTester tester, Measurement measurement, {Matcher measurementMatcher = findsOneWidget, bool checkSizeOfMeasureArea = true}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
-        body: measurementView,
+        body: measurement,
       ),
     ),
   );
 
   final imageFinder = find.byWidget(imageWidget);
-  final measureFinder = find.byType(typeOf<MeasureAreaOld>());
+  final measureFinder = find.byType(typeOf<MeasureArea>());
 
   expect(imageFinder, findsOneWidget);
   expect(measureFinder, measurementMatcher);
@@ -56,13 +56,13 @@ void main() {
   });
 
   testWidgets("Measurement should show child without extras", (WidgetTester tester) async {
-    final measurementView = MeasurementView(child: imageWidget);
+    final measurementView = Measurement(child: imageWidget);
 
     await createApp(tester, measurementView, measurementMatcher: findsNothing, checkSizeOfMeasureArea: false);
   });
 
   testWidgets("Measurement should show MeasureArea", (WidgetTester tester) async {
-    final measurementView = MeasurementView(child: imageWidget, measure: true,);
+    final measurementView = Measurement(child: imageWidget, measure: true,);
 
     await createApp(tester, measurementView);
 
@@ -73,7 +73,7 @@ void main() {
   testWidgets("Measurement should show three Points", (WidgetTester tester) async {
     final List<double> expectedDistances = [80, 100];
 
-    final measurementView = MeasurementView(
+    final measurementView = Measurement(
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
@@ -102,7 +102,7 @@ void main() {
   testWidgets("Measurement should show three points after moving one point", (WidgetTester tester) async {
     final List<double> expectedDistances = [80, 100];
 
-    MeasurementView measurementView = MeasurementView(
+    final measurementView = Measurement(
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
@@ -139,7 +139,7 @@ void main() {
   testWidgets("Measurement should show four points after moving one point and setting another one at that position", (WidgetTester tester) async {
     final List<double> expectedDistances = [80, sqrt(100 * 100 + 200 * 200), sqrt(140 * 140 + 70 * 70)];
 
-    MeasurementView measurementView = MeasurementView(
+    final measurementView = Measurement(
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
@@ -175,7 +175,7 @@ void main() {
   testWidgets("Measurement should show distance with set scale and zoom", (WidgetTester tester) async {
     final List<double> expectedDistances = [80];
 
-    final measurementView = MeasurementView(
+    final measurementView = Measurement(
       child: imageWidget,
       documentSize: Size(imageWidth, imageHeight),
       measure: true,
