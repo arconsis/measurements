@@ -25,7 +25,7 @@ import 'repository/metadata_repository.dart';
  *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
  *
  * - features
- *  - orientation change not supported
+ *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
  *  - slow movement should move points with half distance
  *  - delete points
  *
@@ -138,11 +138,10 @@ class MeasurementView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.log("building");
-    _setBackgroundImageToBloc(context);
     _setStartupArgumentsToBloc(context);
 
     return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-      BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
+      _setBackgroundImageToBloc(context);
       return BlocBuilder<MetadataBloc, MetadataState>(
           builder: (context, state) {
             return _overlay(state);

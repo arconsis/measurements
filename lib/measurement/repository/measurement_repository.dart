@@ -23,6 +23,7 @@ class MeasurementRepository {
   MeasurementRepository(MetadataRepository repository) {
     _logger.log("Created Repository");
 
+    repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
     repository.transformationFactor.listen((factor) => _transformationFactor = factor);
     repository.callback.listen((callback) => _callback = callback);
   }
@@ -133,6 +134,11 @@ class MeasurementRepository {
         _callback(distances);
       }
     }
+  }
+
+  _updatePoints(double factor) {
+    final newPoints = _points.value.map((Offset point) => point * factor).toList();
+    _publishPoints(newPoints);
   }
 }
 

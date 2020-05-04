@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/widgets.dart' as widget;
 import 'package:measurements/util/logger.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -19,8 +18,9 @@ class MetadataRepository {
   final _documentSize = BehaviorSubject<Size>();
   final _scale = BehaviorSubject<double>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
-  final _orientation = BehaviorSubject<widget.Orientation>();
   final _viewWidth = BehaviorSubject<double>();
+
+  final _viewWidthChangeFactor = BehaviorSubject<double>();
 
   MetadataRepository() {
     _logger.log("Created repository");
@@ -38,6 +38,8 @@ class MetadataRepository {
 
   Stream<Offset> get viewCenter => _viewCenter.stream;
 
+  Stream<double> get viewScaleFactor => _viewWidthChangeFactor.stream;
+
   Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
@@ -54,19 +56,17 @@ class MetadataRepository {
 
   void registerBackgroundChange(Image backgroundImage, Size size) {
     _currentBackgroundImage.value = backgroundImage;
-    _viewWidth.value = size.width;
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
+    if (_viewWidth.value == null) {
+      _viewWidth.value = size.width;
+    } else if (_viewWidth.value != size.width) {
+      _viewWidthChangeFactor.value = size.width / _viewWidth.value;
+      _viewWidth.value = size.width;
+    }
+
     _updateTransformationFactor();
-  }
-
-  void registerOrientationChange(widget.Orientation orientation) {
-    _logger.log("New orientation $orientation");
-
-    _orientation.value = orientation;
-
-    // TODO add method and variables if needed (other repository has to do stuff here)
   }
 
   void dispose() {
@@ -76,12 +76,12 @@ class MetadataRepository {
     _zoomLevel.close();
     _showDistance.close();
     _enableMeasure.close();
-    _orientation.close();
     _currentBackgroundImage.close();
     _viewWidth.close();
     _viewCenter.close();
     _imageScaleFactor.close();
     _transformationFactor.close();
+    _viewWidthChangeFactor.close();
   }
 
   void _updateTransformationFactor() async {

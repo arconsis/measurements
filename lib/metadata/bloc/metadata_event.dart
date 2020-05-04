@@ -6,20 +6,6 @@ import 'package:flutter/widgets.dart';
 abstract class MetadataEvent extends Equatable {
 }
 
-class MetadataOrientationEvent extends MetadataEvent {
-  final Orientation orientation;
-
-  MetadataOrientationEvent(this.orientation);
-
-  @override
-  List<Object> get props => [orientation];
-
-  @override
-  String toString() {
-    return super.toString() + " orientation: $orientation";
-  }
-}
-
 class MetadataBackgroundEvent extends MetadataEvent {
   final ui.Image backgroundImage;
   final Size size;
@@ -28,7 +14,6 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   List<Object> get props => [backgroundImage, size];
-
 
   @override
   String toString() {

@@ -40,8 +40,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
-    } else if (event is MetadataOrientationEvent) {
-      _repository.registerOrientationChange(event.orientation);
     }
 
     super.onEvent(event);
