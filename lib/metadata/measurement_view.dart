@@ -38,6 +38,7 @@ import 'repository/metadata_repository.dart';
  * - improve
  *  x add/update tests
  *  x state for painting with distances should contain holders
+ *  - use arconsis blue as default
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *  - incorporate zoomable widget in main as child
