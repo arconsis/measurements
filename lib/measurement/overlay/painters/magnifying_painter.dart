@@ -5,32 +5,32 @@ import 'package:measurements/util/colors.dart' as c;
 import 'package:measurements/util/logger.dart';
 
 class MagnifyingPainter extends CustomPainter {
-  final Logger logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
-  final double borderRadiusOffset = 2,
-      fingerRadiusOffset = 50;
+  final Logger _logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
+  final double _borderRadiusOffset = 2,
+      _fingerRadiusOffset = 50;
 
   final double radius;
   final Offset fingerPosition;
   final ui.Image image;
 
-  Offset drawPosition;
-  Paint drawPaint = Paint();
+  Offset _drawPosition;
+  Paint _drawPaint = Paint();
 
-  RRect outerCircle, innerCircle;
-  Rect imageTargetRect, imageSourceRect;
+  RRect _outerCircle, _innerCircle;
+  Rect _imageTargetRect, _imageSourceRect;
 
   MagnifyingPainter({@required this.fingerPosition, @required this.radius, @required this.image, double imageScaleFactor}) {
-    drawPosition = fingerPosition + Offset(0, -(radius + fingerRadiusOffset));
+    _drawPosition = fingerPosition + Offset(0, -(radius + _fingerRadiusOffset));
 
     double diameter = 2 * radius;
 
-    outerCircle = getCircle(drawPosition, radius + borderRadiusOffset);
-    innerCircle = getCircle(drawPosition, radius);
+    _outerCircle = getCircle(_drawPosition, radius + _borderRadiusOffset);
+    _innerCircle = getCircle(_drawPosition, radius);
 
-    imageSourceRect = Rect.fromCenter(center: fingerPosition * imageScaleFactor, width: diameter, height: diameter);
-    imageTargetRect = Rect.fromCenter(center: drawPosition, width: diameter, height: diameter);
+    _imageSourceRect = Rect.fromCenter(center: fingerPosition * imageScaleFactor, width: diameter, height: diameter);
+    _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
 
-    drawPaint.color = c.Colors.drawColor;
+    _drawPaint.color = c.Colors.drawColor;
   }
 
   RRect getCircle(Offset position, double radius) {
@@ -46,12 +46,12 @@ class MagnifyingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.clipRRect(outerCircle);
-    canvas.drawImageRect(image, imageSourceRect, imageTargetRect, drawPaint);
+    canvas.clipRRect(_outerCircle);
+    canvas.drawImageRect(image, _imageSourceRect, _imageTargetRect, _drawPaint);
 
-    canvas.drawDRRect(outerCircle, innerCircle, drawPaint);
-    canvas.drawLine(Offset(drawPosition.dx - radius, drawPosition.dy), Offset(drawPosition.dx + radius, drawPosition.dy), drawPaint);
-    canvas.drawLine(Offset(drawPosition.dx, drawPosition.dy - radius), Offset(drawPosition.dx, drawPosition.dy + radius), drawPaint);
+    canvas.drawDRRect(_outerCircle, _innerCircle, _drawPaint);
+    canvas.drawLine(Offset(_drawPosition.dx - radius, _drawPosition.dy), Offset(_drawPosition.dx + radius, _drawPosition.dy), _drawPaint);
+    canvas.drawLine(Offset(_drawPosition.dx, _drawPosition.dy - radius), Offset(_drawPosition.dx, _drawPosition.dy + radius), _drawPaint);
   }
 
   @override

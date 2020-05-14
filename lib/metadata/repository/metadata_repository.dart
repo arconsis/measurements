@@ -73,19 +73,6 @@ class MetadataRepository {
     _updateTransformationFactor();
   }
 
-  void _updateTransformationFactor() async {
-    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
-      double scale = _scale.value;
-      double zoomLevel = _zoomLevel.value;
-      double viewWidth = _viewWidth.value;
-      double documentWidth = _documentSize.value.width;
-
-      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
-
-      _logger.log("updated transformationFactor");
-    }
-  }
-
   void dispose() {
     _documentSize.close();
     _distanceCallback.close();
@@ -100,5 +87,18 @@ class MetadataRepository {
     _transformationFactor.close();
     _viewWidthChangeFactor.close();
     _magnificationRadius.close();
+  }
+
+  void _updateTransformationFactor() async {
+    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
+      double scale = _scale.value;
+      double zoomLevel = _zoomLevel.value;
+      double viewWidth = _viewWidth.value;
+      double documentWidth = _documentSize.value.width;
+
+      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
+
+      _logger.log("updated transformationFactor");
+    }
   }
 }

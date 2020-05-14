@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
@@ -15,22 +14,23 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
 
-  ui.Image backgroundImage;
-  double imageScaleFactor;
-  double magnificationRadius;
+  ui.Image _backgroundImage;
+  double _imageScaleFactor;
+  double _magnificationRadius;
 
-  MeasureBloc({@required this.magnificationRadius}) {
+  MeasureBloc(double magnificationRadius) {
+    _magnificationRadius = magnificationRadius;
+
     _measureRepository = GetIt.I<MeasurementRepository>();
-
     _metadataRepository = GetIt.I<MetadataRepository>();
 
     _metadataRepository.backgroundImage.listen((ui.Image image) {
       _logger.log("background updated $image");
-      backgroundImage = image;
+      _backgroundImage = image;
     });
     _metadataRepository.imageScaleFactor.listen((factor) {
       _logger.log("imageScale updated: $factor");
-      imageScaleFactor = factor;
+      _imageScaleFactor = factor;
     });
 
     _logger.log("Created Bloc");
@@ -63,9 +63,9 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
             event: transition.event,
             nextState: MeasureActiveState(
                 state.position,
-                backgroundImage: backgroundImage,
-                imageScaleFactor: imageScaleFactor,
-                magnificationRadius: magnificationRadius
+                backgroundImage: _backgroundImage,
+                imageScaleFactor: _imageScaleFactor,
+                magnificationRadius: _magnificationRadius
             )
         );
       } else {

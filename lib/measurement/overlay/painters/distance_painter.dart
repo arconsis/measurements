@@ -7,13 +7,13 @@ import 'package:measurements/util/logger.dart';
 
 
 class DistancePainter extends material.CustomPainter {
-  final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
+  final Logger _logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
   final double distance;
   final Offset viewCenter;
 
-  Offset _zeroPoint = Offset(-24, 0);
   final double _offsetPerDigit = 4.57;
+  Offset _zeroPoint = Offset(-24, 0);
 
   Paragraph _paragraph;
   double _radians;

@@ -30,7 +30,7 @@ void main() {
     test("getZoomLevel without scale", () async {
       final expectedZoomFactor = 5.0;
 
-      double zoomFactor = await getZoomLevel(viewWidth, documentWidthInMM);
+      double zoomFactor = await ZoomLevelCalculator.getZoomLevel(viewWidth, documentWidthInMM);
 
       expect(zoomFactor, expectedZoomFactor);
     });
@@ -38,7 +38,7 @@ void main() {
     test("getZoomLevel for scaled view", () async {
       final expectedZoomFactor = 10.0;
 
-      double zoomFactor = await getZoomLevel(viewWidth, documentWidthInMM, scaleOfDisplayedObject: 1 / 2.0);
+      double zoomFactor = await ZoomLevelCalculator.getZoomLevel(viewWidth, documentWidthInMM, scaleOfDisplayedObject: 1 / 2.0);
 
       expect(zoomFactor, expectedZoomFactor);
     });

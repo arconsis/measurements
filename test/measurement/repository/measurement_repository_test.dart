@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:mockito/mockito.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../metadata/bloc/metadata_bloc_test.dart';
 
@@ -11,15 +14,22 @@ void main() {
 
     MockMetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
+    BehaviorSubject<double> transformationFactorController;
 
     setUp(() {
       metadataRepository = MockMetadataRepository();
 
+      transformationFactorController = BehaviorSubject.seeded(transformationFactor);
+
       when(metadataRepository.viewScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
-      when(metadataRepository.transformationFactor).thenAnswer((_) => Stream.fromIterable([transformationFactor]));
+      when(metadataRepository.transformationFactor).thenAnswer((_) => transformationFactorController.stream);
       when(metadataRepository.callback).thenAnswer((_) => Stream.fromIterable([]));
 
       measurementRepository = MeasurementRepository(metadataRepository);
+    });
+
+    tearDown(() {
+      transformationFactorController.close();
     });
 
     group("single events", () {
@@ -131,6 +141,29 @@ void main() {
         measurementRepository.registerUpEvent(Offset(300, 200));
 
         measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedHolder));
+      });
+
+      test("update transformation factor changes distances", () async {
+        final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [100 * transformationFactor]);
+        final expectedUpdatedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [100 * transformationFactor * 2]);
+
+        measurementRepository.registerDownEvent(Offset(0, 100));
+        measurementRepository.registerUpEvent(Offset(0, 100));
+
+        measurementRepository.registerDownEvent(Offset(100, 100));
+        measurementRepository.registerUpEvent(Offset(100, 100));
+
+        StreamSubscription sub;
+        sub = measurementRepository.drawingHolder.listen((actual) {
+          expect(actual, expectedHolder);
+          sub?.cancel();
+        });
+
+        transformationFactorController.add(transformationFactor * 2);
+
+        await Future.delayed(Duration(microseconds: 1));
+
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedUpdatedHolder));
       });
     });
   });

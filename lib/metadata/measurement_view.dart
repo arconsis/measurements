@@ -30,14 +30,16 @@ import 'repository/metadata_repository.dart';
  *  - class to style points (color, size, etc.)
  *  - class to style delete (position, widget, etc.)
  *  - slow movement should move points with half distance
+ *  - option to return surface area (need to close contour)
  *
  * - improve
- *  - add/update tests
+ *  x add/update tests
  *  - state for painting with distances should contain holders
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
+ *  - incorporate zoomable widget in main as child
  *
- * - comments from Christof
+ * x comments from Christof
  * - mock repository behaviour or set hard the returned values?
  * - remove GetIt? (Works even when app defined class with same name)
  */
@@ -92,7 +94,7 @@ class Measurement extends StatelessWidget {
 
 class MeasurementView extends StatelessWidget {
   final Logger _logger = Logger(LogDistricts.MEASUREMENT_VIEW);
-  final GlobalKey childKey = GlobalKey();
+  final GlobalKey _childKey = GlobalKey();
 
   final Widget child;
   final Size documentSize;
@@ -114,8 +116,8 @@ class MeasurementView extends StatelessWidget {
 
   void _setBackgroundImageToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (childKey.currentContext != null) {
-        RenderRepaintBoundary boundary = childKey.currentContext.findRenderObject();
+      if (_childKey.currentContext != null) {
+        RenderRepaintBoundary boundary = _childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
           BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
@@ -159,13 +161,13 @@ class MeasurementView extends StatelessWidget {
     if (state.measure) {
       return MultiBlocProvider(
           providers: [
-            BlocProvider(create: (context) => MeasureBloc(magnificationRadius: state.magnificationRadius),),
+            BlocProvider(create: (context) => MeasureBloc(state.magnificationRadius),),
             BlocProvider(create: (context) => PointsBloc(),),
           ],
           child: MeasureArea(
             paintColor: measurePaintColor, // TODO can UI-only parameters be passed like this?
             child: RepaintBoundary(
-              key: childKey,
+              key: _childKey,
               child: child,
             ),
           ));

@@ -19,10 +19,10 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   StreamSubscription _onlyPointsSubscription;
   StreamSubscription _pointsAndDistancesSubscription;
 
-  Offset _viewCenter;
-
   Function(List<Offset>) _pointsListener;
   Function(DrawingHolder) _pointsAndDistanceListener;
+
+  Offset _viewCenter;
 
   PointsBloc() {
     _pointsListener = (points) => add(PointsOnlyEvent(points));

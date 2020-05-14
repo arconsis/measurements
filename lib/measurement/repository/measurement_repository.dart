@@ -23,8 +23,11 @@ class MeasurementRepository {
   MeasurementRepository(MetadataRepository repository) {
     _logger.log("Created Repository");
 
+    repository.transformationFactor.listen((factor) {
+      _transformationFactor = factor;
+      _movementFinished();
+    });
     repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
-    repository.transformationFactor.listen((factor) => _transformationFactor = factor);
     repository.callback.listen((callback) => _callback = callback);
   }
 

@@ -39,7 +39,7 @@ void main() {
           when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
           when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
 
-          return MeasureBloc(magnificationRadius: magnificationRadius);
+          return MeasureBloc(magnificationRadius);
         },
         expect: [MeasureInactiveState()]
     );
@@ -50,7 +50,7 @@ void main() {
             when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
             when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
-            return MeasureBloc(magnificationRadius: magnificationRadius);
+            return MeasureBloc(magnificationRadius);
           },
           act: (bloc) {
             bloc.add(MeasureDownEvent(Offset(0, 0)));
