@@ -1,6 +1,8 @@
 import 'dart:ui';
 
-class DrawingHolder {
+import 'package:equatable/equatable.dart';
+
+class DrawingHolder extends Equatable {
   final List<Offset> points;
   final List<double> distances;
 
@@ -10,4 +12,7 @@ class DrawingHolder {
   String toString() {
     return super.toString() + " points: $points, distances: $distances";
   }
+
+  @override
+  List<Object> get props => [points, distances];
 }
