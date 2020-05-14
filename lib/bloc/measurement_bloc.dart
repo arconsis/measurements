@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/material.dart'; // 132: importing from darts widget library should be avoided in bloc
+import 'package:flutter/material.dart'; // 1432: importing from darts widget library should be avoided in bloc
 
 import 'package:measurements/bloc/bloc_provider.dart';
 import 'package:measurements/util/logger.dart';
@@ -12,9 +12,9 @@ class MeasurementBloc extends BlocBase {
   final Logger logger = Logger(LogDistricts.BLOC);
 
 //  final _pointsController = StreamController<List<Offset>>.broadcast();
-  final _pointsController = //132: example with behaviour subject. it woul be better to not use behaviour subject, but use a repository holding the List with points
+  final _pointsController = //1432: example with behaviour subject. it woul be better to not use behaviour subject, but use a repository holding the List with points
       BehaviorSubject<List<Offset>>.seeded(List<Offset>.of([]));
-// 132: some controllers can be combined using a custom model representing all of these values (less rebuilding)
+// 1432: some controllers can be combined using a custom model representing all of these values (less rebuilding)
 
   final _distanceController = StreamController<List<double>>.broadcast();
 
@@ -26,7 +26,7 @@ class MeasurementBloc extends BlocBase {
   final _showDistanceController = StreamController<bool>.broadcast();
   final _enableMeasurementController = StreamController<bool>.broadcast();
 
-  // 132: it is not good practice to have so man class variables inside bloc. class variables are best inside repository.
+  // 1432: it is not good practice to have so man class variables inside bloc. class variables are best inside repository.
   Size _documentSize;
   Function(List<double>, double) _distanceCallback;
   double _scale;
@@ -46,7 +46,7 @@ class MeasurementBloc extends BlocBase {
   double _transformationFactor;
   double _originalSizeZoomLevel;
 
-// 132: getters and setters need to be on top
+// 1432: getters and setters need to be on top
   Offset getPoint(int index) => _pointsController.value[index];
 
   Stream<List<Offset>> get pointsStream => _pointsController.stream;
@@ -62,7 +62,7 @@ class MeasurementBloc extends BlocBase {
   List<double> get distances => _distances;
 
   bool get showDistance =>
-      _showDistance; // 132: blocs may only expose streams and methods
+      _showDistance; // 1432: blocs may only expose streams and methods
 
   bool get measure => _enableMeasure;
 
@@ -86,12 +86,12 @@ class MeasurementBloc extends BlocBase {
       ? _enableMeasurementController.add(measure)
       : null;
 
-// 132: constructor needs to be on top too
+// 1432: constructor needs to be on top too
   MeasurementBloc(this._documentSize, this._distanceCallback) {
-    //132: this method is too huge
+    //1432: this method is too huge
     logger.log("Creating Bloc");
 
-/*    pointsStream.listen((List<Offset> points) { // 132: do not listen inside of bloc to its own streams. only UI listens to bloc
+/*    pointsStream.listen((List<Offset> points) { // 1432: do not listen inside of bloc to its own streams. only UI listens to bloc
       _points = points;
       logger.log("points: $_points");
 
@@ -99,7 +99,7 @@ class MeasurementBloc extends BlocBase {
     });*/
 
     distancesStream.listen((List<double> distances) {
-      //132: do only listen from external repositories. why are you listening here?
+      //1432: do only listen from external repositories. why are you listening here?
       _distances = distances;
       if (_distanceCallback != null)
         _distanceCallback(distances, sumAllDistances(distances));
@@ -159,11 +159,11 @@ class MeasurementBloc extends BlocBase {
 
 //    _points.add(point);
     _pointsController
-        .add([..._pointsController.value, point]); //132: adding new points List
+        .add([..._pointsController.value, point]); //1432: adding new points List
     _updateDistances();
     logger.log("Added points: ${_pointsController.value}");
     return _pointsController.value.length -
-        1; //132: illegal. only private functions may return values inside bloc (for other calling functions)
+        1; //1432: illegal. only private functions may return values inside bloc (for other calling functions)
   }
 
   void updatePoint(Offset point, int index) {

@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: MeasurementView(
             child: Image.asset(
-              //132: how can I zoom?
+              //1432: how can I zoom? -> you can't with this widget
               "assets/images/example_portrait.png",
               package: "measurements",
             ),

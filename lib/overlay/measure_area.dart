@@ -7,9 +7,9 @@ import 'package:measurements/overlay/pointer_handler.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
-//132: make a folder "widgets" for every UI element and a folder "repositories" for non-ui business logic.
+//1432: make a folder "widgets" for every UI element and a folder "repositories" for non-ui business logic. -> used other structure
 class MeasureArea extends StatefulWidget {
-  // 132: this widget should be entirely stateless and get a reference of the bloc by its parent
+  // 1432: this widget should be entirely stateless and get a reference of the bloc by its parent
   MeasureArea({Key key, this.paintColor, this.child}) : super(key: key);
 
   final Color paintColor;
@@ -22,10 +22,10 @@ class MeasureArea extends StatefulWidget {
 class _MeasureState extends State<MeasureArea> {
   final Logger logger = Logger(LogDistricts.MEASURE_AREA);
 
-  double width, height; // 132: do not keep state inside UI. This is bloc only.
+  double width, height; // 1432: do not keep state inside UI. This is bloc only.
   MeasurementBloc _bloc;
   PointerHandler
-      handler; //132: remove handler from ui. it needs to be inside bloc
+      handler; //1432: remove handler from ui. it needs to be inside bloc -> put logic into repository
   GlobalKey listenerKey = GlobalKey();
 
   @override
@@ -89,7 +89,7 @@ class _MeasureState extends State<MeasureArea> {
                           SizedBox.shrink();
                         }
                         return StreamBuilder(
-                            //132: we do not need initial value here
+                            //1432: we do not need initial value here
                             stream: _bloc.pointsStream,
                             builder: (BuildContext context,
                                 AsyncSnapshot<List<Offset>> points) {
@@ -103,7 +103,7 @@ class _MeasureState extends State<MeasureArea> {
   }
 
   Widget _buildOverlays(
-      //132: business logic. Should be in bloc or repository
+      //1432: business logic. Should be in bloc or repository
       AsyncSnapshot<List<Offset>> points,
       AsyncSnapshot<bool> showDistance,
       AsyncSnapshot<List<double>> distanceSnapshot) {
@@ -171,7 +171,7 @@ class _MeasureState extends State<MeasureArea> {
       Offset first, Offset last, double distance, double width, double height) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
-          //132: this one should get bloc, too
+          //1432: this one should get bloc, too -> Is not a widget
           start: first,
           end: last,
           distance: distance,
@@ -190,7 +190,7 @@ class _MeasureState extends State<MeasureArea> {
 }
 
 class Holder {
-  //132: why do we need this?
+  //1432: why do we need this? -> used to draw points and distances in one go
   Offset first, second;
   double distance;
 

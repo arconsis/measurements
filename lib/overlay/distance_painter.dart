@@ -5,7 +5,9 @@ import 'package:flutter/material.dart' as material;
 import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
 
-//132: how do you delete the points? bug when keeping mouse pressed. This one is also a widget. Calculations could be in the bloc to test them.
+//1432: how do you delete the points? -> not implemented yet
+// bug when keeping mouse pressed. This one is also a widget. -> CustomPainter isn't a widget
+// Calculations could be in the bloc to test them. -> Bloc should only be in widgets I guess, this is not a widget.
 class DistancePainter extends material.CustomPainter {
   final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
 

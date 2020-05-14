@@ -8,12 +8,11 @@ class MeasurementView extends StatefulWidget {
   final Widget child;
   final Size documentSize;
   final double scale;
-  final double zoom; //132: variables need to be above constructor
+  final double zoom; //1432: variables need to be above constructor
   final bool measure;
   final bool showDistanceOnLine;
   final Color measurePaintColor;
-  final Function(List<double>, double)
-      distanceCallback; // 132: added overall length to distance callback
+  final Function(List<double>, double) distanceCallback; // 1432: added overall length to distance callback -> total distance is not too useful I guess. But the surface area could be interesting.
 
   const MeasurementView({
     Key key,
@@ -33,7 +32,7 @@ class MeasurementView extends StatefulWidget {
 
 class _MeasurementViewState extends State<MeasurementView> {
   Logger logger = Logger(LogDistricts.MEASUREMENT);
-  MeasurementBloc _bloc; // 132: bloc should be only here
+  MeasurementBloc _bloc; // 1432: bloc should be only here -> changed to flutter_bloc
 
   @override
   void didChangeDependencies() {
@@ -52,7 +51,7 @@ class _MeasurementViewState extends State<MeasurementView> {
     super.didUpdateWidget(oldWidget);
   }
 
-// 132: this should be set with a function, addPostFrameCallback should be avoided
+// 1432: this should be set with a function, addPostFrameCallback should be avoided -> alternative?
   void _setWidgetArgumentsToBloc() {
     WidgetsBinding.instance.addPostFrameCallback((_) => _bloc
       ..zoomLevel = widget.zoom
@@ -68,7 +67,7 @@ class _MeasurementViewState extends State<MeasurementView> {
         child: OrientationBuilder(
           builder: (BuildContext context, Orientation orientation) {
             _bloc.orientation =
-                orientation; //132: illegal. setting only by functions
+                orientation; //1432: illegal. setting only by functions
 
             return _overlay();
           },
@@ -78,7 +77,7 @@ class _MeasurementViewState extends State<MeasurementView> {
   Widget _overlay() {
     if (widget.measure) {
       return MeasureArea(
-          //132: this widget should get reference of states bloc
+          //1432: this widget should get reference of states bloc
           paintColor: widget.measurePaintColor,
           child: widget.child);
     } else {
