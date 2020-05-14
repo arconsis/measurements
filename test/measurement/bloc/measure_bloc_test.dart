@@ -15,7 +15,13 @@ class MockedMetadataRepository extends Mock implements MetadataRepository {}
 
 class MockedMeasurementRepository extends Mock implements MeasurementRepository {}
 
-class MockedImage extends Mock implements Image {}
+class MockedImage extends Mock implements Image {
+  static final _mockedImage = MockedImage._private();
+
+  MockedImage._private();
+
+  static MockedImage get mock => _mockedImage;
+}
 
 void main() {
   group("Measure Bloc Test", () {
@@ -23,12 +29,10 @@ void main() {
 
     MetadataRepository mockedMetadataRepository;
     MeasurementRepository mockedMeasurementRepository;
-    Image mockedImage;
 
     setUp(() {
       mockedMetadataRepository = MockedMetadataRepository();
       mockedMeasurementRepository = MockedMeasurementRepository();
-      mockedImage = MockedImage();
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);
       GetIt.I.registerSingleton(mockedMetadataRepository);
@@ -53,7 +57,7 @@ void main() {
     group("UI events", () {
       blocTest("stroke events",
           build: () async {
-            when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([mockedImage]));
+            when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
             when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
             return MeasureBloc();
@@ -66,10 +70,21 @@ void main() {
             return;
           },
           expect: [
-            MeasureActiveState(Offset(0, 0), backgroundImage: mockedImage, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
-            MeasureActiveState(Offset(10, 10), backgroundImage: mockedImage, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
+            MeasureActiveState(Offset(0, 0), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
+            MeasureActiveState(Offset(10, 10), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
             MeasureInactiveState()
-          ]);
+          ],
+          verify: (_) {
+            verifyInOrder([
+              mockedMeasurementRepository.registerDownEvent(Offset(0, 0)),
+              mockedMeasurementRepository.registerMoveEvent(Offset(10, 10)),
+              mockedMeasurementRepository.registerUpEvent(Offset(10, 10)),
+            ]);
+
+            verifyNoMoreInteractions(mockedMeasurementRepository);
+
+            return;
+          });
     });
   });
 }
