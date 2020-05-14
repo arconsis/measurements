@@ -26,12 +26,14 @@ import 'repository/metadata_repository.dart';
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
- *  - slow movement should move points with half distance
  *  - delete points
+ *  - class to style points (color, size, etc.)
+ *  - class to style delete (position, widget, etc.)
+ *  - slow movement should move points with half distance
  *
  * - improve
- *  - state for painting with distances should contain holders
  *  - add/update tests
+ *  - state for painting with distances should contain holders
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *

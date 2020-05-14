@@ -78,8 +78,7 @@ class _MyAppState extends State<MyApp> {
             measure: measure,
           ),
         ),
-      )
-      ,
+      ),
     );
   }
 }
