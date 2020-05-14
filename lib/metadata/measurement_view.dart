@@ -6,6 +6,9 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/style/distance_style.dart';
+import 'package:measurements/style/magnification_style.dart';
+import 'package:measurements/style/point_style.dart';
 
 import '../util/logger.dart';
 import 'bloc/metadata_bloc.dart';
@@ -27,7 +30,7 @@ import 'repository/metadata_repository.dart';
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
  *  - delete points
- *  - class to style points (color, size, etc.)
+ *  x class to style points (color, size, etc.) -> separate style classes for points, distances and magnification
  *  - class to style delete (position, widget, etc.)
  *  - slow movement should move points with half distance
  *  - option to return surface area (need to close contour)
@@ -40,7 +43,7 @@ import 'repository/metadata_repository.dart';
  *  - incorporate zoomable widget in main as child
  *
  * x comments from Christof
- * - mock repository behaviour or set hard the returned values?
+ * - mock repository behaviour or hard code the returned values?
  * - remove GetIt? -> makes repository easily accessible for widget test an validation (Works even when app defined class with same name)
  */
 
@@ -50,10 +53,13 @@ class Measurement extends StatelessWidget {
   final Size documentSize;
   final double scale;
   final double zoom;
+  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Color measurePaintColor;
   final Function(List<double>) distanceCallback;
+  final PointStyle pointStyle;
+  final MagnificationStyle magnificationStyle;
+  final DistanceStyle distanceStyle;
 
   Measurement({
     Key key,
@@ -64,7 +70,10 @@ class Measurement extends StatelessWidget {
     this.measure = false,
     this.showDistanceOnLine = false,
     this.distanceCallback,
-    this.measurePaintColor
+    this.magnificationZoomFactor = 2.0,
+    this.pointStyle = const PointStyle(),
+    this.magnificationStyle = const MagnificationStyle(),
+    this.distanceStyle = const DistanceStyle()
   }) {
     if (!GetIt.I.isRegistered<MetadataRepository>()) {
       GetIt.I.registerSingleton(MetadataRepository());
@@ -79,14 +88,17 @@ class Measurement extends StatelessWidget {
     return BlocProvider(
       create: (context) => MetadataBloc(),
       child: MeasurementView(
-        child,
-        documentSize,
-        scale,
-        zoom,
-        measure,
-        showDistanceOnLine,
-        distanceCallback,
-        measurePaintColor,
+          child,
+          documentSize,
+          scale,
+          zoom,
+          measure,
+          showDistanceOnLine,
+          distanceCallback,
+          magnificationZoomFactor,
+          pointStyle,
+          magnificationStyle,
+          distanceStyle
       ),
     );
   }
@@ -100,10 +112,13 @@ class MeasurementView extends StatelessWidget {
   final Size documentSize;
   final double scale;
   final double zoom;
+  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Color measurePaintColor;
   final Function(List<double>) distanceCallback;
+  final PointStyle pointStyle;
+  final MagnificationStyle magnificationStyle;
+  final DistanceStyle distanceStyle;
 
   MeasurementView(this.child,
       this.documentSize,
@@ -112,7 +127,10 @@ class MeasurementView extends StatelessWidget {
       this.measure,
       this.showDistanceOnLine,
       this.distanceCallback,
-      this.measurePaintColor);
+      this.magnificationZoomFactor,
+      this.pointStyle,
+      this.magnificationStyle,
+      this.distanceStyle);
 
   void _setBackgroundImageToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -120,7 +138,7 @@ class MeasurementView extends StatelessWidget {
         RenderRepaintBoundary boundary = _childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: 4.0), boundary.size));
+          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: magnificationZoomFactor), boundary.size));
         } else {
           _logger.log("image dimensions are 0");
           _setBackgroundImageToBloc(context);
@@ -137,8 +155,7 @@ class MeasurementView extends StatelessWidget {
             scale,
             zoom,
             measure,
-            showDistanceOnLine,
-            measurePaintColor)
+            showDistanceOnLine)
     );
   }
 
@@ -161,11 +178,13 @@ class MeasurementView extends StatelessWidget {
     if (state.measure) {
       return MultiBlocProvider(
           providers: [
-            BlocProvider(create: (context) => MeasureBloc(state.magnificationRadius),),
+            BlocProvider(create: (context) => MeasureBloc(),),
             BlocProvider(create: (context) => PointsBloc(),),
           ],
           child: MeasureArea(
-            paintColor: measurePaintColor, // TODO can UI-only parameters be passed like this?
+            pointStyle: pointStyle,
+            magnificationStyle: magnificationStyle,
+            distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
             child: RepaintBoundary(
               key: _childKey,
               child: child,

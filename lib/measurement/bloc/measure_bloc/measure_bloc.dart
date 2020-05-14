@@ -16,11 +16,8 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
   ui.Image _backgroundImage;
   double _imageScaleFactor;
-  double _magnificationRadius;
 
-  MeasureBloc(double magnificationRadius) {
-    _magnificationRadius = magnificationRadius;
-
+  MeasureBloc() {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
@@ -65,7 +62,6 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
                 state.position,
                 backgroundImage: _backgroundImage,
                 imageScaleFactor: _imageScaleFactor,
-                magnificationRadius: _magnificationRadius
             )
         );
       } else {

@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:measurements/util/logger.dart';
-import 'package:measurements/util/size.dart' as sizes;
 import 'package:rxdart/subjects.dart';
 
 
@@ -22,15 +21,12 @@ class MetadataRepository {
   final _viewWidth = BehaviorSubject<double>();
 
   final _viewWidthChangeFactor = BehaviorSubject<double>();
-  final _magnificationRadius = BehaviorSubject.seeded(sizes.magnificationRadius);
 
   MetadataRepository() {
     _logger.log("Created repository");
   }
 
   Stream<bool> get measurement => _enableMeasure.stream;
-
-  Stream<double> get magnificationRadius => _magnificationRadius.stream;
 
   Stream<bool> get showDistances => _showDistance.stream;
 
@@ -86,7 +82,6 @@ class MetadataRepository {
     _imageScaleFactor.close();
     _transformationFactor.close();
     _viewWidthChangeFactor.close();
-    _magnificationRadius.close();
   }
 
   void _updateTransformationFactor() async {

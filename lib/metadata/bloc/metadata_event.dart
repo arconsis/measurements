@@ -28,12 +28,11 @@ class MetadataStartedEvent extends MetadataEvent {
   final double zoom;
   final bool measure;
   final bool showDistances;
-  final Color lineColor;
 
-  MetadataStartedEvent(this.documentSize, this.callback, this.scale, this.zoom, this.measure, this.showDistances, this.lineColor);
+  MetadataStartedEvent(this.documentSize, this.callback, this.scale, this.zoom, this.measure, this.showDistances);
 
   @override
-  List<Object> get props => [documentSize, callback, scale, zoom, measure, showDistances, lineColor];
+  List<Object> get props => [documentSize, callback, scale, zoom, measure, showDistances];
 
   @override
   String toString() {
@@ -43,15 +42,14 @@ class MetadataStartedEvent extends MetadataEvent {
 
 class MetadataUpdatedEvent extends MetadataEvent {
   final bool measure;
-  final double magnificationRadius;
 
-  MetadataUpdatedEvent(this.measure, this.magnificationRadius);
+  MetadataUpdatedEvent(this.measure);
 
   @override
-  List<Object> get props => [measure, magnificationRadius];
+  List<Object> get props => [measure];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure magnificationRadius: $magnificationRadius";
+    return super.toString() + " measure: $measure";
   }
 }

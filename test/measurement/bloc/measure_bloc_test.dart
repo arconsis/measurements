@@ -15,7 +15,6 @@ import '../../mocks/test_mocks.dart';
 void main() {
   group("Measure Bloc Unit Test", () {
     final imageScaleFactor = 3.0;
-    final magnificationRadius = 50.0;
 
     MetadataRepository mockedMetadataRepository;
     MeasurementRepository mockedMeasurementRepository;
@@ -39,7 +38,7 @@ void main() {
           when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
           when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
 
-          return MeasureBloc(magnificationRadius);
+          return MeasureBloc();
         },
         expect: [MeasureInactiveState()]
     );
@@ -50,7 +49,7 @@ void main() {
             when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
             when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
-            return MeasureBloc(magnificationRadius);
+            return MeasureBloc();
           },
           act: (bloc) {
             bloc.add(MeasureDownEvent(Offset(0, 0)));
@@ -60,8 +59,8 @@ void main() {
             return;
           },
           expect: [
-            MeasureActiveState(Offset(0, 0), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
-            MeasureActiveState(Offset(10, 10), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor, magnificationRadius: magnificationRadius),
+            MeasureActiveState(Offset(0, 0), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+            MeasureActiveState(Offset(10, 10), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
             MeasureInactiveState()
           ],
           verify: (_) {

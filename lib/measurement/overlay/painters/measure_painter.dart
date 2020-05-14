@@ -1,32 +1,33 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measurements/util/colors.dart';
+import 'package:measurements/style/point_style.dart';
 import 'package:measurements/util/logger.dart';
 
 class MeasurePainter extends material.CustomPainter {
   final Logger _logger = Logger(LogDistricts.MEASURE_PAINTER);
   final Offset start, end;
 
-  final Paint _drawPaint = Paint();
+  final Paint _dotPaint = Paint(),
+      _linePaint = Paint();
+  double _dotRadius;
 
-  MeasurePainter({@material.required this.start, @material.required this.end, Color paintColor}) {
-    if (paintColor == null) {
-      paintColor = Colors.drawColor;
-    }
+  MeasurePainter({@material.required this.start, @material.required this.end, @material.required PointStyle style}) {
+    _dotPaint.color = style.dotColor;
+    _dotRadius = style.dotRadius;
 
-    _drawPaint.color = paintColor;
-    _drawPaint.strokeWidth = 2.0;
+    _linePaint.color = style.lineColor;
+    _linePaint.strokeWidth = style.lineWidth;
 
     _logger.log("drawing from $start to $end");
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(start, 4, _drawPaint);
-    canvas.drawCircle(end, 4, _drawPaint);
+    canvas.drawCircle(start, _dotRadius, _dotPaint);
+    canvas.drawCircle(end, _dotRadius, _dotPaint);
 
-    canvas.drawLine(start, end, _drawPaint);
+    canvas.drawLine(start, end, _linePaint);
   }
 
   @override

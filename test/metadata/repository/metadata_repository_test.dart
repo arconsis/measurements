@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
-import 'package:measurements/util/size.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
@@ -21,7 +20,6 @@ void main() {
     final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
     final expectedTransformationFactor = 1 / 20;
-    final expectedMagnificationRadius = magnificationRadius;
 
     final viewSize = Size(200, 300);
 
@@ -50,7 +48,6 @@ void main() {
       metadataRepository.viewScaleFactor.listen((actual) => expect(actual, expectedViewScaleFactor));
       metadataRepository.imageScaleFactor.listen((actual) => expect(actual, expectedImageScaleFactor));
       metadataRepository.transformationFactor.listen((actual) => expect(actual, expectedTransformationFactor));
-      metadataRepository.magnificationRadius.listen((actual) => expect(actual, expectedMagnificationRadius));
     });
 
     test("started and updated view size", () {

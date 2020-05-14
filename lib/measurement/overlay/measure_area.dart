@@ -5,6 +5,9 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/style/distance_style.dart';
+import 'package:measurements/style/magnification_style.dart';
+import 'package:measurements/style/point_style.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
@@ -15,10 +18,12 @@ import 'painters/measure_painter.dart';
 class MeasureArea extends StatelessWidget {
   final _logger = Logger(LogDistricts.MEASURE_AREA);
 
-  final Color paintColor;
   final Widget child;
+  final PointStyle pointStyle;
+  final MagnificationStyle magnificationStyle;
+  final DistanceStyle distanceStyle;
 
-  MeasureArea({this.paintColor, @required this.child});
+  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +98,9 @@ class MeasureArea extends StatelessWidget {
   CustomPaint _pointPainter(Offset first, Offset last) {
     return CustomPaint(
       foregroundPainter: MeasurePainter(
-          start: first,
-          end: last,
-          paintColor: paintColor
+        start: first,
+        end: last,
+        style: pointStyle,
       ),
     );
   }
@@ -103,11 +108,11 @@ class MeasureArea extends StatelessWidget {
   CustomPaint _distancePainter(Offset first, Offset last, double distance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
-          start: first,
-          end: last,
-          distance: distance,
-          viewCenter: viewCenter,
-          drawColor: paintColor
+        start: first,
+        end: last,
+        distance: distance,
+        viewCenter: viewCenter,
+        style: distanceStyle,
       ),
     );
   }
@@ -116,10 +121,10 @@ class MeasureArea extends StatelessWidget {
     if (state is MeasureActiveState) {
       return CustomPaint(
         foregroundPainter: MagnifyingPainter(
-            fingerPosition: state.position,
-            image: state.backgroundImage,
-            radius: state.magnificationRadius,
-            imageScaleFactor: state.imageScaleFactor
+          fingerPosition: state.position,
+          image: state.backgroundImage,
+          imageScaleFactor: state.imageScaleFactor,
+          style: magnificationStyle,
         ),
       );
     }

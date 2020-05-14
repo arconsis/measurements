@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measurements/util/colors.dart';
+import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/util/logger.dart';
 
 
@@ -23,11 +23,7 @@ class DistancePainter extends material.CustomPainter {
     @material.required Offset end,
     @material.required this.distance,
     @material.required this.viewCenter,
-    Color drawColor}) {
-    if (drawColor == null) {
-      drawColor = Colors.drawColor;
-    }
-
+    @material.required DistanceStyle style}) {
     if (distance > 0) {
       _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
     }
@@ -56,8 +52,8 @@ class DistancePainter extends material.CustomPainter {
         fontStyle: FontStyle.normal,
       ),
     );
-    paragraphBuilder.pushStyle(TextStyle(color: drawColor),);
-    paragraphBuilder.addText("${distance?.toStringAsFixed(2)} mm");
+    paragraphBuilder.pushStyle(TextStyle(color: style.textColor),);
+    paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)} mm");
 
     _paragraph = paragraphBuilder.build();
     _paragraph.layout(ParagraphConstraints(width: 300));

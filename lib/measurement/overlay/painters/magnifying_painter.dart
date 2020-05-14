@@ -1,36 +1,36 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:measurements/util/colors.dart' as c;
+import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 
 class MagnifyingPainter extends CustomPainter {
   final Logger _logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
-  final double _borderRadiusOffset = 2,
-      _fingerRadiusOffset = 50;
+  final double _fingerRadiusOffset = 50;
 
-  final double radius;
   final Offset fingerPosition;
   final ui.Image image;
+  final MagnificationStyle style;
 
-  Offset _drawPosition;
   Paint _drawPaint = Paint();
 
+  Offset _drawPosition;
   RRect _outerCircle, _innerCircle;
   Rect _imageTargetRect, _imageSourceRect;
 
-  MagnifyingPainter({@required this.fingerPosition, @required this.radius, @required this.image, double imageScaleFactor}) {
-    _drawPosition = fingerPosition + Offset(0, -(radius + _fingerRadiusOffset));
+  MagnifyingPainter({@required this.fingerPosition, @required this.image, @required this.style, double imageScaleFactor}) {
+    _drawPosition = fingerPosition + Offset(0, -(style.magnificationRadius + _fingerRadiusOffset));
 
-    double diameter = 2 * radius;
+    double diameter = 2 * style.magnificationRadius;
 
-    _outerCircle = getCircle(_drawPosition, radius + _borderRadiusOffset);
-    _innerCircle = getCircle(_drawPosition, radius);
+    _outerCircle = getCircle(_drawPosition, style.magnificationRadius + style.outerCircleThickness);
+    _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
 
     _imageSourceRect = Rect.fromCenter(center: fingerPosition * imageScaleFactor, width: diameter, height: diameter);
     _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
 
-    _drawPaint.color = c.Colors.drawColor;
+    _drawPaint.color = style.magnificationColor;
+    _drawPaint.strokeWidth = style.crossHairThickness;
   }
 
   RRect getCircle(Offset position, double radius) {
@@ -50,8 +50,8 @@ class MagnifyingPainter extends CustomPainter {
     canvas.drawImageRect(image, _imageSourceRect, _imageTargetRect, _drawPaint);
 
     canvas.drawDRRect(_outerCircle, _innerCircle, _drawPaint);
-    canvas.drawLine(Offset(_drawPosition.dx - radius, _drawPosition.dy), Offset(_drawPosition.dx + radius, _drawPosition.dy), _drawPaint);
-    canvas.drawLine(Offset(_drawPosition.dx, _drawPosition.dy - radius), Offset(_drawPosition.dx, _drawPosition.dy + radius), _drawPaint);
+    canvas.drawLine(Offset(_drawPosition.dx - style.magnificationRadius, _drawPosition.dy), Offset(_drawPosition.dx + style.magnificationRadius, _drawPosition.dy), _drawPaint);
+    canvas.drawLine(Offset(_drawPosition.dx, _drawPosition.dy - style.magnificationRadius), Offset(_drawPosition.dx, _drawPosition.dy + style.magnificationRadius), _drawPaint);
   }
 
   @override

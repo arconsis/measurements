@@ -2,15 +2,14 @@ import 'package:equatable/equatable.dart';
 
 class MetadataState extends Equatable {
   final bool measure;
-  final double magnificationRadius;
 
-  MetadataState(this.measure, this.magnificationRadius);
+  MetadataState(this.measure);
 
   @override
-  List<Object> get props => [measure, magnificationRadius];
+  List<Object> get props => [measure];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure magnificationRadius: $magnificationRadius";
+    return super.toString() + " measure: $measure";
   }
 }
