@@ -6,9 +6,11 @@ import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_event.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
+import 'package:measurements/measurement/overlay/holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:measurements/util/utils.dart';
 
 class PointsBloc extends Bloc<PointsEvent, PointsState> {
   final _logger = Logger(LogDistricts.POINTS_BLOC);
@@ -68,16 +70,20 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       if (event is PointsOnlyEvent) {
         yield PointsOnlyState(event.points);
       } else if (event is PointsAndDistancesEvent) {
+        List<Holder> holders = List();
+        event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
+        event.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
+
         if (event.distances.contains(null)) {
           List<int> nullIndices = List();
           nullIndices.add(event.distances.indexOf(null));
           nullIndices.add(event.distances.lastIndexOf(null));
 
-          yield PointsAndDistanceActiveState(event.points, event.distances, _viewCenter, nullIndices);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, nullIndices);
         } else if (event.points.length - 1 > event.distances.length) {
-          yield PointsAndDistanceActiveState(event.points, event.distances, _viewCenter, [event.distances.length]);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, [event.distances.length]);
         } else {
-          yield PointsAndDistanceState(event.points, event.distances, _viewCenter);
+          yield PointsAndDistanceState(holders, _viewCenter);
         }
       }
     }

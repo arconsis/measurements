@@ -8,7 +8,6 @@ import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 
-import 'holder.dart';
 import 'painters/distance_painter.dart';
 import 'painters/magnifying_painter.dart';
 import 'painters/measure_painter.dart';
@@ -69,12 +68,8 @@ class MeasureArea extends StatelessWidget {
 
   Iterable<Widget> _pointsAndDistancesWithSpace(PointsAndDistanceActiveState state) {
     List<Widget> widgets = List();
-    List<Holder> holders = List();
 
-    state.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-    state.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
-
-    holders.asMap().forEach((index, holder) {
+    state.holders.asMap().forEach((index, holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
       if (!state.nullIndices.contains(index)) {
         widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.viewCenter));
@@ -86,12 +81,8 @@ class MeasureArea extends StatelessWidget {
 
   List<Widget> _pointsAndDistances(PointsAndDistanceState state) {
     List<Widget> widgets = List();
-    List<Holder> holders = List();
 
-    state.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-    state.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
-
-    holders.forEach((holder) {
+    state.holders.forEach((holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
       widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.viewCenter));
     });

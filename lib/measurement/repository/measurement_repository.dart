@@ -24,8 +24,12 @@ class MeasurementRepository {
     _logger.log("Created Repository");
 
     repository.transformationFactor.listen((factor) {
-      _transformationFactor = factor;
-      _movementFinished();
+      if (_transformationFactor != factor) {
+        _transformationFactor = factor;
+        _movementFinished();
+      } else {
+        _transformationFactor = factor;
+      }
     });
     repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
     repository.callback.listen((callback) => _callback = callback);

@@ -34,14 +34,14 @@ import 'repository/metadata_repository.dart';
  *
  * - improve
  *  x add/update tests
- *  - state for painting with distances should contain holders
+ *  x state for painting with distances should contain holders
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *  - incorporate zoomable widget in main as child
  *
  * x comments from Christof
  * - mock repository behaviour or set hard the returned values?
- * - remove GetIt? (Works even when app defined class with same name)
+ * - remove GetIt? -> makes repository easily accessible for widget test an validation (Works even when app defined class with same name)
  */
 
 
