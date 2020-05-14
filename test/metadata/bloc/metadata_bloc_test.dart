@@ -7,6 +7,7 @@ import 'package:measurements/metadata/bloc/metadata_bloc.dart';
 import 'package:measurements/metadata/bloc/metadata_event.dart';
 import 'package:measurements/metadata/bloc/metadata_state.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/util/size.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -52,33 +53,40 @@ void main() {
         skip: 0,
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+          when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([magnificationRadius]));
+
           return MetadataBloc();
         },
-        expect: [MetadataState(false)]);
+        expect: [MetadataState(false, magnificationRadius)]);
 
     group("metadata events", () {
       blocTest("started event should show measurements",
           build: () async {
             when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+            when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([magnificationRadius]));
+
             return MetadataBloc();
           },
           act: (bloc) => bloc.add(startedEvent),
-          expect: [MetadataState(true)]
+          expect: [MetadataState(true, magnificationRadius)]
       );
 
       blocTest("background registered",
           skip: 0,
           build: () async {
             when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+            when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([magnificationRadius]));
+
             return MetadataBloc();
           },
           act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-          expect: [MetadataState(false)]
+          expect: [MetadataState(false, magnificationRadius)]
       );
 
       blocTest("started and background event",
           build: () async {
             when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+            when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([magnificationRadius]));
 
             return MetadataBloc();
           },
@@ -87,7 +95,7 @@ void main() {
             bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
             return;
           },
-          expect: [MetadataState(true)]
+          expect: [MetadataState(true, magnificationRadius)]
       );
     });
 
@@ -95,15 +103,23 @@ void main() {
       blocTest("enable and disable measurement",
           build: () async {
             when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
+            when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([magnificationRadius]));
+
             return MetadataBloc();
           },
-          act: (bloc) {
-            bloc.add(MetadataUpdatedEvent(true));
-            bloc.add(MetadataUpdatedEvent(false));
+          expect: [MetadataState(true, magnificationRadius), MetadataState(false, magnificationRadius)]
+      );
 
-            return;
-          },
-          expect: [MetadataState(true), MetadataState(false)]);
+      blocTest("enable measurement and change magnification radius",
+        build: () async {
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+          when(mockedRepository.magnificationRadius).thenAnswer((_) => Stream.fromIterable([60]));
+
+          return MetadataBloc();
+        },
+        skip: 0,
+        expect: [MetadataState(false, magnificationRadius), MetadataState(false, 60), MetadataState(true, 60)],
+      );
     });
   });
 }

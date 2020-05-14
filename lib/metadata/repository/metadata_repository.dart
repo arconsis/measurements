@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:measurements/util/logger.dart';
+import 'package:measurements/util/size.dart' as sizes;
 import 'package:rxdart/subjects.dart';
 
 
@@ -21,12 +22,15 @@ class MetadataRepository {
   final _viewWidth = BehaviorSubject<double>();
 
   final _viewWidthChangeFactor = BehaviorSubject<double>();
+  final _magnificationRadius = BehaviorSubject.seeded(sizes.magnificationRadius);
 
   MetadataRepository() {
     _logger.log("Created repository");
   }
 
   Stream<bool> get measurement => _enableMeasure.stream;
+
+  Stream<double> get magnificationRadius => _magnificationRadius.stream;
 
   Stream<bool> get showDistances => _showDistance.stream;
 
@@ -69,6 +73,19 @@ class MetadataRepository {
     _updateTransformationFactor();
   }
 
+  void _updateTransformationFactor() async {
+    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
+      double scale = _scale.value;
+      double zoomLevel = _zoomLevel.value;
+      double viewWidth = _viewWidth.value;
+      double documentWidth = _documentSize.value.width;
+
+      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
+
+      _logger.log("updated transformationFactor");
+    }
+  }
+
   void dispose() {
     _documentSize.close();
     _distanceCallback.close();
@@ -82,18 +99,6 @@ class MetadataRepository {
     _imageScaleFactor.close();
     _transformationFactor.close();
     _viewWidthChangeFactor.close();
-  }
-
-  void _updateTransformationFactor() async {
-    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
-      double scale = _scale.value;
-      double zoomLevel = _zoomLevel.value;
-      double viewWidth = _viewWidth.value;
-      double documentWidth = _documentSize.value.width;
-
-      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
-
-      _logger.log("updated transformationFactor");
-    }
+    _magnificationRadius.close();
   }
 }

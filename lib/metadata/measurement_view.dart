@@ -157,7 +157,7 @@ class MeasurementView extends StatelessWidget {
     if (state.measure) {
       return MultiBlocProvider(
           providers: [
-            BlocProvider(create: (context) => MeasureBloc(),),
+            BlocProvider(create: (context) => MeasureBloc(magnificationRadius: state.magnificationRadius),),
             BlocProvider(create: (context) => PointsBloc(),),
           ],
           child: MeasureArea(

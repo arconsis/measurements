@@ -1,5 +1,6 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
@@ -7,7 +8,6 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
-import 'package:measurements/util/size.dart';
 
 class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   final _logger = Logger(LogDistricts.MEASURE_BLOC);
@@ -15,15 +15,16 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
 
-  Image backgroundImage;
+  ui.Image backgroundImage;
   double imageScaleFactor;
+  double magnificationRadius;
 
-  MeasureBloc() {
+  MeasureBloc({@required this.magnificationRadius}) {
     _measureRepository = GetIt.I<MeasurementRepository>();
 
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _metadataRepository.backgroundImage.listen((image) {
+    _metadataRepository.backgroundImage.listen((ui.Image image) {
       _logger.log("background updated $image");
       backgroundImage = image;
     });

@@ -43,14 +43,15 @@ class MetadataStartedEvent extends MetadataEvent {
 
 class MetadataUpdatedEvent extends MetadataEvent {
   final bool measure;
+  final double magnificationRadius;
 
-  MetadataUpdatedEvent(this.measure);
+  MetadataUpdatedEvent(this.measure, this.magnificationRadius);
 
   @override
-  List<Object> get props => [measure];
+  List<Object> get props => [measure, magnificationRadius];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure";
+    return super.toString() + " measure: $measure magnificationRadius: $magnificationRadius";
   }
 }

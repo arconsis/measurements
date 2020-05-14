@@ -8,24 +8,14 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
-import 'package:measurements/util/size.dart';
 import 'package:mockito/mockito.dart';
 
-class MockedMetadataRepository extends Mock implements MetadataRepository {}
-
-class MockedMeasurementRepository extends Mock implements MeasurementRepository {}
-
-class MockedImage extends Mock implements Image {
-  static final _mockedImage = MockedImage._private();
-
-  MockedImage._private();
-
-  static MockedImage get mock => _mockedImage;
-}
+import '../../mocks/test_mocks.dart';
 
 void main() {
   group("Measure Bloc Test", () {
     final imageScaleFactor = 3.0;
+    final magnificationRadius = 50.0;
 
     MetadataRepository mockedMetadataRepository;
     MeasurementRepository mockedMeasurementRepository;
@@ -49,7 +39,7 @@ void main() {
           when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
           when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
 
-          return MeasureBloc();
+          return MeasureBloc(magnificationRadius: magnificationRadius);
         },
         expect: [MeasureInactiveState()]
     );
@@ -60,7 +50,7 @@ void main() {
             when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
             when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
-            return MeasureBloc();
+            return MeasureBloc(magnificationRadius: magnificationRadius);
           },
           act: (bloc) {
             bloc.add(MeasureDownEvent(Offset(0, 0)));
