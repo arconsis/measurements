@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import '../../metadata/bloc/metadata_bloc_test.dart';
 
 void main() {
-  group("Measurement Repository Test", () {
+  group("Measurement Repository Unit Test", () {
     final transformationFactor = 5.0;
 
     MockMetadataRepository metadataRepository;

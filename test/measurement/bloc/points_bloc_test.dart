@@ -13,7 +13,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Points Bloc Test", () {
+  group("Points Bloc Unit Test", () {
     MeasurementRepository measurementRepository;
     MetadataRepository metadataRepository;
 

@@ -47,156 +47,158 @@ Function(List<double>) distanceCallback;
 List<double> distances;
 
 void main() {
-  setUpAll(() {
-    distances = List();
+  group("Measurement Widget Integration Test", () {
+    setUpAll(() {
+      distances = List();
 
-    distanceCallback = (List<double> data) {
-      distances = data;
-    };
-  });
+      distanceCallback = (List<double> data) {
+        distances = data;
+      };
+    });
 
-  testWidgets("Measurement should show child without extras", (WidgetTester tester) async {
-    final measurementView = Measurement(child: imageWidget);
+    testWidgets("Measurement should show child without extras", (WidgetTester tester) async {
+      final measurementView = Measurement(child: imageWidget);
 
-    await createApp(tester, measurementView, measurementMatcher: findsNothing, checkSizeOfMeasureArea: false);
-  });
+      await createApp(tester, measurementView, measurementMatcher: findsNothing, checkSizeOfMeasureArea: false);
+    });
 
-  testWidgets("Measurement should show MeasureArea", (WidgetTester tester) async {
-    final measurementView = Measurement(child: imageWidget, measure: true,);
+    testWidgets("Measurement should show MeasureArea", (WidgetTester tester) async {
+      final measurementView = Measurement(child: imageWidget, measure: true,);
 
-    await createApp(tester, measurementView);
+      await createApp(tester, measurementView);
 
-    final paintFinder = find.byType(typeOf<CustomPaint>());
-    expect(paintFinder, findsOneWidget); // there seems to be a CustomPaint in the default widget tree
-  });
+      final paintFinder = find.byType(typeOf<MeasureArea>());
+      expect(paintFinder, findsOneWidget); // there seems to be a CustomPaint in the default widget tree
+    });
 
-  testWidgets("Measurement should show three Points", (WidgetTester tester) async {
-    final List<double> expectedDistances = [80, 100];
+    testWidgets("Measurement should show three Points", (WidgetTester tester) async {
+      final List<double> expectedDistances = [80, 100];
 
-    final measurementView = Measurement(
-      child: imageWidget,
-      documentSize: Size(imageWidth, imageHeight),
-      measure: true,
-      distanceCallback: distanceCallback,
-    );
+      final measurementView = Measurement(
+        child: imageWidget,
+        documentSize: Size(imageWidth, imageHeight),
+        measure: true,
+        distanceCallback: distanceCallback,
+      );
 
-    await createApp(tester, measurementView);
+      await createApp(tester, measurementView);
 
-    final gesture = await tester.startGesture(Offset(10, 20));
-    await gesture.up();
+      final gesture = await tester.startGesture(Offset(10, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(90, 20));
-    await gesture.up();
+      await gesture.down(Offset(90, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(90, 120));
-    await gesture.up();
+      await gesture.down(Offset(90, 120));
+      await gesture.up();
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    final paintFinder = find.byType(typeOf<CustomPaint>());
+      final paintFinder = find.byType(typeOf<CustomPaint>());
 
-    expect(paintFinder, findsNWidgets(3));
-    expect(distances, expectedDistances);
-  });
+      expect(paintFinder, findsNWidgets(3));
+      expect(distances, expectedDistances);
+    });
 
-  testWidgets("Measurement should show three points after moving one point", (WidgetTester tester) async {
-    final List<double> expectedDistances = [80, 100];
+    testWidgets("Measurement should show three points after moving one point", (WidgetTester tester) async {
+      final List<double> expectedDistances = [80, 100];
 
-    final measurementView = Measurement(
-      child: imageWidget,
-      documentSize: Size(imageWidth, imageHeight),
-      measure: true,
-      distanceCallback: distanceCallback,
-    );
+      final measurementView = Measurement(
+        child: imageWidget,
+        documentSize: Size(imageWidth, imageHeight),
+        measure: true,
+        distanceCallback: distanceCallback,
+      );
 
-    await createApp(tester, measurementView);
+      await createApp(tester, measurementView);
 
-    final gesture = await tester.startGesture(Offset(10, 20));
-    await gesture.up();
+      final gesture = await tester.startGesture(Offset(10, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(90, 20));
-    await gesture.up();
+      await gesture.down(Offset(90, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(40, 150));
-    await gesture.up();
+      await gesture.down(Offset(40, 150));
+      await gesture.up();
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    Finder paintFinder = find.byType(typeOf<CustomPaint>());
+      Finder paintFinder = find.byType(typeOf<CustomPaint>());
 
-    expect(paintFinder, findsNWidgets(3));
-    expect(distances, isNot(expectedDistances));
+      expect(paintFinder, findsNWidgets(3));
+      expect(distances, isNot(expectedDistances));
 
-    await gesture.down(Offset(45, 145));
-    await gesture.moveTo(Offset(90, 120));
-    await gesture.up();
+      await gesture.down(Offset(45, 145));
+      await gesture.moveTo(Offset(90, 120));
+      await gesture.up();
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    expect(distances, expectedDistances);
-  });
+      expect(distances, expectedDistances);
+    });
 
-  testWidgets("Measurement should show four points after moving one point and setting another one at that position", (WidgetTester tester) async {
-    final List<double> expectedDistances = [80, sqrt(100 * 100 + 200 * 200), sqrt(140 * 140 + 70 * 70)];
+    testWidgets("Measurement should show four points after moving one point and setting another one at that position", (WidgetTester tester) async {
+      final List<double> expectedDistances = [80, sqrt(100 * 100 + 200 * 200), sqrt(140 * 140 + 70 * 70)];
 
-    final measurementView = Measurement(
-      child: imageWidget,
-      documentSize: Size(imageWidth, imageHeight),
-      measure: true,
-      distanceCallback: distanceCallback,
-    );
+      final measurementView = Measurement(
+        child: imageWidget,
+        documentSize: Size(imageWidth, imageHeight),
+        measure: true,
+        distanceCallback: distanceCallback,
+      );
 
-    await createApp(tester, measurementView);
+      await createApp(tester, measurementView);
 
-    final gesture = await tester.startGesture(Offset(10, 20));
-    await gesture.up();
+      final gesture = await tester.startGesture(Offset(10, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(90, 20));
-    await gesture.up();
+      await gesture.down(Offset(90, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(40, 150));
-    await gesture.up();
+      await gesture.down(Offset(40, 150));
+      await gesture.up();
 
-    await gesture.down(Offset(45, 145));
-    await gesture.moveTo(Offset(190, 220));
-    await gesture.up();
+      await gesture.down(Offset(45, 145));
+      await gesture.moveTo(Offset(190, 220));
+      await gesture.up();
 
-    await gesture.down(Offset(50, 150));
-    await gesture.up();
+      await gesture.down(Offset(50, 150));
+      await gesture.up();
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    Finder paintFinder = find.byType(typeOf<CustomPaint>());
+      Finder paintFinder = find.byType(typeOf<CustomPaint>());
 
-    expect(paintFinder, findsNWidgets(4));
-    expect(distances, expectedDistances);
-  });
+      expect(paintFinder, findsNWidgets(4));
+      expect(distances, expectedDistances);
+    });
 
-  testWidgets("Measurement should show distance with set scale and zoom", (WidgetTester tester) async {
-    final List<double> expectedDistances = [80];
+    testWidgets("Measurement should show distance with set scale and zoom", (WidgetTester tester) async {
+      final List<double> expectedDistances = [80];
 
-    final measurementView = Measurement(
-      child: imageWidget,
-      documentSize: Size(imageWidth, imageHeight),
-      measure: true,
-      distanceCallback: distanceCallback,
-      scale: 1 / 2.0,
-      zoom: 2.0,
-    );
+      final measurementView = Measurement(
+        child: imageWidget,
+        documentSize: Size(imageWidth, imageHeight),
+        measure: true,
+        distanceCallback: distanceCallback,
+        scale: 1 / 2.0,
+        zoom: 2.0,
+      );
 
-    await createApp(tester, measurementView);
+      await createApp(tester, measurementView);
 
-    final gesture = await tester.startGesture(Offset(10, 20));
-    await gesture.up();
+      final gesture = await tester.startGesture(Offset(10, 20));
+      await gesture.up();
 
-    await gesture.down(Offset(90, 20));
-    await gesture.up();
+      await gesture.down(Offset(90, 20));
+      await gesture.up();
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    final paintFinder = find.byType(typeOf<CustomPaint>());
+      final paintFinder = find.byType(typeOf<CustomPaint>());
 
-    expect(paintFinder, findsNWidgets(2));
-    expect(distances, expectedDistances);
+      expect(paintFinder, findsNWidgets(2));
+      expect(distances, expectedDistances);
+    });
   });
 }

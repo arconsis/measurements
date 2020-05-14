@@ -13,7 +13,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Measure Bloc Test", () {
+  group("Measure Bloc Unit Test", () {
     final imageScaleFactor = 3.0;
     final magnificationRadius = 50.0;
 

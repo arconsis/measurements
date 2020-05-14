@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Metadata Repository Test", () {
+  group("Metadata Repository Unit Test", () {
     final expectedMeasurement = true;
     final expectedShowDistance = true;
     final Function(List<double>) expectedCallback = null;

@@ -16,7 +16,7 @@ class MockMetadataRepository extends Mock implements MetadataRepository {}
 class MockImage extends Mock implements Image {}
 
 void main() {
-  group("Metadata Bloc Test", () {
+  group("Metadata Bloc Unit Test", () {
     MetadataRepository mockedRepository;
     BehaviorSubject<bool> measurement;
     Image mockedImage;
