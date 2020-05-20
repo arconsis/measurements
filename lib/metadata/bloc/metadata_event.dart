@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:measurements/style/magnification_style.dart';
 
 abstract class MetadataEvent extends Equatable {
 }
@@ -28,8 +29,9 @@ class MetadataStartedEvent extends MetadataEvent {
   final double zoom;
   final bool measure;
   final bool showDistances;
+  final MagnificationStyle magnificationStyle;
 
-  MetadataStartedEvent(this.documentSize, this.callback, this.scale, this.zoom, this.measure, this.showDistances);
+  MetadataStartedEvent(this.documentSize, this.callback, this.scale, this.zoom, this.measure, this.showDistances, this.magnificationStyle);
 
   @override
   List<Object> get props => [documentSize, callback, scale, zoom, measure, showDistances];

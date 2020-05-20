@@ -125,6 +125,7 @@ class MeasureArea extends StatelessWidget {
           image: state.backgroundImage,
           imageScaleFactor: state.imageScaleFactor,
           style: magnificationStyle,
+          magnificationOffset: state.magnificationOffset,
         ),
       );
     }

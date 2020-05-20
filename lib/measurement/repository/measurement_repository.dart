@@ -21,8 +21,6 @@ class MeasurementRepository {
   int _currentIndex = -1;
 
   MeasurementRepository(MetadataRepository repository) {
-    _logger.log("Created Repository");
-
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
@@ -33,6 +31,8 @@ class MeasurementRepository {
     });
     repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
     repository.callback.listen((callback) => _callback = callback);
+
+    _logger.log("Created Repository");
   }
 
   Stream<List<Offset>> get points => _points.stream;

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -18,7 +19,8 @@ class MetadataRepository {
   final _documentSize = BehaviorSubject<Size>();
   final _scale = BehaviorSubject<double>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
-  final _viewWidth = BehaviorSubject<double>();
+  final _viewSize = BehaviorSubject<Size>();
+  final _magnificationRadius = BehaviorSubject<double>();
 
   final _viewWidthChangeFactor = BehaviorSubject<double>();
 
@@ -38,18 +40,23 @@ class MetadataRepository {
 
   Stream<Offset> get viewCenter => _viewCenter.stream;
 
+  Stream<Size> get viewSize => _viewSize.stream;
+
+  Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
+
   Stream<double> get viewScaleFactor => _viewWidthChangeFactor.stream;
 
   Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
-  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize) {
+  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize, MagnificationStyle magnificationStyle) {
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
     _scale.value = scale;
     _zoomLevel.value = zoom;
     _documentSize.value = documentSize;
+    _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
 
     _updateTransformationFactor();
   }
@@ -59,11 +66,11 @@ class MetadataRepository {
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
-    if (_viewWidth.value == null) {
-      _viewWidth.value = size.width;
-    } else if (_viewWidth.value != size.width) {
-      _viewWidthChangeFactor.value = size.width / _viewWidth.value;
-      _viewWidth.value = size.width;
+    if (_viewSize.value == null) {
+      _viewSize.value = size;
+    } else if (_viewSize.value.width != size.width) {
+      _viewWidthChangeFactor.value = size.width / _viewSize.value.width;
+      _viewSize.value = size;
     }
 
     _updateTransformationFactor();
@@ -77,7 +84,8 @@ class MetadataRepository {
     _showDistance.close();
     _enableMeasure.close();
     _currentBackgroundImage.close();
-    _viewWidth.close();
+    _viewSize.close();
+    _magnificationRadius.close();
     _viewCenter.close();
     _imageScaleFactor.close();
     _transformationFactor.close();
@@ -85,10 +93,10 @@ class MetadataRepository {
   }
 
   void _updateTransformationFactor() async {
-    if (_scale.hasValue && _zoomLevel.hasValue && _viewWidth.hasValue && _documentSize.hasValue) {
+    if (_scale.hasValue && _zoomLevel.hasValue && _viewSize.hasValue && _documentSize.hasValue) {
       double scale = _scale.value;
       double zoomLevel = _zoomLevel.value;
-      double viewWidth = _viewWidth.value;
+      double viewWidth = _viewSize.value.width;
       double documentWidth = _documentSize.value.width;
 
       _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);

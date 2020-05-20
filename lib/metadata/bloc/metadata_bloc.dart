@@ -36,7 +36,8 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
           event.callback,
           event.scale,
           event.zoom,
-          event.documentSize
+          event.documentSize,
+          event.magnificationStyle
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);

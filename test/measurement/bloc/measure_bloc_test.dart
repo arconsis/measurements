@@ -23,6 +23,9 @@ void main() {
       mockedMetadataRepository = MockedMetadataRepository();
       mockedMeasurementRepository = MockedMeasurementRepository();
 
+      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
+
       GetIt.I.registerSingleton(mockedMeasurementRepository);
       GetIt.I.registerSingleton(mockedMetadataRepository);
     });
@@ -59,8 +62,8 @@ void main() {
             return;
           },
           expect: [
-            MeasureActiveState(Offset(0, 0), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
-            MeasureActiveState(Offset(10, 10), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+            MeasureActiveState(Offset(0, 0), Offset(-10, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+            MeasureActiveState(Offset(10, 10), Offset(0, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
             MeasureInactiveState()
           ],
           verify: (_) {

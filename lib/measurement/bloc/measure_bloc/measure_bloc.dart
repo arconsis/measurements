@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -10,24 +10,27 @@ import 'package:measurements/util/logger.dart';
 
 class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   final _logger = Logger(LogDistricts.MEASURE_BLOC);
+  final _defaultMagnificationOffset = Offset(0, 40);
 
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
 
-  ui.Image _backgroundImage;
+  Image _backgroundImage;
   double _imageScaleFactor;
+  Size _viewSize;
+  double _magnificationRadius;
+  Offset _magnificationOffset;
 
   MeasureBloc() {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _metadataRepository.backgroundImage.listen((ui.Image image) {
-      _logger.log("background updated $image");
-      _backgroundImage = image;
-    });
-    _metadataRepository.imageScaleFactor.listen((factor) {
-      _logger.log("imageScale updated: $factor");
-      _imageScaleFactor = factor;
+    _metadataRepository.backgroundImage.listen((image) => _backgroundImage = image);
+    _metadataRepository.imageScaleFactor.listen((factor) => _imageScaleFactor = factor);
+    _metadataRepository.viewSize.listen((size) => _viewSize = size);
+    _metadataRepository.magnificationCircleRadius.listen((radius) {
+      _magnificationRadius = radius;
+      _magnificationOffset = Offset(_defaultMagnificationOffset.dx, _defaultMagnificationOffset.dy + radius);
     });
 
     _logger.log("Created Bloc");
@@ -38,7 +41,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
   @override
   void onEvent(MeasureEvent event) {
-    _logger.log("received event: $event");
+//    _logger.log("received event: $event");
 
     if (event is MeasureDownEvent) {
       _measureRepository.registerDownEvent(event.position);
@@ -59,9 +62,10 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
         return Transition(currentState: transition.currentState,
             event: transition.event,
             nextState: MeasureActiveState(
-                state.position,
-                backgroundImage: _backgroundImage,
-                imageScaleFactor: _imageScaleFactor,
+              state.position,
+              state.magnificationOffset,
+              backgroundImage: _backgroundImage,
+              imageScaleFactor: _imageScaleFactor,
             )
         );
       } else {
@@ -73,9 +77,38 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   @override
   Stream<MeasureState> mapEventToState(MeasureEvent event) async* {
     if (event is MeasureDownEvent || event is MeasureMoveEvent) {
-      yield MeasureActiveState(event.position);
+      Offset magnificationPosition = event.position - _magnificationOffset;
+
+      if (magnificationGlassFitsWithoutModification(magnificationPosition)) {
+        yield MeasureActiveState(event.position, _magnificationOffset);
+        _logger.log("magnification normal");
+      } else {
+        Offset modifiedOffset = _magnificationOffset;
+
+        if (event.position.dy < _magnificationOffset.dy + _magnificationRadius) {
+          _logger.log("magnification upper");
+
+          modifiedOffset = Offset(modifiedOffset.dx, -modifiedOffset.dy);
+        }
+
+        if (event.position.dx < _magnificationRadius) {
+          _logger.log("magnification left");
+
+          modifiedOffset = Offset(event.position.dx - _magnificationRadius, modifiedOffset.dy);
+        } else if (event.position.dx > _viewSize.width - _magnificationRadius) {
+          _logger.log("magnification right");
+
+          modifiedOffset = Offset(_magnificationRadius - (_viewSize.width - event.position.dx), modifiedOffset.dy);
+        }
+
+        yield MeasureActiveState(event.position, modifiedOffset);
+      }
     } else if (event is MeasureUpEvent) {
       yield MeasureInactiveState();
     }
   }
+
+  bool magnificationGlassFitsWithoutModification(Offset magnificationPosition) =>
+      magnificationPosition > Offset(_magnificationRadius, _magnificationRadius)
+          && magnificationPosition < Offset(_viewSize.width - _magnificationRadius, _viewSize.height - _magnificationRadius);
 }

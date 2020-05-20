@@ -18,7 +18,7 @@ import 'repository/metadata_repository.dart';
 
 /*
  * TODO list:
- * - bug
+ * x bugs
  *  x slow movement of points - states are equal -> no update -> copy points and distances in measurement repository instead of using same object
  *  x metadata not loaded on start -> stateless measurementView and update arguments in build method
  *  x when distances are shown error during movement -> detect null values in distance list and don't paint distances there
@@ -34,11 +34,18 @@ import 'repository/metadata_repository.dart';
  *  - class to style delete (position, widget, etc.)
  *  - slow movement should move points with half distance
  *  - option to return surface area (need to close contour)
+ *  - return tolerance (size of one pixel in converted mm)
+ *
+ *  - line type through style
+ *  - delete button/interaction styleable through api user
+ *  - example app to control all features
+ *  - snap to line
  *
  * - improve
  *  x add/update tests
  *  x state for painting with distances should contain holders
- *  - use arconsis blue as default
+ *  x use arconsis blue as default
+ *  - mag-glass below finger when on top and move to sides
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *  - incorporate zoomable widget in main as child
@@ -156,7 +163,8 @@ class MeasurementView extends StatelessWidget {
             scale,
             zoom,
             measure,
-            showDistanceOnLine)
+            showDistanceOnLine,
+            magnificationStyle)
     );
   }
 

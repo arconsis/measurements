@@ -12,13 +12,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: 4.0.0
-  get_it: 4.0.1
-  image: 2.1.4
-  path_provider: 1.6.5
-  rxdart: 0.23.0
+  get_it: 4.0.2
+  image: 2.1.12
+  path_provider: 1.6.8
+  rxdart: 0.24.1
 
 dev_dependencies:
-  bloc_test: 5.0.0
+  bloc_test: 5.1.0
   flutter_test:
     sdk: flutter
   mockito: 4.1.1

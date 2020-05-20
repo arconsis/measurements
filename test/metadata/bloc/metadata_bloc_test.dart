@@ -7,6 +7,7 @@ import 'package:measurements/metadata/bloc/metadata_bloc.dart';
 import 'package:measurements/metadata/bloc/metadata_event.dart';
 import 'package:measurements/metadata/bloc/metadata_state.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -25,6 +26,7 @@ void main() {
     final zoom = 1.0;
     final measure = true;
     final showDistance = true;
+    final magnificationStyle = MagnificationStyle();
 
     final startedEvent = MetadataStartedEvent(
         documentSize,
@@ -32,7 +34,8 @@ void main() {
         scale,
         zoom,
         measure,
-        showDistance
+        showDistance,
+        magnificationStyle
     );
 
     setUp(() {

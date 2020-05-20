@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
@@ -16,6 +17,7 @@ void main() {
     final expectedDocumentSize = Size(200, 300);
     final expectedViewCenter = Offset(100, 150);
     final Image expectedImage = MockedImage.mock;
+    final magnificationStyle = MagnificationStyle();
 
     final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
@@ -36,7 +38,14 @@ void main() {
     test("started", () {
       when((expectedImage as MockedImage).width).thenReturn(600);
 
-      metadataRepository.registerStartupValuesChange(expectedMeasurement, expectedShowDistance, expectedCallback, expectedScale, expectedZoom, expectedDocumentSize);
+      metadataRepository.registerStartupValuesChange(
+          expectedMeasurement,
+          expectedShowDistance,
+          expectedCallback,
+          expectedScale,
+          expectedZoom,
+          expectedDocumentSize,
+          magnificationStyle);
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
 
       metadataRepository.measurement.listen((actual) => expect(actual, expectedMeasurement));
@@ -56,7 +65,14 @@ void main() {
 
       when((expectedImage as MockedImage).width).thenReturn(600);
 
-      metadataRepository.registerStartupValuesChange(expectedMeasurement, expectedShowDistance, expectedCallback, expectedScale, expectedZoom, expectedDocumentSize);
+      metadataRepository.registerStartupValuesChange(
+          expectedMeasurement,
+          expectedShowDistance,
+          expectedCallback,
+          expectedScale,
+          expectedZoom,
+          expectedDocumentSize,
+          magnificationStyle);
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
       metadataRepository.registerBackgroundChange(expectedImage, updatedViewSize);
 
