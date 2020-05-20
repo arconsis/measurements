@@ -9,8 +9,8 @@ import 'package:measurements/measurement/repository/measurement_repository.dart'
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
+import 'package:measurements/util/logger.dart';
 
-import '../util/logger.dart';
 import 'bloc/metadata_bloc.dart';
 import 'bloc/metadata_event.dart';
 import 'bloc/metadata_state.dart';
@@ -26,25 +26,26 @@ import 'repository/metadata_repository.dart';
  *  + distance switch provided twice -> correct because measurementView is build twice
  *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
  *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
+ *  - switching measure off and back on causes exception when points are set
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
  *  x line type through style
  *  x class to style points (color, size, etc.) -> separate style classes for points, distances and magnification
+ *  x return tolerance (size of one pixel in converted mm) (and add as info to displayed distance)
  *  - delete points
  *  - class to style delete (position, widget, etc.)
  *  - slow movement should move points with half distance
  *  - option to return surface area (need to close contour)
- *  - return tolerance (size of one pixel in converted mm) (and add as info to displayed distance)
  *  - snap to line
  *
- *  - example app to control all features
+ *  - example app to control ALL features
  *
  * - improve
  *  x add/update tests
  *  x state for painting with distances should contain holders
  *  x use arconsis blue as default
- *  - mag-glass below finger when on top and move to sides
+ *  x mag-glass below finger when on top and move to sides
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *  - incorporate zoomable widget in main as child
@@ -191,19 +192,20 @@ class MeasurementView extends StatelessWidget {
   Widget _overlay(MetadataState state) {
     if (state.measure) {
       return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => MeasureBloc(),),
-            BlocProvider(create: (context) => PointsBloc(),),
-          ],
-          child: MeasureArea(
-            pointStyle: pointStyle,
-            magnificationStyle: magnificationStyle,
-            distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
-            child: RepaintBoundary(
-              key: _childKey,
-              child: child,
-            ),
-          ));
+        providers: [
+          BlocProvider(create: (context) => MeasureBloc(),),
+          BlocProvider(create: (context) => PointsBloc(),),
+        ],
+        child: MeasureArea(
+          pointStyle: pointStyle,
+          magnificationStyle: magnificationStyle,
+          distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
+          child: RepaintBoundary(
+            key: _childKey,
+            child: child,
+          ),
+        ),
+      );
     } else {
       return child;
     }

@@ -39,9 +39,11 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       _pointsAndDistancesSubscription?.cancel();
 
       if (showDistances) {
-        _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
+        _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(
+            _pointsAndDistanceListener);
       } else {
-        _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
+        _onlyPointsSubscription = _measureRepository.points.listen(
+            _pointsListener);
       }
     });
 
@@ -58,6 +60,13 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   void onEvent(PointsEvent event) {
     _logger.log("received event: $event");
     super.onEvent(event);
+  }
+
+  @override
+  Future<void> close() {
+    _onlyPointsSubscription?.cancel();
+    _pointsAndDistancesSubscription?.cancel();
+    return super.close();
   }
 
   @override
