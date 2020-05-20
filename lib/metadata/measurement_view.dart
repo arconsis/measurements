@@ -29,17 +29,16 @@ import 'repository/metadata_repository.dart';
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
- *  - delete points
+ *  x line type through style
  *  x class to style points (color, size, etc.) -> separate style classes for points, distances and magnification
+ *  - delete points
  *  - class to style delete (position, widget, etc.)
  *  - slow movement should move points with half distance
  *  - option to return surface area (need to close contour)
- *  - return tolerance (size of one pixel in converted mm)
- *
- *  - line type through style
- *  - delete button/interaction styleable through api user
- *  - example app to control all features
+ *  - return tolerance (size of one pixel in converted mm) (and add as info to displayed distance)
  *  - snap to line
+ *
+ *  - example app to control all features
  *
  * - improve
  *  x add/update tests
@@ -65,6 +64,7 @@ class Measurement extends StatelessWidget {
   final bool measure;
   final bool showDistanceOnLine;
   final Function(List<double>) distanceCallback;
+  final Function(double) distanceToleranceCallback;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -78,6 +78,7 @@ class Measurement extends StatelessWidget {
     this.measure = false,
     this.showDistanceOnLine = false,
     this.distanceCallback,
+    this.distanceToleranceCallback,
     this.magnificationZoomFactor = 2.0,
     this.pointStyle = const PointStyle(),
     this.magnificationStyle = const MagnificationStyle(),
@@ -103,6 +104,7 @@ class Measurement extends StatelessWidget {
           measure,
           showDistanceOnLine,
           distanceCallback,
+          distanceToleranceCallback,
           magnificationZoomFactor,
           pointStyle,
           magnificationStyle,
@@ -124,6 +126,7 @@ class MeasurementView extends StatelessWidget {
   final bool measure;
   final bool showDistanceOnLine;
   final Function(List<double>) distanceCallback;
+  final Function(double) distanceToleranceCallback;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -135,6 +138,7 @@ class MeasurementView extends StatelessWidget {
       this.measure,
       this.showDistanceOnLine,
       this.distanceCallback,
+      this.distanceToleranceCallback,
       this.magnificationZoomFactor,
       this.pointStyle,
       this.magnificationStyle,
@@ -160,6 +164,7 @@ class MeasurementView extends StatelessWidget {
         MetadataStartedEvent(
             documentSize,
             distanceCallback,
+            distanceToleranceCallback,
             scale,
             zoom,
             measure,

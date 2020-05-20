@@ -25,6 +25,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   Function(DrawingHolder) _pointsAndDistanceListener;
 
   Offset _viewCenter;
+  double _tolerance;
 
   PointsBloc() {
     _pointsListener = (points) => add(PointsOnlyEvent(points));
@@ -44,9 +45,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       }
     });
 
-    _metadataRepository.viewCenter.listen((center) {
-      _viewCenter = center;
-    });
+    _metadataRepository.viewCenter.listen((center) => _viewCenter = center);
+    _metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance);
 
     _logger.log("Created Bloc");
   }
@@ -79,11 +79,11 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
           nullIndices.add(event.distances.indexOf(null));
           nullIndices.add(event.distances.lastIndexOf(null));
 
-          yield PointsAndDistanceActiveState(holders, _viewCenter, nullIndices);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
         } else if (event.points.length - 1 > event.distances.length) {
-          yield PointsAndDistanceActiveState(holders, _viewCenter, [event.distances.length]);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
         } else {
-          yield PointsAndDistanceState(holders, _viewCenter);
+          yield PointsAndDistanceState(holders, _viewCenter, _tolerance);
         }
       }
     }

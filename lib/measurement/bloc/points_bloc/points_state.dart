@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/gestures.dart';
-import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/overlay/holder.dart';
 
 abstract class PointsState extends Equatable {
@@ -44,25 +43,26 @@ class PointsOnlyState extends PointsState {
 class PointsAndDistanceState extends PointsState {
   final List<Holder> holders;
   final Offset viewCenter;
+  final double tolerance;
 
-  PointsAndDistanceState(this.holders, this.viewCenter);
+  PointsAndDistanceState(this.holders, this.viewCenter, this.tolerance);
 
   @override
-  List<Object> get props => [holders, viewCenter];
+  List<Object> get props => [holders, viewCenter, tolerance];
 
   @override
   String toString() {
-    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter";
+    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter -- tolerance: $tolerance";
   }
 }
 
 class PointsAndDistanceActiveState extends PointsAndDistanceState {
   final List<int> nullIndices;
 
-  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, this.nullIndices) : super(holders, viewCenter);
+  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, this.nullIndices) : super(holders, viewCenter, tolerance);
 
   @override
-  List<Object> get props => [holders, viewCenter, nullIndices];
+  List<Object> get props => [holders, viewCenter, tolerance, nullIndices];
 
   @override
   String toString() {

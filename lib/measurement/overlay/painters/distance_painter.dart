@@ -13,7 +13,9 @@ class DistancePainter extends material.CustomPainter {
   final Offset viewCenter;
 
   final double _offsetPerDigit = 4.57;
-  Offset _zeroPoint = Offset(-24, 0);
+  Offset _zeroPoint;
+  final Offset _zeroPointWithoutTolerance = Offset(-29, 0);
+  final Offset _zeroPointWithTolerance = Offset(-47, 0);
 
   Paragraph _paragraph;
   double _radians;
@@ -23,7 +25,14 @@ class DistancePainter extends material.CustomPainter {
     @material.required Offset end,
     @material.required this.distance,
     @material.required this.viewCenter,
+    @material.required double tolerance,
     @material.required DistanceStyle style}) {
+    if (style.showTolerance) {
+      _zeroPoint = _zeroPointWithTolerance;
+    } else {
+      _zeroPoint = _zeroPointWithoutTolerance;
+    }
+
     if (distance > 0) {
       _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
     }
@@ -53,7 +62,11 @@ class DistancePainter extends material.CustomPainter {
       ),
     );
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor),);
-    paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)} mm");
+    if (style.showTolerance) {
+      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}mm");
+    } else {
+      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}mm");
+    }
 
     _paragraph = paragraphBuilder.build();
     _paragraph.layout(ParagraphConstraints(width: 300));

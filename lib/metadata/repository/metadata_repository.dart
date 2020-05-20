@@ -15,6 +15,7 @@ class MetadataRepository {
   final _currentBackgroundImage = BehaviorSubject<Image>();
   final _viewCenter = BehaviorSubject<Offset>();
   final _distanceCallback = BehaviorSubject<Function(List<double>)>();
+  final _toleranceCallback = BehaviorSubject<Function(double)>();
 
   final _documentSize = BehaviorSubject<Size>();
   final _scale = BehaviorSubject<double>();
@@ -40,6 +41,8 @@ class MetadataRepository {
 
   Stream<Offset> get viewCenter => _viewCenter.stream;
 
+  Stream<double> get tolerance => _transformationFactor.stream;
+
   Stream<Size> get viewSize => _viewSize.stream;
 
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
@@ -49,10 +52,12 @@ class MetadataRepository {
   Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
-  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, double scale, double zoom, Size documentSize, MagnificationStyle magnificationStyle) {
+  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, Function(double) toleranceCallback, double scale, double zoom, Size documentSize,
+      MagnificationStyle magnificationStyle) {
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
+    _toleranceCallback.value = toleranceCallback;
     _scale.value = scale;
     _zoomLevel.value = zoom;
     _documentSize.value = documentSize;
@@ -79,6 +84,7 @@ class MetadataRepository {
   void dispose() {
     _documentSize.close();
     _distanceCallback.close();
+    _toleranceCallback.close();
     _scale.close();
     _zoomLevel.close();
     _showDistance.close();
@@ -101,6 +107,7 @@ class MetadataRepository {
 
       _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
 
+      _logger.log("tolerance is: ${_transformationFactor.value}mm");
       _logger.log("updated transformationFactor");
     }
   }

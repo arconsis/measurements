@@ -77,7 +77,7 @@ class MeasureArea extends StatelessWidget {
     state.holders.asMap().forEach((index, holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
       if (!state.nullIndices.contains(index)) {
-        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.viewCenter));
+        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
       }
     });
 
@@ -89,7 +89,7 @@ class MeasureArea extends StatelessWidget {
 
     state.holders.forEach((holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
-      widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.viewCenter));
+      widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
     });
 
     return widgets;
@@ -105,12 +105,13 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,
         end: last,
         distance: distance,
+        tolerance: tolerance,
         viewCenter: viewCenter,
         style: distanceStyle,
       ),

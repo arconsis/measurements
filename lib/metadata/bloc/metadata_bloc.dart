@@ -34,6 +34,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
           event.measure,
           event.showDistances,
           event.callback,
+          event.toleranceCallback,
           event.scale,
           event.zoom,
           event.documentSize,

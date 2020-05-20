@@ -6,6 +6,7 @@ class DistanceStyle {
   final Color textColor;
 
   final int numDecimalPlaces;
+  final bool showTolerance;
 
-  const DistanceStyle({this.textColor = Colors.drawColor, this.numDecimalPlaces = 2});
+  const DistanceStyle({this.textColor = Colors.drawColor, this.numDecimalPlaces = 2, this.showTolerance = false});
 }
