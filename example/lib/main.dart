@@ -48,6 +48,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color(0xff1280b3),
           title: Row(
             children: <Widget>[
               IconButton(onPressed: () {

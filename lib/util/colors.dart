@@ -1,5 +1,5 @@
 import 'dart:ui';
 
 class Colors {
-  static const Color drawColor = Color(0xFFAADD22);
+  static const Color drawColor = Color(0xff1280b3);
 }
