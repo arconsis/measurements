@@ -77,6 +77,7 @@ class _MyAppState extends State<MyApp> {
             distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,
             measure: measure,
+            pointStyle: PointStyle(lineType: DashedLine()),
           ),
         ),
       ),

@@ -41,7 +41,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
   @override
   void onEvent(MeasureEvent event) {
-//    _logger.log("received event: $event");
+    _logger.log("received event: $event");
 
     if (event is MeasureDownEvent) {
       _measureRepository.registerDownEvent(event.position);
@@ -81,23 +81,16 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
       if (magnificationGlassFitsWithoutModification(magnificationPosition)) {
         yield MeasureActiveState(event.position, _magnificationOffset);
-        _logger.log("magnification normal");
       } else {
         Offset modifiedOffset = _magnificationOffset;
 
         if (event.position.dy < _magnificationOffset.dy + _magnificationRadius) {
-          _logger.log("magnification upper");
-
           modifiedOffset = Offset(modifiedOffset.dx, -modifiedOffset.dy);
         }
 
         if (event.position.dx < _magnificationRadius) {
-          _logger.log("magnification left");
-
           modifiedOffset = Offset(event.position.dx - _magnificationRadius, modifiedOffset.dy);
         } else if (event.position.dx > _viewSize.width - _magnificationRadius) {
-          _logger.log("magnification right");
-
           modifiedOffset = Offset(_magnificationRadius - (_viewSize.width - event.position.dx), modifiedOffset.dy);
         }
 
