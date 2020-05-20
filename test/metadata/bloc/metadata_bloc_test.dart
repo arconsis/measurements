@@ -31,6 +31,7 @@ void main() {
     final startedEvent = MetadataStartedEvent(
         documentSize,
         null,
+        null,
         scale,
         zoom,
         measure,

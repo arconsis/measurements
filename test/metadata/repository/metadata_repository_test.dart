@@ -12,6 +12,7 @@ void main() {
     final expectedMeasurement = true;
     final expectedShowDistance = true;
     final Function(List<double>) expectedCallback = null;
+    final Function(double) expectedToleranceCallback = null;
     final expectedScale = 4.0;
     final expectedZoom = 5.0;
     final expectedDocumentSize = Size(200, 300);
@@ -42,6 +43,7 @@ void main() {
           expectedMeasurement,
           expectedShowDistance,
           expectedCallback,
+          expectedToleranceCallback,
           expectedScale,
           expectedZoom,
           expectedDocumentSize,
@@ -69,6 +71,7 @@ void main() {
           expectedMeasurement,
           expectedShowDistance,
           expectedCallback,
+          expectedToleranceCallback,
           expectedScale,
           expectedZoom,
           expectedDocumentSize,

@@ -22,6 +22,8 @@ void main() {
       measurementRepository = MockedMeasurementRepository();
       metadataRepository = MockedMetadataRepository();
 
+      when(metadataRepository.tolerance).thenAnswer((_) => Stream.fromIterable([0.0]));
+
       GetIt.I.registerSingleton(measurementRepository);
       GetIt.I.registerSingleton(metadataRepository);
     });
@@ -90,7 +92,7 @@ void main() {
 
           return PointsBloc();
         },
-        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200))], Offset(0, 0))],
+        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200))], Offset(0, 0), 0.0)],
       );
 
       blocTest("active measurement with two points and distances",
@@ -102,7 +104,7 @@ void main() {
 
           return PointsBloc();
         },
-        expect: [PointsAndDistanceActiveState([Holder.withDistance(Offset(10, 10), Offset(20, 20), null)], Offset(0, 0), [0, 0])],
+        expect: [PointsAndDistanceActiveState([Holder.withDistance(Offset(10, 10), Offset(20, 20), null)], Offset(0, 0), 0.0, [0, 0])],
       );
 
       blocTest("active measurement on second last point with five points and distances",
@@ -128,6 +130,7 @@ void main() {
             Holder.withDistance(Offset(30, 30), Offset(10, 30), null)
           ],
               Offset(0, 0),
+              0.0,
               [2, 3]
           ),
         ],
