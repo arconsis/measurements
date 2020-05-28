@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:photo_view/photo_view.dart';
 
 import 'metadata_event.dart';
 import 'metadata_state.dart';
@@ -10,6 +11,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
 
   MetadataRepository _repository;
+  PhotoViewController _controller;
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
@@ -18,11 +20,17 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
       add(MetadataUpdatedEvent(measure));
     });
 
+    _controller = PhotoViewController();
+
+    _controller.outputStateStream.listen((state) {
+
+    });
+
     _logger.log("Created Bloc");
   }
 
   @override
-  MetadataState get initialState => MetadataState();
+  MetadataState get initialState => MetadataState(_controller);
 
   @override
   void onEvent(MetadataEvent event) {
@@ -35,7 +43,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
           event.callback,
           event.toleranceCallback,
           event.scale,
-          event.zoom,
           event.documentSize,
           event.magnificationStyle
       );
@@ -48,5 +55,12 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
+    yield MetadataState(_controller);
+  }
+
+  @override
+  Future<void> close() {
+    _controller?.dispose();
+    return super.close();
   }
 }

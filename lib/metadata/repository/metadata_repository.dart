@@ -19,9 +19,11 @@ class MetadataRepository {
 
   final _documentSize = BehaviorSubject<Size>();
   final _scale = BehaviorSubject<double>();
-  final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _viewSize = BehaviorSubject<Size>();
   final _magnificationRadius = BehaviorSubject<double>();
+
+  final _contentPosition = BehaviorSubject<Offset>();
+  final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
 
   final _viewWidthChangeFactor = BehaviorSubject<double>();
 
@@ -52,14 +54,13 @@ class MetadataRepository {
   Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
-  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, Function(double) toleranceCallback, double scale, double zoom, Size documentSize,
+  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, Function(double) toleranceCallback, double scale, Size documentSize,
       MagnificationStyle magnificationStyle) {
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
     _toleranceCallback.value = toleranceCallback;
     _scale.value = scale;
-    _zoomLevel.value = zoom;
     _documentSize.value = documentSize;
     _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
 
@@ -81,21 +82,31 @@ class MetadataRepository {
     _updateTransformationFactor();
   }
 
+  void registerResizing(Offset position, double zoom) {
+    _logger.log("Offset: $position, zoom: $zoom");
+    _contentPosition.value = position;
+    _zoomLevel.value = zoom;
+  }
+
   void dispose() {
     _documentSize.close();
     _distanceCallback.close();
     _toleranceCallback.close();
-    _scale.close();
-    _zoomLevel.close();
+    _magnificationRadius.close();
     _showDistance.close();
     _enableMeasure.close();
+    _scale.close();
+
     _currentBackgroundImage.close();
-    _viewSize.close();
-    _magnificationRadius.close();
-    _viewCenter.close();
     _imageScaleFactor.close();
-    _transformationFactor.close();
+    _viewSize.close();
+    _viewCenter.close();
     _viewWidthChangeFactor.close();
+
+    _contentPosition.close();
+    _zoomLevel.close();
+
+    _transformationFactor.close();
   }
 
   void _updateTransformationFactor() async {

@@ -27,19 +27,18 @@ class MetadataStartedEvent extends MetadataEvent {
   final Function(List<double>) callback;
   final Function(double) toleranceCallback;
   final double scale;
-  final double zoom;
   final bool measure;
   final bool showDistances;
   final MagnificationStyle magnificationStyle;
 
-  MetadataStartedEvent(this.documentSize, this.callback, this.toleranceCallback, this.scale, this.zoom, this.measure, this.showDistances, this.magnificationStyle);
+  MetadataStartedEvent(this.documentSize, this.callback, this.toleranceCallback, this.scale, this.measure, this.showDistances, this.magnificationStyle);
 
   @override
-  List<Object> get props => [documentSize, callback, toleranceCallback, scale, zoom, measure, showDistances];
+  List<Object> get props => [documentSize, callback, toleranceCallback, scale, measure, showDistances];
 
   @override
   String toString() {
-    return super.toString() + " documentSize: $documentSize -- scale: $scale -- zoom: $zoom -- measure: $measure -- showDistances: $showDistances";
+    return super.toString() + " documentSize: $documentSize -- scale: $scale -- measure: $measure -- showDistances: $showDistances";
   }
 }
 

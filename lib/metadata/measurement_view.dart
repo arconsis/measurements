@@ -47,9 +47,10 @@ import 'repository/metadata_repository.dart';
  *  x state for painting with distances should contain holders
  *  x use arconsis blue as default
  *  x mag-glass below finger when on top and move to sides
+ *  - incorporate zoomable widget as child
+ *  - add zoom-to-original feature
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
- *  - incorporate zoomable widget as child
  *  - metadata bloc test should verify calls to repository
  *
  * x comments from Christof
@@ -62,7 +63,6 @@ class Measurement extends StatelessWidget {
   final Widget child;
   final Size documentSize;
   final double scale;
-  final double zoom;
   final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
@@ -77,7 +77,6 @@ class Measurement extends StatelessWidget {
     @required this.child,
     this.documentSize = const Size(210, 297),
     this.scale = 1.0,
-    this.zoom = 1.0,
     this.measure = false,
     this.showDistanceOnLine = false,
     this.distanceCallback,
@@ -103,7 +102,6 @@ class Measurement extends StatelessWidget {
           child,
           documentSize,
           scale,
-          zoom,
           measure,
           showDistanceOnLine,
           distanceCallback,
@@ -124,7 +122,6 @@ class MeasurementView extends StatelessWidget {
   final Widget child;
   final Size documentSize;
   final double scale;
-  final double zoom;
   final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
@@ -137,7 +134,6 @@ class MeasurementView extends StatelessWidget {
   MeasurementView(this.child,
       this.documentSize,
       this.scale,
-      this.zoom,
       this.measure,
       this.showDistanceOnLine,
       this.distanceCallback,
@@ -169,7 +165,6 @@ class MeasurementView extends StatelessWidget {
             distanceCallback,
             distanceToleranceCallback,
             scale,
-            zoom,
             measure,
             showDistanceOnLine,
             magnificationStyle)
@@ -206,7 +201,9 @@ class MeasurementView extends StatelessWidget {
             key: _childKey,
             child: child,
           ),
+          basePosition: Alignment.topLeft,
           enableRotation: false,
+          controller: state.controller,
           initialScale: PhotoViewComputedScale.contained,
           minScale: PhotoViewComputedScale.contained,
           maxScale: PhotoViewComputedScale.contained * 5,
