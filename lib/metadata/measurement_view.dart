@@ -48,7 +48,7 @@ import 'repository/metadata_repository.dart';
  *  x mag-glass below finger when on top and move to sides
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
- *  - incorporate zoomable widget in main as child
+ *  - incorporate zoomable widget as child
  *
  * x comments from Christof
  * - mock repository behaviour or hard code the returned values?

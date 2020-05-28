@@ -35,15 +35,20 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _metadataRepository = GetIt.I<MetadataRepository>();
 
     _metadataRepository.showDistances.listen((showDistances) {
-      _onlyPointsSubscription?.cancel();
-      _pointsAndDistancesSubscription?.cancel();
-
       if (showDistances) {
-        _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(
-            _pointsAndDistanceListener);
+        if (_pointsAndDistancesSubscription == null) {
+          _onlyPointsSubscription?.cancel();
+          _onlyPointsSubscription = null;
+
+          _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
+        }
       } else {
-        _onlyPointsSubscription = _measureRepository.points.listen(
-            _pointsListener);
+        if (_onlyPointsSubscription == null) {
+          _pointsAndDistancesSubscription?.cancel();
+          _pointsAndDistancesSubscription = null;
+
+          _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
+        }
       }
     });
 
@@ -64,6 +69,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   Future<void> close() {
+    _logger.log("closing Points Bloc");
     _onlyPointsSubscription?.cancel();
     _pointsAndDistancesSubscription?.cancel();
     return super.close();
