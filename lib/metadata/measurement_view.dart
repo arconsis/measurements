@@ -6,6 +6,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -19,8 +20,7 @@ import 'repository/metadata_repository.dart';
 
 class Measurement extends StatelessWidget {
   final Widget child;
-  final Size documentSize;
-  final double scale;
+  final MeasurementInformation measurementInformation;
   final double zoom;
   final double magnificationZoomFactor;
   final bool measure;
@@ -34,8 +34,7 @@ class Measurement extends StatelessWidget {
   Measurement({
     Key key,
     @required this.child,
-    this.documentSize = const Size(210, 297),
-    this.scale = 1.0,
+    this.measurementInformation = const MeasurementInformation(),
     this.zoom = 1.0,
     this.measure = false,
     this.showDistanceOnLine = false,
@@ -60,8 +59,7 @@ class Measurement extends StatelessWidget {
       create: (context) => MetadataBloc(),
       child: MeasurementView(
           child,
-          documentSize,
-          scale,
+          measurementInformation,
           zoom,
           measure,
           showDistanceOnLine,
@@ -81,8 +79,7 @@ class MeasurementView extends StatelessWidget {
   final GlobalKey _childKey = GlobalKey();
 
   final Widget child;
-  final Size documentSize;
-  final double scale;
+  final MeasurementInformation measurementInformation;
   final double zoom;
   final double magnificationZoomFactor;
   final bool measure;
@@ -94,8 +91,7 @@ class MeasurementView extends StatelessWidget {
   final DistanceStyle distanceStyle;
 
   MeasurementView(this.child,
-      this.documentSize,
-      this.scale,
+      this.measurementInformation,
       this.zoom,
       this.measure,
       this.showDistanceOnLine,
@@ -124,14 +120,14 @@ class MeasurementView extends StatelessWidget {
   void _setStartupArgumentsToBloc(BuildContext context) {
     BlocProvider.of<MetadataBloc>(context).add(
         MetadataStartedEvent(
-            documentSize,
-            distanceCallback,
-            distanceToleranceCallback,
-            scale,
-            zoom,
-            measure,
-            showDistanceOnLine,
-            magnificationStyle)
+          measurementInformation: measurementInformation,
+          measure: measure,
+          showDistances: showDistanceOnLine,
+          zoom: zoom,
+          magnificationStyle: magnificationStyle,
+          callback: distanceCallback,
+          toleranceCallback: distanceToleranceCallback,
+        )
     );
   }
 

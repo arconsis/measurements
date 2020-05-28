@@ -73,9 +73,14 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Measurement(
             child: Image.asset("assets/images/example_portrait.png",),
-            scale: 1 / 2.0,
+            measurementInformation: MeasurementInformation(
+              scale: 1 / 2.0,
+              documentWidthInLengthUnits: Millimeter(210),
+              unitOfMeasurement: UnitOfMeasurement.INCH,
+            ),
             distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,
+            distanceStyle: DistanceStyle(numDecimalPlaces: 4, showTolerance: true),
             measure: measure,
             pointStyle: PointStyle(lineType: DashedLine()),
           ),

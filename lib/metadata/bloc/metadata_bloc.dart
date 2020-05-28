@@ -31,14 +31,13 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
     if (event is MetadataStartedEvent) {
       _repository.registerStartupValuesChange(
-          event.measure,
-          event.showDistances,
-          event.callback,
-          event.toleranceCallback,
-          event.scale,
-          event.zoom,
-          event.documentSize,
-          event.magnificationStyle
+        measurementInformation: event.measurementInformation,
+        measure: event.measure,
+        showDistance: event.showDistances,
+        callback: event.callback,
+        toleranceCallback: event.toleranceCallback,
+        magnificationStyle: event.magnificationStyle,
+        zoom: event.zoom,
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);

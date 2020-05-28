@@ -1,5 +1,7 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
+import 'package:flutter/widgets.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:rxdart/subjects.dart';
@@ -12,13 +14,12 @@ class MetadataRepository {
   final _showDistance = BehaviorSubject<bool>();
   final _transformationFactor = BehaviorSubject<double>();
   final _imageScaleFactor = BehaviorSubject<double>();
-  final _currentBackgroundImage = BehaviorSubject<Image>();
+  final _currentBackgroundImage = BehaviorSubject<ui.Image>();
   final _viewCenter = BehaviorSubject<Offset>();
   final _distanceCallback = BehaviorSubject<Function(List<double>)>();
   final _toleranceCallback = BehaviorSubject<Function(double)>();
 
-  final _documentSize = BehaviorSubject<Size>();
-  final _scale = BehaviorSubject<double>();
+  final _measurementInformation = BehaviorSubject<MeasurementInformation>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _viewSize = BehaviorSubject<Size>();
   final _magnificationRadius = BehaviorSubject<double>();
@@ -37,7 +38,7 @@ class MetadataRepository {
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
-  Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
+  Stream<ui.Image> get backgroundImage => _currentBackgroundImage.stream;
 
   Stream<Offset> get viewCenter => _viewCenter.stream;
 
@@ -52,21 +53,27 @@ class MetadataRepository {
   Stream<Function(List<double>)> get callback => _distanceCallback.stream;
 
 
-  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, Function(double) toleranceCallback, double scale, double zoom, Size documentSize,
-      MagnificationStyle magnificationStyle) {
+  void registerStartupValuesChange({
+    @required MeasurementInformation measurementInformation,
+    @required bool measure,
+    @required bool showDistance,
+    @required double zoom,
+    @required MagnificationStyle magnificationStyle,
+    @required Function(List<double>) callback,
+    @required Function(double) toleranceCallback,
+  }) {
+    _measurementInformation.value = measurementInformation;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
     _toleranceCallback.value = toleranceCallback;
-    _scale.value = scale;
     _zoomLevel.value = zoom;
-    _documentSize.value = documentSize;
     _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
 
     _updateTransformationFactor();
   }
 
-  void registerBackgroundChange(Image backgroundImage, Size size) {
+  void registerBackgroundChange(ui.Image backgroundImage, Size size) {
     _currentBackgroundImage.value = backgroundImage;
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
@@ -82,10 +89,9 @@ class MetadataRepository {
   }
 
   void dispose() {
-    _documentSize.close();
+    _measurementInformation.close();
     _distanceCallback.close();
     _toleranceCallback.close();
-    _scale.close();
     _zoomLevel.close();
     _showDistance.close();
     _enableMeasure.close();
@@ -99,15 +105,14 @@ class MetadataRepository {
   }
 
   void _updateTransformationFactor() async {
-    if (_scale.hasValue && _zoomLevel.hasValue && _viewSize.hasValue && _documentSize.hasValue) {
-      double scale = _scale.value;
+    if (_zoomLevel.hasValue && _viewSize.hasValue && _measurementInformation.hasValue) {
       double zoomLevel = _zoomLevel.value;
       double viewWidth = _viewSize.value.width;
-      double documentWidth = _documentSize.value.width;
+      MeasurementInformation measurementInfo = _measurementInformation.value;
 
-      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
+      _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth * zoomLevel);
 
-      _logger.log("tolerance is: ${_transformationFactor.value}mm");
+      _logger.log("tolerance is: ${_transformationFactor.value} ${measurementInfo.unitOfMeasurement}");
       _logger.log("updated transformationFactor");
     }
   }
