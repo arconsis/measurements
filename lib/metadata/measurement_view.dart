@@ -17,47 +17,6 @@ import 'bloc/metadata_event.dart';
 import 'bloc/metadata_state.dart';
 import 'repository/metadata_repository.dart';
 
-/*
- * TODO list:
- * x bugs
- *  x slow movement of points - states are equal -> no update -> copy points and distances in measurement repository instead of using same object
- *  x metadata not loaded on start -> stateless measurementView and update arguments in build method
- *  x when distances are shown error during movement -> detect null values in distance list and don't paint distances there
- *  + onEvent and map is called multiple times for each point update -> only called on start and end if showing distances because movementStarted/Finished method
- *  + distance switch provided twice -> correct because measurementView is build twice
- *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
- *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
- *  x switching measure off and back on causes exception when points are set
- *
- * - features
- *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
- *  x line type through style
- *  x class to style points (color, size, etc.) -> separate style classes for points, distances and magnification
- *  x return tolerance (size of one pixel in converted mm) (and add as info to displayed distance)
- *  - delete points
- *  - class to style delete (position, widget, etc.)
- *  - slow movement should move points with half distance
- *  - option to return surface area (need to close contour)
- *  - snap to line
- *
- *  - example app to control ALL features
- *
- * - improve
- *  x add/update tests
- *  x state for painting with distances should contain holders
- *  x use arconsis blue as default
- *  x mag-glass below finger when on top and move to sides
- *  - incorporate zoomable widget as child
- *  - add zoom-to-original feature
- *  - carefully place logger calls
- *  - initial frames on movement start are slow
- *  - metadata bloc test should verify calls to repository
- *
- * x comments from Christof
- * - mock repository behaviour or hard code the returned values?
- * - remove GetIt? -> makes repository easily accessible for widget test an validation (Works even when app defined class with same name)
- */
-
 
 class Measurement extends StatelessWidget {
   final Widget child;

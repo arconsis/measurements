@@ -45,7 +45,6 @@ void main() {
           expectedCallback,
           expectedToleranceCallback,
           expectedScale,
-          expectedZoom,
           expectedDocumentSize,
           magnificationStyle);
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
@@ -73,7 +72,6 @@ void main() {
           expectedCallback,
           expectedToleranceCallback,
           expectedScale,
-          expectedZoom,
           expectedDocumentSize,
           magnificationStyle);
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);

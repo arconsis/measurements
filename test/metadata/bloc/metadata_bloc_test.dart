@@ -33,7 +33,6 @@ void main() {
         null,
         null,
         scale,
-        zoom,
         measure,
         showDistance,
         magnificationStyle

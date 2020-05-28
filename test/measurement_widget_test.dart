@@ -160,7 +160,7 @@ void main() {
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
     });
 
-    testWidgets("adding multiple points and getting distances with set scale and zoom", (WidgetTester tester) async {
+    testWidgets("adding multiple points and getting distances with set scale", (WidgetTester tester) async {
       await tester.pumpWidget(fillTemplate(
           Measurement(
             child: imageWidget,
@@ -168,7 +168,6 @@ void main() {
             showDistanceOnLine: true,
             documentSize: Size(imageWidth * 2, imageHeight * 2),
             scale: 2.0,
-            zoom: 2.0,
           )
       ));
 
@@ -190,7 +189,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [100, 100, 100]
+          [200, 200, 200]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));

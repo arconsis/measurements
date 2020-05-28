@@ -20,6 +20,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   StreamSubscription _onlyPointsSubscription;
   StreamSubscription _pointsAndDistancesSubscription;
+  StreamSubscription _showDistanceSubscription;
 
   Function(List<Offset>) _pointsListener;
   Function(DrawingHolder) _pointsAndDistanceListener;
@@ -34,18 +35,17 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _metadataRepository.showDistances.listen((showDistances) {
+    _showDistanceSubscription = _metadataRepository.showDistances.listen((showDistances) {
       if (showDistances) {
         if (_pointsAndDistancesSubscription == null) {
           _onlyPointsSubscription?.cancel();
-          _onlyPointsSubscription = null;
 
           _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
+          _logger.log("created points and distances subscription $_pointsAndDistancesSubscription ${_pointsAndDistancesSubscription.hashCode}");
         }
       } else {
         if (_onlyPointsSubscription == null) {
           _pointsAndDistancesSubscription?.cancel();
-          _pointsAndDistancesSubscription = null;
 
           _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
         }
@@ -69,7 +69,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   Future<void> close() {
-    _logger.log("closing Points Bloc");
+    _logger.log("closing Points Bloc $this ${this.hashCode}");
+    _showDistanceSubscription?.cancel();
     _onlyPointsSubscription?.cancel();
     _pointsAndDistancesSubscription?.cancel();
     return super.close();
