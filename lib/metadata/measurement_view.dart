@@ -26,15 +26,19 @@ import 'repository/metadata_repository.dart';
  *  + distance switch provided twice -> correct because measurementView is build twice
  *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
  *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
- *  - switching measure off and back on causes exception when points are set
+ *  x switching measure off and back on causes exception when points are set
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
  *  x line type through style
  *  x class to style points (color, size, etc.) -> separate style classes for points, distances and magnification
  *  x return tolerance (size of one pixel in converted mm) (and add as info to displayed distance)
+ *  - different units of measurement (request unit of document dimensions)
+ *  - incorporate zoomable widget as child
  *  - delete points
  *  - class to style delete (position, widget, etc.)
+ *
+ * - nice to have, maybe sometime
  *  - slow movement should move points with half distance
  *  - option to return surface area (need to close contour)
  *  - snap to line
@@ -46,9 +50,9 @@ import 'repository/metadata_repository.dart';
  *  x state for painting with distances should contain holders
  *  x use arconsis blue as default
  *  x mag-glass below finger when on top and move to sides
- *  - carefully place logger calls
+ *  - comment for api class
+ *  - do correct logging
  *  - initial frames on movement start are slow
- *  - incorporate zoomable widget as child
  *
  * x comments from Christof
  * - mock repository behaviour or hard code the returned values?
