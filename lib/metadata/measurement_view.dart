@@ -26,7 +26,7 @@ import 'repository/metadata_repository.dart';
  *  + distance switch provided twice -> correct because measurementView is build twice
  *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
  *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
- *  - switching measure off and back on causes exception when points are set
+ *  x switching measure off and back on causes exception when points are set
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
@@ -55,7 +55,7 @@ import 'repository/metadata_repository.dart';
  * - remove GetIt? -> makes repository easily accessible for widget test an validation (Works even when app defined class with same name)
  */
 
-
+/// TODO Add docu
 class Measurement extends StatelessWidget {
   final Widget child;
   final Size documentSize;
