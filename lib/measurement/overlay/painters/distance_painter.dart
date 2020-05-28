@@ -2,18 +2,20 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measurements/util/colors.dart';
+import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/util/logger.dart';
 
 
 class DistancePainter extends material.CustomPainter {
-  final Logger logger = Logger(LogDistricts.DISTANCE_PAINTER);
+  final Logger _logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
   final double distance;
   final Offset viewCenter;
 
-  Offset _zeroPoint = Offset(-24, 0);
   final double _offsetPerDigit = 4.57;
+  Offset _zeroPoint;
+  final Offset _zeroPointWithoutTolerance = Offset(-29, 0);
+  final Offset _zeroPointWithTolerance = Offset(-47, 0);
 
   Paragraph _paragraph;
   double _radians;
@@ -23,9 +25,12 @@ class DistancePainter extends material.CustomPainter {
     @material.required Offset end,
     @material.required this.distance,
     @material.required this.viewCenter,
-    Color drawColor}) {
-    if (drawColor == null) {
-      drawColor = Colors.drawColor;
+    @material.required double tolerance,
+    @material.required DistanceStyle style}) {
+    if (style.showTolerance) {
+      _zeroPoint = _zeroPointWithTolerance;
+    } else {
+      _zeroPoint = _zeroPointWithoutTolerance;
     }
 
     if (distance > 0) {
@@ -56,8 +61,12 @@ class DistancePainter extends material.CustomPainter {
         fontStyle: FontStyle.normal,
       ),
     );
-    paragraphBuilder.pushStyle(TextStyle(color: drawColor),);
-    paragraphBuilder.addText("${distance?.toStringAsFixed(2)} mm");
+    paragraphBuilder.pushStyle(TextStyle(color: style.textColor),);
+    if (style.showTolerance) {
+      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}mm");
+    } else {
+      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}mm");
+    }
 
     _paragraph = paragraphBuilder.build();
     _paragraph.layout(ParagraphConstraints(width: 300));

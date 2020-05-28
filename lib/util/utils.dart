@@ -21,7 +21,6 @@ extension IterableExtension on Iterable {
     Iterator thisIterator = this.iterator,
         otherIterator = iterable.iterator;
 
-
     while (thisIterator.moveNext() && otherIterator.moveNext()) {
       K thisCurrent = thisIterator.current;
       T otherCurrent = otherIterator.current;

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
 
-void main() => runApp(MyApp());
+class MetadataRepository {}
+
+void main() {
+  GetIt.I.registerSingleton(MetadataRepository());
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -41,6 +48,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color(0xff1280b3),
           title: Row(
             children: <Widget>[
               IconButton(onPressed: () {
@@ -63,16 +71,16 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         body: Center(
-          child: MeasurementView(
+          child: Measurement(
             child: Image.asset("assets/images/example_portrait.png",),
             scale: 1 / 2.0,
             distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,
             measure: measure,
+            pointStyle: PointStyle(lineType: DashedLine()),
           ),
         ),
-      )
-      ,
+      ),
     );
   }
 }

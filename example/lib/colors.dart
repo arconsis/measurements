@@ -1,4 +1,4 @@
 import 'package:flutter/material.dart';
 
-const unselectedColor = Color(0x55AADD22);
-const selectedColor = Color(0xFFAADD22);
+const unselectedColor = Color(0xffeb743f);
+const selectedColor = Color(0xffb34512);
