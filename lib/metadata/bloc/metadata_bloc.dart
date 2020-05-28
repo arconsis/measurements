@@ -8,7 +8,6 @@ import 'metadata_state.dart';
 
 class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
-  final _initialMeasure = false;
 
   MetadataRepository _repository;
 
@@ -23,7 +22,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   }
 
   @override
-  MetadataState get initialState => MetadataState(_initialMeasure);
+  MetadataState get initialState => MetadataState();
 
   @override
   void onEvent(MetadataEvent event) {
@@ -49,8 +48,5 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
-    if (event is MetadataUpdatedEvent) {
-      yield MetadataState(event.measure);
-    }
   }
 }

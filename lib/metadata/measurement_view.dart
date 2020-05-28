@@ -10,6 +10,7 @@ import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:photo_view/photo_view.dart';
 
 import 'bloc/metadata_bloc.dart';
 import 'bloc/metadata_event.dart';
@@ -26,7 +27,7 @@ import 'repository/metadata_repository.dart';
  *  + distance switch provided twice -> correct because measurementView is build twice
  *  x switching between "showDistances" and "dontShowDistances" has no immediate effect -> stream subscriptions have to be canceled and recreated. Pause can be stacked -> one resume is not enough
  *  + after changing "showDistances" flag no measurements possible -> fixed with above bug
- *  - switching measure off and back on causes exception when points are set
+ *  x switching measure off and back on causes exception when points are set
  *
  * - features
  *  x orientation change not supported -> calculate viewWidthRatio and multiply points by that ratio
@@ -49,6 +50,7 @@ import 'repository/metadata_repository.dart';
  *  - carefully place logger calls
  *  - initial frames on movement start are slow
  *  - incorporate zoomable widget as child
+ *  - metadata bloc test should verify calls to repository
  *
  * x comments from Christof
  * - mock repository behaviour or hard code the returned values?
@@ -190,24 +192,26 @@ class MeasurementView extends StatelessWidget {
   }
 
   Widget _overlay(MetadataState state) {
-    if (state.measure) {
-      return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => MeasureBloc(),),
-          BlocProvider(create: (context) => PointsBloc(),),
-        ],
-        child: MeasureArea(
-          pointStyle: pointStyle,
-          magnificationStyle: magnificationStyle,
-          distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => MeasureBloc(),),
+        BlocProvider(create: (context) => PointsBloc(),),
+      ],
+      child: MeasureArea(
+        pointStyle: pointStyle,
+        magnificationStyle: magnificationStyle,
+        distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
+        child: PhotoView.customChild(
           child: RepaintBoundary(
             key: _childKey,
             child: child,
           ),
+          enableRotation: false,
+          initialScale: PhotoViewComputedScale.contained,
+          minScale: PhotoViewComputedScale.contained,
+          maxScale: PhotoViewComputedScale.contained * 5,
         ),
-      );
-    } else {
-      return child;
-    }
+      ),
+    );
   }
 }

@@ -20,6 +20,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   Size _viewSize;
   double _magnificationRadius;
   Offset _magnificationOffset;
+  bool _measuring;
 
   MeasureBloc() {
     _measureRepository = GetIt.I<MeasurementRepository>();
@@ -28,6 +29,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
     _metadataRepository.backgroundImage.listen((image) => _backgroundImage = image);
     _metadataRepository.imageScaleFactor.listen((factor) => _imageScaleFactor = factor);
     _metadataRepository.viewSize.listen((size) => _viewSize = size);
+    _metadataRepository.measurement.listen((measuring) => _measuring = measuring);
     _metadataRepository.magnificationCircleRadius.listen((radius) {
       _magnificationRadius = radius;
       _magnificationOffset = Offset(_defaultMagnificationOffset.dx, _defaultMagnificationOffset.dy + radius);
@@ -43,12 +45,14 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   void onEvent(MeasureEvent event) {
     _logger.log("received event: $event");
 
-    if (event is MeasureDownEvent) {
-      _measureRepository.registerDownEvent(event.position);
-    } else if (event is MeasureMoveEvent) {
-      _measureRepository.registerMoveEvent(event.position);
-    } else if (event is MeasureUpEvent) {
-      _measureRepository.registerUpEvent(event.position);
+    if (_measuring) {
+      if (event is MeasureDownEvent) {
+        _measureRepository.registerDownEvent(event.position);
+      } else if (event is MeasureMoveEvent) {
+        _measureRepository.registerMoveEvent(event.position);
+      } else if (event is MeasureUpEvent) {
+        _measureRepository.registerUpEvent(event.position);
+      }
     }
 
     super.onEvent(event);
@@ -76,6 +80,8 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
 
   @override
   Stream<MeasureState> mapEventToState(MeasureEvent event) async* {
+    if (!_measuring) return;
+    
     if (event is MeasureDownEvent || event is MeasureMoveEvent) {
       Offset magnificationPosition = event.position - _magnificationOffset;
 

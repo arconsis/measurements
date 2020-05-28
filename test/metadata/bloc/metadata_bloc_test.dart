@@ -58,7 +58,7 @@ void main() {
 
           return MetadataBloc();
         },
-        expect: [MetadataState(false)]);
+        expect: [MetadataState()]);
 
     group("metadata events", () {
       blocTest("started event should show measurements",
@@ -68,7 +68,7 @@ void main() {
             return MetadataBloc();
           },
           act: (bloc) => bloc.add(startedEvent),
-          expect: [MetadataState(true)]
+          expect: []
       );
 
       blocTest("background registered",
@@ -79,7 +79,7 @@ void main() {
             return MetadataBloc();
           },
           act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-          expect: [MetadataState(false)]
+          expect: [MetadataState()]
       );
 
       blocTest("started and background event",
@@ -93,7 +93,7 @@ void main() {
             bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
             return;
           },
-          expect: [MetadataState(true)]
+          expect: []
       );
     });
 
@@ -104,7 +104,7 @@ void main() {
 
             return MetadataBloc();
           },
-          expect: [MetadataState(true), MetadataState(false)]
+          expect: []
       );
     });
   });
