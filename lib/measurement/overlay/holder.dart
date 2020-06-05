@@ -1,10 +1,11 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
+import 'package:measurements/measurements.dart';
 
 class Holder extends Equatable {
   final Offset start, end;
-  double distance;
+  LengthUnit distance;
 
   Holder(this.start, this.end);
 

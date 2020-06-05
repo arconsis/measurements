@@ -94,18 +94,18 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       } else if (event is PointsAndDistancesEvent) {
         List<Holder> holders = List();
         event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-        event.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
+        event.distances.zip(holders, (LengthUnit distance, Holder holder) => holder.distance = distance);
 
         if (event.distances.contains(null)) {
           List<int> nullIndices = List();
           nullIndices.add(event.distances.indexOf(null));
           nullIndices.add(event.distances.lastIndexOf(null));
 
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, _unitOfMeasurement, nullIndices);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
         } else if (event.points.length - 1 > event.distances.length) {
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, _unitOfMeasurement, [event.distances.length]);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
         } else {
-          yield PointsAndDistanceState(holders, _viewCenter, _tolerance, _unitOfMeasurement);
+          yield PointsAndDistanceState(holders, _viewCenter, _tolerance);
         }
       }
     }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurements.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -10,11 +11,11 @@ import '../../metadata/bloc/metadata_bloc_test.dart';
 
 void main() {
   group("Measurement Repository Unit Test", () {
-    final transformationFactor = 5.0;
+    final transformationFactor = Millimeter(5.0);
 
     MockMetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
-    BehaviorSubject<double> transformationFactorController;
+    BehaviorSubject<LengthUnit> transformationFactorController;
 
     setUp(() {
       metadataRepository = MockMetadataRepository();
@@ -84,7 +85,7 @@ void main() {
       });
 
       test("two points with distance", () {
-        final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [100 * transformationFactor]);
+        final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 100]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
         measurementRepository.registerUpEvent(Offset(0, 100));
@@ -119,10 +120,10 @@ void main() {
               Offset(300, 200),
             ],
             [
-              100 * transformationFactor,
-              100 * transformationFactor,
-              100 * transformationFactor,
-              100 * transformationFactor,
+              transformationFactor * 100,
+              transformationFactor * 100,
+              transformationFactor * 100,
+              transformationFactor * 100,
             ]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
@@ -144,8 +145,8 @@ void main() {
       });
 
       test("update transformation factor changes distances", () async {
-        final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [100 * transformationFactor]);
-        final expectedUpdatedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [100 * transformationFactor * 2]);
+        final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 100]);
+        final expectedUpdatedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 2 * 100]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
         measurementRepository.registerUpEvent(Offset(0, 100));

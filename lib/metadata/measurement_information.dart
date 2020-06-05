@@ -5,17 +5,21 @@ abstract class LengthUnit extends Equatable {
 
   const LengthUnit(this.value);
 
-  double convertToMillimeter();
+  Millimeter convertToMillimeter();
 
-  double convertToMeter();
+  Meter convertToMeter();
 
-  double convertToInch();
+  Inch convertToInch();
 
-  double convertToFoot();
+  Foot convertToFoot();
 
-  double convertFrom(LengthUnit lengthUnit);
+  LengthUnit convertFrom(LengthUnit lengthUnit);
 
   String getAbbreviation();
+
+  LengthUnit operator /(double value);
+
+  LengthUnit operator *(double value);
 
   @override
   List<Object> get props => [value];
@@ -27,25 +31,31 @@ class Meter extends LengthUnit {
   Meter(double meters) : super(meters);
 
   @override
-  double convertToFoot() => value / 0.3048;
+  Foot convertToFoot() => Foot(value / 0.3048);
 
   @override
-  double convertToInch() => value / 0.0254;
+  Inch convertToInch() => Inch(value / 0.0254);
 
   @override
-  double convertToMeter() => value;
+  Meter convertToMeter() => Meter(value);
 
   @override
-  double convertToMillimeter() => value * 1000;
+  Millimeter convertToMillimeter() => Millimeter(value * 1000);
 
   @override
-  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMeter();
+  Meter convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMeter();
 
   @override
   String toString() => super.toString() + " ${value}m";
 
   @override
   String getAbbreviation() => "m";
+
+  @override
+  Meter operator *(double value) => Meter(this.value * value);
+
+  @override
+  Meter operator /(double value) => Meter(this.value / value);
 }
 
 class Millimeter extends LengthUnit {
@@ -54,25 +64,31 @@ class Millimeter extends LengthUnit {
   const Millimeter(double millimeters) : super(millimeters);
 
   @override
-  double convertToFoot() => value / 304.8;
+  Foot convertToFoot() => Foot(value / 304.8);
 
   @override
-  double convertToInch() => value / 25.4;
+  Inch convertToInch() => Inch(value / 25.4);
 
   @override
-  double convertToMeter() => value / 1000;
+  Meter convertToMeter() => Meter(value / 1000);
 
   @override
-  double convertToMillimeter() => value;
+  Millimeter convertToMillimeter() => Millimeter(value);
 
   @override
-  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMillimeter();
+  Millimeter convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMillimeter();
 
   @override
   String toString() => super.toString() + " ${value}mm";
 
   @override
   String getAbbreviation() => "mm";
+
+  @override
+  Millimeter operator *(double value) => Millimeter(this.value * value);
+
+  @override
+  Millimeter operator /(double value) => Millimeter(this.value / value);
 }
 
 class Inch extends LengthUnit {
@@ -81,25 +97,31 @@ class Inch extends LengthUnit {
   Inch(double inches) : super(inches);
 
   @override
-  double convertToFoot() => value / 12;
+  Foot convertToFoot() => Foot(value / 12);
 
   @override
-  double convertToInch() => value;
+  Inch convertToInch() => Inch(value);
 
   @override
-  double convertToMeter() => value * 0.0254;
+  Meter convertToMeter() => Meter(value * 0.0254);
 
   @override
-  double convertToMillimeter() => value * 25.4;
+  Millimeter convertToMillimeter() => Millimeter(value * 25.4);
 
   @override
-  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToInch();
+  Inch convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToInch();
 
   @override
   String toString() => super.toString() + " ${value}in";
 
   @override
   String getAbbreviation() => "in";
+
+  @override
+  Inch operator *(double value) => Inch(this.value * value);
+
+  @override
+  Inch operator /(double value) => Inch(this.value / value);
 }
 
 class Foot extends LengthUnit {
@@ -108,25 +130,31 @@ class Foot extends LengthUnit {
   Foot(double feet) : super(feet);
 
   @override
-  double convertToFoot() => value;
+  Foot convertToFoot() => Foot(value);
 
   @override
-  double convertToInch() => value * 12;
+  Inch convertToInch() => Inch(value * 12);
 
   @override
-  double convertToMeter() => value * 0.3048;
+  Meter convertToMeter() => Meter(value * 0.3048);
 
   @override
-  double convertToMillimeter() => value * 304.8;
+  Millimeter convertToMillimeter() => Millimeter(value * 304.8);
 
   @override
-  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToFoot();
+  Foot convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToFoot();
 
   @override
   String toString() => super.toString() + " ${value}ft";
 
   @override
   String getAbbreviation() => "ft";
+
+  @override
+  Foot operator *(double value) => Foot(this.value * value);
+
+  @override
+  Foot operator /(double value) => Foot(this.value / value);
 }
 
 class MeasurementInformation extends Equatable {
@@ -140,7 +168,7 @@ class MeasurementInformation extends Equatable {
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
-  double get documentWidthInUnitOfMeasurement => targetLengthUnit.convertFrom(documentWidthInLengthUnits);
+  LengthUnit get documentWidthInUnitOfMeasurement => targetLengthUnit.convertFrom(documentWidthInLengthUnits);
 
   String get unitAbbreviation => targetLengthUnit.getAbbreviation();
 

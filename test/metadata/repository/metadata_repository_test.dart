@@ -23,7 +23,7 @@ void main() {
 
     final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
-    final expectedTransformationFactor = 1 / 20;
+    final expectedTransformationFactor = Millimeter(1 / 20);
 
     final viewSize = Size(200, 300);
 

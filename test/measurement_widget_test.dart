@@ -107,7 +107,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [400, 400, 400]
+          [Millimeter(400), Millimeter(400), Millimeter(400)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
@@ -154,7 +154,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [400, 400, 400]
+          [Millimeter(400), Millimeter(400), Millimeter(400)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
@@ -189,7 +189,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [100, 100, 100]
+          [Millimeter(100), Millimeter(100), Millimeter(100)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));

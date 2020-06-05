@@ -90,11 +90,11 @@ void main() {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
-          when(measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([DrawingHolder([Offset(10, 10), Offset(20, 20)], [sqrt(200)])]));
+          when(measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([DrawingHolder([Offset(10, 10), Offset(20, 20)], [Millimeter(sqrt(200))])]));
 
           return PointsBloc();
         },
-        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200))], Offset(0, 0), 0.0, Millimeter.asUnit())],
+        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200)))], Offset(0, 0), 0.0)],
       );
 
       blocTest("active measurement with two points and distances",
@@ -106,7 +106,7 @@ void main() {
 
           return PointsBloc();
         },
-        expect: [PointsAndDistanceActiveState([Holder.withDistance(Offset(10, 10), Offset(20, 20), null)], Offset(0, 0), 0.0, Millimeter.asUnit(), [0, 0])],
+        expect: [PointsAndDistanceActiveState([Holder.withDistance(Offset(10, 10), Offset(20, 20), null)], Offset(0, 0), 0.0, [0, 0])],
       );
 
       blocTest("active measurement on second last point with five points and distances",
@@ -118,7 +118,7 @@ void main() {
               Stream.fromIterable([
                 DrawingHolder(
                     [Offset(10, 10), Offset(20, 20), Offset(20, 30), Offset(30, 30), Offset(10, 30)],
-                    [sqrt(200), 10, null, null]
+                    [Millimeter(sqrt(200)), Millimeter(10), null, null]
                 )
               ]));
 
@@ -126,14 +126,13 @@ void main() {
         },
         expect: [
           PointsAndDistanceActiveState([
-            Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200)),
-            Holder.withDistance(Offset(20, 20), Offset(20, 30), 10),
+            Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200))),
+            Holder.withDistance(Offset(20, 20), Offset(20, 30), Millimeter(10)),
             Holder.withDistance(Offset(20, 30), Offset(30, 30), null),
             Holder.withDistance(Offset(30, 30), Offset(10, 30), null)
           ],
               Offset(0, 0),
               0.0,
-              Millimeter.asUnit(),
               [2, 3]
           ),
         ],
