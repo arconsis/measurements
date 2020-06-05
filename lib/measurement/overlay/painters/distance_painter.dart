@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:math';
 import 'dart:ui';
 
@@ -6,7 +11,9 @@ import 'package:measurements/measurements.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/util/logger.dart';
 
+/*
 
+ */
 class DistancePainter extends material.CustomPainter {
   final Logger _logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
