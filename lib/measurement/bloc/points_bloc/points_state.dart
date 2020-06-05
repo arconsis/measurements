@@ -45,7 +45,7 @@ class PointsAndDistanceState extends PointsState {
   final List<Holder> holders;
   final Offset viewCenter;
   final double tolerance;
-  final UnitOfMeasurement unitOfMeasurement;
+  final LengthUnit unitOfMeasurement;
 
   PointsAndDistanceState(this.holders, this.viewCenter, this.tolerance, this.unitOfMeasurement);
 
@@ -61,7 +61,7 @@ class PointsAndDistanceState extends PointsState {
 class PointsAndDistanceActiveState extends PointsAndDistanceState {
   final List<int> nullIndices;
 
-  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, UnitOfMeasurement unitOfMeasurement, this.nullIndices)
+  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, LengthUnit unitOfMeasurement, this.nullIndices)
       : super(holders, viewCenter, tolerance, unitOfMeasurement);
 
   @override

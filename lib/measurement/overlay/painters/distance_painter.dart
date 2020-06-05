@@ -27,7 +27,7 @@ class DistancePainter extends material.CustomPainter {
     @material.required this.distance,
     @material.required this.viewCenter,
     @material.required double tolerance,
-    @material.required UnitOfMeasurement unitOfMeasurement,
+    @material.required LengthUnit unitOfMeasurement,
     @material.required DistanceStyle style}) {
     if (style.showTolerance) {
       _zeroPoint = _zeroPointWithTolerance;

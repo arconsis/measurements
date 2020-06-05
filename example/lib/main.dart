@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
   bool showDistanceOnLine = true;
   bool showTolerance = false;
 
-  List<UnitOfMeasurement> unitsOfMeasurement = [UnitMeter(), UnitMillimeter(), UnitInch(), UnitFoot()];
+  List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
   int unitIndex = 0;
 
   Function(List<double>) distanceCallback;
@@ -64,18 +64,14 @@ class _MyAppState extends State<MyApp> {
                   icon: Icon(Icons.straighten, color: getButtonColor(measure))
               ),
               IconButton(onPressed: () =>
-                  setState(() {
-                    showDistanceOnLine = !showDistanceOnLine;
-                  }),
+                  setState(() => showDistanceOnLine = !showDistanceOnLine),
                   icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
               ),
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
                   onPressed: () =>
-                      setState(() {
-                        showTolerance = !showTolerance;
-                      }),
+                      setState(() => showTolerance = !showTolerance),
                   child: Text("±"),
                   textColor: getButtonColor(showTolerance),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -86,9 +82,7 @@ class _MyAppState extends State<MyApp> {
                 child: MaterialButton(
                   shape: CircleBorder(),
                   onPressed: () =>
-                      setState(() {
-                        unitIndex = (unitIndex + 1) % unitsOfMeasurement.length;
-                      }),
+                      setState(() => unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
                   child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
                   textColor: unselectedColor,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -105,7 +99,7 @@ class _MyAppState extends State<MyApp> {
             measurementInformation: MeasurementInformation(
               scale: 1 / 2.0,
               documentWidthInLengthUnits: Millimeter(210),
-              unitOfMeasurement: unitsOfMeasurement[unitIndex],
+              targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
             distanceCallback: distanceCallback,
             showDistanceOnLine: showDistanceOnLine,

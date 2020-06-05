@@ -28,7 +28,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   Offset _viewCenter;
   double _tolerance;
-  UnitOfMeasurement _unitOfMeasurement;
+  LengthUnit _unitOfMeasurement;
 
   PointsBloc() {
     _pointsListener = (points) => add(PointsOnlyEvent(points));

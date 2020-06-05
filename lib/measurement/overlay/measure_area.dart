@@ -106,7 +106,7 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter, UnitOfMeasurement unitOfMeasurement) {
+  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter, LengthUnit unitOfMeasurement) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,

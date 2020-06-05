@@ -13,11 +13,17 @@ abstract class LengthUnit extends Equatable {
 
   double convertToFoot();
 
+  double convertFrom(LengthUnit lengthUnit);
+
+  String getAbbreviation();
+
   @override
   List<Object> get props => [value];
 }
 
 class Meter extends LengthUnit {
+  Meter.asUnit() : super(1);
+
   Meter(double meters) : super(meters);
 
   @override
@@ -33,12 +39,18 @@ class Meter extends LengthUnit {
   double convertToMillimeter() => value * 1000;
 
   @override
-  String toString() {
-    return super.toString() + " ${value}m";
-  }
+  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMeter();
+
+  @override
+  String toString() => super.toString() + " ${value}m";
+
+  @override
+  String getAbbreviation() => "m";
 }
 
 class Millimeter extends LengthUnit {
+  const Millimeter.asUnit() : super(1);
+
   const Millimeter(double millimeters) : super(millimeters);
 
   @override
@@ -54,12 +66,18 @@ class Millimeter extends LengthUnit {
   double convertToMillimeter() => value;
 
   @override
-  String toString() {
-    return super.toString() + " ${value}mm";
-  }
+  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMillimeter();
+
+  @override
+  String toString() => super.toString() + " ${value}mm";
+
+  @override
+  String getAbbreviation() => "mm";
 }
 
 class Inch extends LengthUnit {
+  Inch.asUnit() : super(1);
+
   Inch(double inches) : super(inches);
 
   @override
@@ -75,12 +93,18 @@ class Inch extends LengthUnit {
   double convertToMillimeter() => value * 25.4;
 
   @override
-  String toString() {
-    return super.toString() + " ${value}in";
-  }
+  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToInch();
+
+  @override
+  String toString() => super.toString() + " ${value}in";
+
+  @override
+  String getAbbreviation() => "in";
 }
 
 class Foot extends LengthUnit {
+  Foot.asUnit() : super(1);
+
   Foot(double feet) : super(feet);
 
   @override
@@ -96,109 +120,35 @@ class Foot extends LengthUnit {
   double convertToMillimeter() => value * 304.8;
 
   @override
-  String toString() {
-    return super.toString() + " ${value}ft";
-  }
-}
-
-abstract class UnitOfMeasurement extends Equatable {
-  const UnitOfMeasurement();
-
-  String getAbbreviation();
-}
-
-class UnitMeter extends UnitOfMeasurement {
-  @override
-  String getAbbreviation() {
-    return "m";
-  }
+  double convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToFoot();
 
   @override
-  String toString() {
-    return "Meter";
-  }
+  String toString() => super.toString() + " ${value}ft";
 
   @override
-  List<Object> get props => [];
-}
-
-class UnitMillimeter extends UnitOfMeasurement {
-  const UnitMillimeter();
-
-  @override
-  String getAbbreviation() {
-    return "mm";
-  }
-
-  @override
-  String toString() {
-    return "Millimeter";
-  }
-
-  @override
-  List<Object> get props => [];
-}
-
-class UnitFoot extends UnitOfMeasurement {
-  @override
-  String getAbbreviation() {
-    return "ft";
-  }
-
-  @override
-  String toString() {
-    return "Foot";
-  }
-
-  @override
-  List<Object> get props => [];
-}
-
-class UnitInch extends UnitOfMeasurement {
-  @override
-  String getAbbreviation() {
-    return "in";
-  }
-
-  @override
-  String toString() {
-    return "Inch";
-  }
-
-  @override
-  List<Object> get props => [];
+  String getAbbreviation() => "ft";
 }
 
 class MeasurementInformation extends Equatable {
   final double scale;
   final LengthUnit documentWidthInLengthUnits;
-  final UnitOfMeasurement unitOfMeasurement;
+  final LengthUnit targetLengthUnit;
 
   const MeasurementInformation({
     this.scale = 1.0,
     this.documentWidthInLengthUnits = const Millimeter(210.0),
-    this.unitOfMeasurement = const UnitMillimeter(),
+    this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
-  double get documentWidthInUnitOfMeasurement {
-    if (unitOfMeasurement is UnitMeter) {
-      return documentWidthInLengthUnits.convertToMeter();
-    } else if (unitOfMeasurement is UnitMillimeter) {
-      return documentWidthInLengthUnits.convertToMillimeter();
-    } else if (unitOfMeasurement is UnitFoot) {
-      return documentWidthInLengthUnits.convertToFoot();
-    } else if (unitOfMeasurement is UnitInch) {
-      return documentWidthInLengthUnits.convertToInch();
-    } else {
-      return 0.0;
-    }
-  }
+  double get documentWidthInUnitOfMeasurement => targetLengthUnit.convertFrom(documentWidthInLengthUnits);
+
+  String get unitAbbreviation => targetLengthUnit.getAbbreviation();
 
   @override
-  List<Object> get props => [scale, documentWidthInLengthUnits, unitOfMeasurement];
+  List<Object> get props => [scale, documentWidthInLengthUnits, targetLengthUnit];
 
   @override
   String toString() {
-    return super.toString() + " scale: $scale, documentWidth: $documentWidthInLengthUnits, unitOfMeasurement: $unitOfMeasurement";
+    return super.toString() + " scale: $scale, documentWidth: $documentWidthInLengthUnits, targetLengthUnit: $targetLengthUnit";
   }
 }

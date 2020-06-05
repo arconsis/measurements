@@ -20,7 +20,7 @@ class MetadataRepository {
   final _toleranceCallback = BehaviorSubject<Function(double)>();
 
   final _measurementInformation = BehaviorSubject<MeasurementInformation>();
-  final _unitOfMeasurement = BehaviorSubject<UnitOfMeasurement>();
+  final _unitOfMeasurement = BehaviorSubject<LengthUnit>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _viewSize = BehaviorSubject<Size>();
   final _magnificationRadius = BehaviorSubject<double>();
@@ -37,7 +37,7 @@ class MetadataRepository {
 
   Stream<double> get transformationFactor => _transformationFactor.stream;
 
-  Stream<UnitOfMeasurement> get unitOfMeasurement => _unitOfMeasurement.stream;
+  Stream<LengthUnit> get unitOfMeasurement => _unitOfMeasurement.stream;
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
@@ -66,7 +66,7 @@ class MetadataRepository {
     @required Function(double) toleranceCallback,
   }) {
     _measurementInformation.value = measurementInformation;
-    _unitOfMeasurement.value = measurementInformation.unitOfMeasurement;
+    _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
@@ -117,7 +117,7 @@ class MetadataRepository {
 
       _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth * zoomLevel);
 
-      _logger.log("tolerance is: ${_transformationFactor.value} ${measurementInfo.unitOfMeasurement}");
+      _logger.log("tolerance is: ${_transformationFactor.value} ${measurementInfo.unitAbbreviation}");
       _logger.log("updated transformationFactor");
     }
   }
