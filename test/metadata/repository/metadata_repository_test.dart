@@ -1,11 +1,18 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
+
 
 void main() {
   group("Metadata Repository Unit Test", () {
@@ -13,16 +20,15 @@ void main() {
     final expectedShowDistance = true;
     final Function(List<double>) expectedCallback = null;
     final Function(double) expectedToleranceCallback = null;
-    final expectedScale = 4.0;
     final expectedZoom = 5.0;
-    final expectedDocumentSize = Size(200, 300);
+    final expectedMeasurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(200), scale: 4.0);
     final expectedViewCenter = Offset(100, 150);
     final Image expectedImage = MockedImage.mock;
-    final magnificationStyle = MagnificationStyle();
+    final expectedMagnificationStyle = MagnificationStyle();
 
     final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
-    final expectedTransformationFactor = 1 / 20;
+    final expectedTransformationFactor = Millimeter(1 / 20);
 
     final viewSize = Size(200, 300);
 
@@ -40,13 +46,14 @@ void main() {
       when((expectedImage as MockedImage).width).thenReturn(600);
 
       metadataRepository.registerStartupValuesChange(
-          expectedMeasurement,
-          expectedShowDistance,
-          expectedCallback,
-          expectedToleranceCallback,
-          expectedScale,
-          expectedDocumentSize,
-          magnificationStyle);
+          measurementInformation: expectedMeasurementInformation,
+          measure: expectedMeasurement,
+          showDistance: expectedShowDistance,
+          magnificationStyle: expectedMagnificationStyle,
+          callback: expectedCallback,
+          toleranceCallback: expectedToleranceCallback
+      );
+
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
 
       metadataRepository.measurement.listen((actual) => expect(actual, expectedMeasurement));
@@ -67,13 +74,14 @@ void main() {
       when((expectedImage as MockedImage).width).thenReturn(600);
 
       metadataRepository.registerStartupValuesChange(
-          expectedMeasurement,
-          expectedShowDistance,
-          expectedCallback,
-          expectedToleranceCallback,
-          expectedScale,
-          expectedDocumentSize,
-          magnificationStyle);
+          measurementInformation: expectedMeasurementInformation,
+          measure: expectedMeasurement,
+          showDistance: expectedShowDistance,
+          magnificationStyle: expectedMagnificationStyle,
+          callback: expectedCallback,
+          toleranceCallback: expectedToleranceCallback
+      );
+
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
       metadataRepository.registerBackgroundChange(expectedImage, updatedViewSize);
 

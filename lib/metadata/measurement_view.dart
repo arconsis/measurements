@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +11,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -20,8 +26,7 @@ import 'repository/metadata_repository.dart';
 
 class Measurement extends StatelessWidget {
   final Widget child;
-  final Size documentSize;
-  final double scale;
+  final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
@@ -34,8 +39,7 @@ class Measurement extends StatelessWidget {
   Measurement({
     Key key,
     @required this.child,
-    this.documentSize = const Size(210, 297),
-    this.scale = 1.0,
+    this.measurementInformation = const MeasurementInformation(),
     this.measure = false,
     this.showDistanceOnLine = false,
     this.distanceCallback,
@@ -59,8 +63,7 @@ class Measurement extends StatelessWidget {
       create: (context) => MetadataBloc(),
       child: MeasurementView(
           child,
-          documentSize,
-          scale,
+          measurementInformation,
           measure,
           showDistanceOnLine,
           distanceCallback,
@@ -79,8 +82,7 @@ class MeasurementView extends StatelessWidget {
   final GlobalKey _childKey = GlobalKey();
 
   final Widget child;
-  final Size documentSize;
-  final double scale;
+  final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
@@ -91,8 +93,7 @@ class MeasurementView extends StatelessWidget {
   final DistanceStyle distanceStyle;
 
   MeasurementView(this.child,
-      this.documentSize,
-      this.scale,
+      this.measurementInformation,
       this.measure,
       this.showDistanceOnLine,
       this.distanceCallback,
@@ -120,13 +121,13 @@ class MeasurementView extends StatelessWidget {
   void _setStartupArgumentsToBloc(BuildContext context) {
     BlocProvider.of<MetadataBloc>(context).add(
         MetadataStartedEvent(
-            documentSize,
-            distanceCallback,
-            distanceToleranceCallback,
-            scale,
-            measure,
-            showDistanceOnLine,
-            magnificationStyle)
+          measurementInformation: measurementInformation,
+          measure: measure,
+          showDistances: showDistanceOnLine,
+          magnificationStyle: magnificationStyle,
+          callback: distanceCallback,
+          toleranceCallback: distanceToleranceCallback,
+        )
     );
   }
 
@@ -151,21 +152,22 @@ class MeasurementView extends StatelessWidget {
         BlocProvider(create: (context) => MeasureBloc(),),
         BlocProvider(create: (context) => PointsBloc(),),
       ],
-      child: MeasureArea(
-        pointStyle: pointStyle,
-        magnificationStyle: magnificationStyle,
-        distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
-        child: PhotoView.customChild(
+      child: PhotoView.customChild(
+        basePosition: Alignment.topLeft,
+        enableRotation: false,
+        gestureDetectorBehavior: HitTestBehavior.opaque,
+        controller: state.controller,
+        initialScale: PhotoViewComputedScale.contained,
+        minScale: PhotoViewComputedScale.contained,
+        maxScale: PhotoViewComputedScale.contained * 5,
+        child: MeasureArea(
+          pointStyle: pointStyle,
+          magnificationStyle: magnificationStyle,
+          distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
           child: RepaintBoundary(
-            key: _childKey,
-            child: child,
+              key: _childKey,
+              child: child
           ),
-          basePosition: Alignment.topLeft,
-          enableRotation: false,
-          controller: state.controller,
-          initialScale: PhotoViewComputedScale.contained,
-          minScale: PhotoViewComputedScale.contained,
-          maxScale: PhotoViewComputedScale.contained * 5,
         ),
       ),
     );

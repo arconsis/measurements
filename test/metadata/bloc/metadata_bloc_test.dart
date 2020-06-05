@@ -1,47 +1,56 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/bloc/metadata_bloc.dart';
 import 'package:measurements/metadata/bloc/metadata_event.dart';
 import 'package:measurements/metadata/bloc/metadata_state.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MockMetadataRepository extends Mock implements MetadataRepository {}
 
 class MockImage extends Mock implements Image {}
 
+class MockPhotoViewController extends Mock implements PhotoViewController {}
+
 void main() {
   group("Metadata Bloc Unit Test", () {
     MetadataRepository mockedRepository;
     BehaviorSubject<bool> measurement;
     Image mockedImage;
+    PhotoViewController controller;
 
-    final documentSize = Size(210, 297);
-    final scale = 1.0;
+    final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(210), scale: 1.0);
     final zoom = 1.0;
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
 
     final startedEvent = MetadataStartedEvent(
-        documentSize,
-        null,
-        null,
-        scale,
-        measure,
-        showDistance,
-        magnificationStyle
+      measurementInformation: measurementInformation,
+      measure: measure,
+      showDistances: showDistance,
+      magnificationStyle: magnificationStyle,
+      callback: null,
+      toleranceCallback: null,
     );
 
     setUp(() {
       mockedImage = MockImage();
       measurement = BehaviorSubject();
       mockedRepository = MockMetadataRepository();
+      controller = MockPhotoViewController();
       GetIt.I.registerSingleton(mockedRepository);
     });
 
@@ -57,7 +66,7 @@ void main() {
 
           return MetadataBloc();
         },
-        expect: [MetadataState()]);
+        expect: [MetadataState(controller)]);
 
     group("metadata events", () {
       blocTest("started event should show measurements",
@@ -78,7 +87,7 @@ void main() {
             return MetadataBloc();
           },
           act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-          expect: [MetadataState()]
+          expect: [MetadataState(controller)]
       );
 
       blocTest("started and background event",

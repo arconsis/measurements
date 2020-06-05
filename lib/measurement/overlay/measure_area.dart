@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
@@ -5,6 +10,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -28,12 +34,9 @@ class MeasureArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Listener(
-        onPointerDown: (PointerDownEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
-        onPointerMove: (PointerMoveEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
-        onPointerUp: (PointerUpEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
+        onPointerDown: (PointerDownEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
+        onPointerMove: (PointerMoveEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
+        onPointerUp: (PointerUpEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
         child: Stack(
           children: <Widget>[
             BlocBuilder<PointsBloc, PointsState>(
@@ -105,7 +108,7 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance, double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,

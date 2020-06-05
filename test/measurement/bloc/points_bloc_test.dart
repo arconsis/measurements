@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:math';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -8,6 +13,7 @@ import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/overlay/holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
@@ -23,6 +29,7 @@ void main() {
       metadataRepository = MockedMetadataRepository();
 
       when(metadataRepository.tolerance).thenAnswer((_) => Stream.fromIterable([0.0]));
+      when(metadataRepository.unitOfMeasurement).thenAnswer((_) => Stream.fromIterable([Millimeter.asUnit()]));
 
       GetIt.I.registerSingleton(measurementRepository);
       GetIt.I.registerSingleton(metadataRepository);
@@ -88,11 +95,11 @@ void main() {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
-          when(measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([DrawingHolder([Offset(10, 10), Offset(20, 20)], [sqrt(200)])]));
+          when(measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([DrawingHolder([Offset(10, 10), Offset(20, 20)], [Millimeter(sqrt(200))])]));
 
           return PointsBloc();
         },
-        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200))], Offset(0, 0), 0.0)],
+        expect: [PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200)))], Offset(0, 0), 0.0)],
       );
 
       blocTest("active measurement with two points and distances",
@@ -116,7 +123,7 @@ void main() {
               Stream.fromIterable([
                 DrawingHolder(
                     [Offset(10, 10), Offset(20, 20), Offset(20, 30), Offset(30, 30), Offset(10, 30)],
-                    [sqrt(200), 10, null, null]
+                    [Millimeter(sqrt(200)), Millimeter(10), null, null]
                 )
               ]));
 
@@ -124,8 +131,8 @@ void main() {
         },
         expect: [
           PointsAndDistanceActiveState([
-            Holder.withDistance(Offset(10, 10), Offset(20, 20), sqrt(200)),
-            Holder.withDistance(Offset(20, 20), Offset(20, 30), 10),
+            Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200))),
+            Holder.withDistance(Offset(20, 20), Offset(20, 30), Millimeter(10)),
             Holder.withDistance(Offset(20, 30), Offset(30, 30), null),
             Holder.withDistance(Offset(30, 30), Offset(10, 30), null)
           ],

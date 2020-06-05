@@ -1,15 +1,23 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
+import 'package:measurements/measurements.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/util/logger.dart';
 
+/*
 
+ */
 class DistancePainter extends material.CustomPainter {
   final Logger _logger = Logger(LogDistricts.DISTANCE_PAINTER);
 
-  final double distance;
+  final LengthUnit distance;
   final Offset viewCenter;
 
   final double _offsetPerDigit = 4.57;
@@ -33,8 +41,10 @@ class DistancePainter extends material.CustomPainter {
       _zeroPoint = _zeroPointWithoutTolerance;
     }
 
-    if (distance > 0) {
-      _zeroPoint -= Offset(((log(distance) / log(10)).floor() - 1) * _offsetPerDigit, 0);
+    double distanceValue = distance.value;
+
+    if (distanceValue > 0) {
+      _zeroPoint -= Offset(((log(distanceValue) / log(10)).floor() - 1) * _offsetPerDigit, 0);
     }
 
     Offset difference = end - start;
@@ -63,9 +73,9 @@ class DistancePainter extends material.CustomPainter {
     );
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor),);
     if (style.showTolerance) {
-      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}mm");
+      paragraphBuilder.addText("${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}");
     } else {
-      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}mm");
+      paragraphBuilder.addText("${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}");
     }
 
     _paragraph = paragraphBuilder.build();

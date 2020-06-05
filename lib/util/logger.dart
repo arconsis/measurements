@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 enum LogDistricts {
   MEASUREMENT_VIEW,
   METADATA_BLOC,
@@ -16,12 +21,11 @@ class Logger {
 //    LogDistricts.MEASUREMENT_VIEW,
 //    LogDistricts.METADATA_BLOC,
 //    LogDistricts.METADATA_REPOSITORY,
-//
 //    LogDistricts.MEASURE_AREA,
 //    LogDistricts.MEASURE_BLOC,
-    LogDistricts.POINTS_BLOC,
+//    LogDistricts.POINTS_BLOC,
 //    LogDistricts.MEASUREMENT_REPOSITORY,
-
+//
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.MAGNIFYING_PAINTER,

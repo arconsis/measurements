@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
@@ -38,13 +43,12 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
     if (event is MetadataStartedEvent) {
       _repository.registerStartupValuesChange(
-          event.measure,
-          event.showDistances,
-          event.callback,
-          event.toleranceCallback,
-          event.scale,
-          event.documentSize,
-          event.magnificationStyle
+        measurementInformation: event.measurementInformation,
+        measure: event.measure,
+        showDistance: event.showDistances,
+        callback: event.callback,
+        toleranceCallback: event.toleranceCallback,
+        magnificationStyle: event.magnificationStyle,
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
