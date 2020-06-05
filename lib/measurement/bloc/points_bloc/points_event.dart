@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
+import 'package:measurements/measurements.dart';
 
 abstract class PointsEvent extends Equatable {
   final List<Offset> points;
@@ -21,7 +22,7 @@ class PointsOnlyEvent extends PointsEvent {
 }
 
 class PointsAndDistancesEvent extends PointsEvent {
-  final List<double> distances;
+  final List<LengthUnit> distances;
 
   PointsAndDistancesEvent(List<Offset> points, this.distances) : super(points);
 

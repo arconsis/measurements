@@ -19,9 +19,9 @@ class Logger {
 //
 //    LogDistricts.MEASURE_AREA,
 //    LogDistricts.MEASURE_BLOC,
-    LogDistricts.POINTS_BLOC,
+//    LogDistricts.POINTS_BLOC,
 //    LogDistricts.MEASUREMENT_REPOSITORY,
-
+//
 //    LogDistricts.MEASURE_PAINTER,
 //    LogDistricts.DISTANCE_PAINTER,
 //    LogDistricts.MAGNIFYING_PAINTER,

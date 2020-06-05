@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 
 abstract class MetadataEvent extends Equatable {
@@ -23,23 +24,31 @@ class MetadataBackgroundEvent extends MetadataEvent {
 }
 
 class MetadataStartedEvent extends MetadataEvent {
-  final Size documentSize;
-  final Function(List<double>) callback;
-  final Function(double) toleranceCallback;
-  final double scale;
-  final double zoom;
   final bool measure;
+  final double zoom;
   final bool showDistances;
+  final MeasurementInformation measurementInformation;
   final MagnificationStyle magnificationStyle;
 
-  MetadataStartedEvent(this.documentSize, this.callback, this.toleranceCallback, this.scale, this.zoom, this.measure, this.showDistances, this.magnificationStyle);
+  final Function(List<double>) callback;
+  final Function(double) toleranceCallback;
+
+  MetadataStartedEvent({
+    @required this.measurementInformation,
+    @required this.zoom,
+    @required this.measure,
+    @required this.showDistances,
+    @required this.magnificationStyle,
+    @required this.callback,
+    @required this.toleranceCallback
+  });
 
   @override
-  List<Object> get props => [documentSize, callback, toleranceCallback, scale, zoom, measure, showDistances];
+  List<Object> get props => [measurementInformation, callback, toleranceCallback, zoom, measure, showDistances, magnificationStyle];
 
   @override
   String toString() {
-    return super.toString() + " documentSize: $documentSize -- scale: $scale -- zoom: $zoom -- measure: $measure -- showDistances: $showDistances";
+    return super.toString() + " MeasurementInformation: $measurementInformation -- zoom: $zoom -- measure: $measure -- showDistances: $showDistances -- magnificationStyle: $magnificationStyle";
   }
 }
 

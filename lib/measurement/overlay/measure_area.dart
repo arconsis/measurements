@@ -5,6 +5,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -105,7 +106,7 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance, double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,

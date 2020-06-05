@@ -85,7 +85,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: true,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -107,7 +107,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [400, 400, 400]
+          [Millimeter(400), Millimeter(400), Millimeter(400)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
@@ -119,7 +119,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: false,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -146,7 +146,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: false,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -154,7 +154,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [400, 400, 400]
+          [Millimeter(400), Millimeter(400), Millimeter(400)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
@@ -166,8 +166,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: true,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
-            scale: 2.0,
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), scale:  2.0),
             zoom: 2.0,
           )
       ));
@@ -190,7 +189,7 @@ void main() {
 
       final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [100, 100, 100]
+          [Millimeter(100), Millimeter(100), Millimeter(100)]
       );
 
       measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));

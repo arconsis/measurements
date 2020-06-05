@@ -8,6 +8,7 @@ import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/overlay/holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
@@ -27,6 +28,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   Offset _viewCenter;
   double _tolerance;
+  LengthUnit _unitOfMeasurement;
 
   PointsBloc() {
     _pointsListener = (points) => add(PointsOnlyEvent(points));
@@ -39,6 +41,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       if (showDistances) {
         if (_pointsAndDistancesSubscription == null) {
           _onlyPointsSubscription?.cancel();
+          _onlyPointsSubscription = null;
 
           _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
           _logger.log("created points and distances subscription $_pointsAndDistancesSubscription ${_pointsAndDistancesSubscription.hashCode}");
@@ -46,14 +49,17 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       } else {
         if (_onlyPointsSubscription == null) {
           _pointsAndDistancesSubscription?.cancel();
+          _pointsAndDistancesSubscription = null;
 
           _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
+          _logger.log("created points subscription $_onlyPointsSubscription ${_onlyPointsSubscription.hashCode}");
         }
       }
     });
 
     _metadataRepository.viewCenter.listen((center) => _viewCenter = center);
     _metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance);
+    _metadataRepository.unitOfMeasurement.listen((unitOfMeasurement) => _unitOfMeasurement = unitOfMeasurement);
 
     _logger.log("Created Bloc");
   }
@@ -88,7 +94,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       } else if (event is PointsAndDistancesEvent) {
         List<Holder> holders = List();
         event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-        event.distances.zip(holders, (double distance, Holder holder) => holder.distance = distance);
+        event.distances.zip(holders, (LengthUnit distance, Holder holder) => holder.distance = distance);
 
         if (event.distances.contains(null)) {
           List<int> nullIndices = List();
