@@ -101,11 +101,72 @@ class Foot extends LengthUnit {
   }
 }
 
-enum UnitOfMeasurement {
-  METER,
-  MILLIMETER,
-  INCH,
-  FOOT
+abstract class UnitOfMeasurement extends Equatable {
+  const UnitOfMeasurement();
+
+  String getAbbreviation();
+}
+
+class UnitMeter extends UnitOfMeasurement {
+  @override
+  String getAbbreviation() {
+    return "m";
+  }
+
+  @override
+  String toString() {
+    return "Meter";
+  }
+
+  @override
+  List<Object> get props => [];
+}
+
+class UnitMillimeter extends UnitOfMeasurement {
+  const UnitMillimeter();
+
+  @override
+  String getAbbreviation() {
+    return "mm";
+  }
+
+  @override
+  String toString() {
+    return "Millimeter";
+  }
+
+  @override
+  List<Object> get props => [];
+}
+
+class UnitFoot extends UnitOfMeasurement {
+  @override
+  String getAbbreviation() {
+    return "ft";
+  }
+
+  @override
+  String toString() {
+    return "Foot";
+  }
+
+  @override
+  List<Object> get props => [];
+}
+
+class UnitInch extends UnitOfMeasurement {
+  @override
+  String getAbbreviation() {
+    return "in";
+  }
+
+  @override
+  String toString() {
+    return "Inch";
+  }
+
+  @override
+  List<Object> get props => [];
 }
 
 class MeasurementInformation extends Equatable {
@@ -116,22 +177,21 @@ class MeasurementInformation extends Equatable {
   const MeasurementInformation({
     this.scale = 1.0,
     this.documentWidthInLengthUnits = const Millimeter(210.0),
-    this.unitOfMeasurement = UnitOfMeasurement.MILLIMETER
+    this.unitOfMeasurement = const UnitMillimeter(),
   });
 
   double get documentWidthInUnitOfMeasurement {
-    switch (unitOfMeasurement) {
-      case UnitOfMeasurement.METER:
-        return documentWidthInLengthUnits.convertToMeter();
-      case UnitOfMeasurement.MILLIMETER:
-        return documentWidthInLengthUnits.convertToMillimeter();
-      case UnitOfMeasurement.INCH:
-        return documentWidthInLengthUnits.convertToInch();
-      case UnitOfMeasurement.FOOT:
-        return documentWidthInLengthUnits.convertToFoot();
+    if (unitOfMeasurement is UnitMeter) {
+      return documentWidthInLengthUnits.convertToMeter();
+    } else if (unitOfMeasurement is UnitMillimeter) {
+      return documentWidthInLengthUnits.convertToMillimeter();
+    } else if (unitOfMeasurement is UnitFoot) {
+      return documentWidthInLengthUnits.convertToFoot();
+    } else if (unitOfMeasurement is UnitInch) {
+      return documentWidthInLengthUnits.convertToInch();
+    } else {
+      return 0.0;
     }
-
-    return 0.0;
   }
 
   @override

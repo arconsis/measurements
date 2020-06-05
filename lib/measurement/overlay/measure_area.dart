@@ -5,6 +5,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -77,7 +78,7 @@ class MeasureArea extends StatelessWidget {
     state.holders.asMap().forEach((index, holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
       if (!state.nullIndices.contains(index)) {
-        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
+        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter, state.unitOfMeasurement));
       }
     });
 
@@ -89,7 +90,7 @@ class MeasureArea extends StatelessWidget {
 
     state.holders.forEach((holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
-      widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
+      widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter, state.unitOfMeasurement));
     });
 
     return widgets;
@@ -105,7 +106,7 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter, UnitOfMeasurement unitOfMeasurement) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,
@@ -113,6 +114,7 @@ class MeasureArea extends StatelessWidget {
         distance: distance,
         tolerance: tolerance,
         viewCenter: viewCenter,
+        unitOfMeasurement: unitOfMeasurement,
         style: distanceStyle,
       ),
     );

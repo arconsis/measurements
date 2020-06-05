@@ -20,6 +20,7 @@ class MetadataRepository {
   final _toleranceCallback = BehaviorSubject<Function(double)>();
 
   final _measurementInformation = BehaviorSubject<MeasurementInformation>();
+  final _unitOfMeasurement = BehaviorSubject<UnitOfMeasurement>();
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _viewSize = BehaviorSubject<Size>();
   final _magnificationRadius = BehaviorSubject<double>();
@@ -35,6 +36,8 @@ class MetadataRepository {
   Stream<bool> get showDistances => _showDistance.stream;
 
   Stream<double> get transformationFactor => _transformationFactor.stream;
+
+  Stream<UnitOfMeasurement> get unitOfMeasurement => _unitOfMeasurement.stream;
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
@@ -63,6 +66,7 @@ class MetadataRepository {
     @required Function(double) toleranceCallback,
   }) {
     _measurementInformation.value = measurementInformation;
+    _unitOfMeasurement.value = measurementInformation.unitOfMeasurement;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _distanceCallback.value = callback;
@@ -90,6 +94,7 @@ class MetadataRepository {
 
   void dispose() {
     _measurementInformation.close();
+    _unitOfMeasurement.close();
     _distanceCallback.close();
     _toleranceCallback.close();
     _zoomLevel.close();

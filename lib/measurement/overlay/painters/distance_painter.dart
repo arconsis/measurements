@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
+import 'package:measurements/measurements.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/util/logger.dart';
 
@@ -26,6 +27,7 @@ class DistancePainter extends material.CustomPainter {
     @material.required this.distance,
     @material.required this.viewCenter,
     @material.required double tolerance,
+    @material.required UnitOfMeasurement unitOfMeasurement,
     @material.required DistanceStyle style}) {
     if (style.showTolerance) {
       _zeroPoint = _zeroPointWithTolerance;
@@ -65,7 +67,7 @@ class DistancePainter extends material.CustomPainter {
     if (style.showTolerance) {
       paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}mm");
     } else {
-      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}mm");
+      paragraphBuilder.addText("${distance?.toStringAsFixed(style.numDecimalPlaces)}${unitOfMeasurement.getAbbreviation()}");
     }
 
     _paragraph = paragraphBuilder.build();

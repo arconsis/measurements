@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/bloc/metadata_bloc.dart';
 import 'package:measurements/metadata/bloc/metadata_event.dart';
 import 'package:measurements/metadata/bloc/metadata_state.dart';
@@ -21,22 +22,20 @@ void main() {
     BehaviorSubject<bool> measurement;
     Image mockedImage;
 
-    final documentSize = Size(210, 297);
-    final scale = 1.0;
+    final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(210), scale: 1.0);
     final zoom = 1.0;
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
 
     final startedEvent = MetadataStartedEvent(
-        documentSize,
-        null,
-        null,
-        scale,
-        zoom,
-        measure,
-        showDistance,
-        magnificationStyle
+      measurementInformation: measurementInformation,
+      zoom: zoom,
+      measure: measure,
+      showDistances: showDistance,
+      magnificationStyle: magnificationStyle,
+      callback: null,
+      toleranceCallback: null,
     );
 
     setUp(() {

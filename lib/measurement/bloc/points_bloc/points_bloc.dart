@@ -8,6 +8,7 @@ import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/overlay/holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
@@ -27,6 +28,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   Offset _viewCenter;
   double _tolerance;
+  UnitOfMeasurement _unitOfMeasurement;
 
   PointsBloc() {
     _pointsListener = (points) => add(PointsOnlyEvent(points));
@@ -54,6 +56,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
     _metadataRepository.viewCenter.listen((center) => _viewCenter = center);
     _metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance);
+    _metadataRepository.unitOfMeasurement.listen((unitOfMeasurement) => _unitOfMeasurement = unitOfMeasurement);
 
     _logger.log("Created Bloc");
   }
@@ -95,11 +98,11 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
           nullIndices.add(event.distances.indexOf(null));
           nullIndices.add(event.distances.lastIndexOf(null));
 
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, _unitOfMeasurement, nullIndices);
         } else if (event.points.length - 1 > event.distances.length) {
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
+          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, _unitOfMeasurement, [event.distances.length]);
         } else {
-          yield PointsAndDistanceState(holders, _viewCenter, _tolerance);
+          yield PointsAndDistanceState(holders, _viewCenter, _tolerance, _unitOfMeasurement);
         }
       }
     }

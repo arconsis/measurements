@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:measurements/measurement/overlay/holder.dart';
+import 'package:measurements/measurements.dart';
 
 abstract class PointsState extends Equatable {
 }
@@ -44,25 +45,27 @@ class PointsAndDistanceState extends PointsState {
   final List<Holder> holders;
   final Offset viewCenter;
   final double tolerance;
+  final UnitOfMeasurement unitOfMeasurement;
 
-  PointsAndDistanceState(this.holders, this.viewCenter, this.tolerance);
+  PointsAndDistanceState(this.holders, this.viewCenter, this.tolerance, this.unitOfMeasurement);
 
   @override
-  List<Object> get props => [holders, viewCenter, tolerance];
+  List<Object> get props => [holders, viewCenter, tolerance, unitOfMeasurement];
 
   @override
   String toString() {
-    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter -- tolerance: $tolerance";
+    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter -- tolerance: $tolerance -- unitOfMeasurement: $unitOfMeasurement";
   }
 }
 
 class PointsAndDistanceActiveState extends PointsAndDistanceState {
   final List<int> nullIndices;
 
-  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, this.nullIndices) : super(holders, viewCenter, tolerance);
+  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, UnitOfMeasurement unitOfMeasurement, this.nullIndices)
+      : super(holders, viewCenter, tolerance, unitOfMeasurement);
 
   @override
-  List<Object> get props => [holders, viewCenter, tolerance, nullIndices];
+  List<Object> get props => [holders, viewCenter, tolerance, unitOfMeasurement, nullIndices];
 
   @override
   String toString() {

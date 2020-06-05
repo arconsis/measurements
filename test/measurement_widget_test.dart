@@ -85,7 +85,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: true,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -119,7 +119,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: false,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -146,7 +146,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: false,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
           )
       ));
 
@@ -166,8 +166,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: true,
-            documentSize: Size(imageWidth * 2, imageHeight * 2),
-            scale: 2.0,
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), scale:  2.0),
             zoom: 2.0,
           )
       ));
