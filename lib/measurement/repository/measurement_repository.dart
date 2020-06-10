@@ -13,6 +13,12 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
+enum TouchState {
+  FREE,
+  DOWN,
+  MOVE,
+  UP,
+}
 
 class MeasurementRepository {
   final _logger = Logger(LogDistricts.MEASUREMENT_REPOSITORY);
@@ -25,6 +31,7 @@ class MeasurementRepository {
   LengthUnit _transformationFactor;
 
   int _currentIndex = -1;
+  TouchState _currentState = TouchState.FREE;
 
   MeasurementRepository(MetadataRepository repository) {
     repository.transformationFactor.listen((factor) {
@@ -46,6 +53,9 @@ class MeasurementRepository {
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
   void registerDownEvent(Offset position) {
+    if (_currentState != TouchState.FREE) return;
+    _currentState = TouchState.DOWN;
+
     List<Offset> points = List()
       ..addAll(_points.value);
 
@@ -68,13 +78,21 @@ class MeasurementRepository {
   }
 
   void registerMoveEvent(Offset position) {
+    if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
+    _currentState = TouchState.MOVE;
+
     _updatePoint(position, _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
+    if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
+    _currentState = TouchState.UP;
+
     _updatePoint(position, _currentIndex);
     _currentIndex = -1;
     _movementFinished();
+
+    _currentState = TouchState.FREE;
   }
 
   void dispose() {

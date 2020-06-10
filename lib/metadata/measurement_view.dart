@@ -156,7 +156,6 @@ class MeasurementView extends StatelessWidget {
         pointStyle: pointStyle,
         magnificationStyle: magnificationStyle,
         distanceStyle: distanceStyle,
-//        behavior: state.measure ? HitTestBehavior.opaque : HitTestBehavior.translucent,
         child: AbsorbPointer(
           absorbing: state.measure,
           child: PhotoView.customChild(
