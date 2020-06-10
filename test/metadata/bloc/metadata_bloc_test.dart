@@ -32,7 +32,6 @@ void main() {
     PhotoViewController controller;
 
     final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(210), scale: 1.0);
-    final zoom = 1.0;
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
@@ -60,59 +59,97 @@ void main() {
     });
 
     blocTest("initial state",
+      skip: 0,
+      build: () async {
+        when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+
+        return MetadataBloc();
+      },
+      verify: (MetadataBloc bloc) {
+        expect(bloc.state.controller, isA<PhotoViewController>());
+        expect(bloc.state.measure, equals(false));
+
+        return;
+      },
+    );
+
+    group("metadata events", () {
+      blocTest("started event should show measurements",
+        build: () async {
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+
+          return MetadataBloc();
+        },
+        act: (bloc) => bloc.add(startedEvent),
+        verify: (MetadataBloc bloc) {
+          expect(bloc.state.controller, isA<PhotoViewController>());
+          expect(bloc.state.measure, equals(true));
+
+          return;
+        },
+      );
+
+      blocTest("background registered",
         skip: 0,
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
 
           return MetadataBloc();
         },
-        expect: [MetadataState(controller)]);
+        act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
+        verify: (MetadataBloc bloc) {
+          expect(bloc.state.controller, isA<PhotoViewController>());
+          expect(bloc.state.measure, equals(false));
 
-    group("metadata events", () {
-      blocTest("started event should show measurements",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-
-            return MetadataBloc();
-          },
-          act: (bloc) => bloc.add(startedEvent),
-          expect: []
-      );
-
-      blocTest("background registered",
-          skip: 0,
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
-
-            return MetadataBloc();
-          },
-          act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-          expect: [MetadataState(controller)]
+          return;
+        },
       );
 
       blocTest("started and background event",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+        build: () async {
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
 
-            return MetadataBloc();
-          },
-          act: (bloc) {
-            bloc.add(startedEvent);
-            bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
-            return;
-          },
-          expect: []
+          return MetadataBloc();
+        },
+        act: (bloc) {
+          bloc.add(startedEvent);
+          bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
+          return;
+        },
+        verify: (MetadataBloc bloc) {
+          expect(bloc.state.controller, isA<PhotoViewController>());
+          expect(bloc.state.measure, equals(true));
+
+          return;
+        },
       );
     });
 
     group("UI events", () {
-      blocTest("enable and disable measurement",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
+      List<MetadataState> states;
 
-            return MetadataBloc();
-          },
-          expect: []
+      setUp(() {
+        states = List();
+      });
+
+      blocTest("enable and disable measurement",
+        build: () async {
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
+
+          final bloc = MetadataBloc();
+          bloc.listen(states.add);
+
+          return bloc;
+        },
+        verify: (MetadataBloc bloc) async {
+          states.forEach((state) => expect(state.controller, isA<PhotoViewController>()));
+
+          expect(states[0].measure, equals(false));
+          expect(states[1].measure, equals(true));
+          expect(states[2].measure, equals(false));
+
+          return;
+        },
       );
     });
   });

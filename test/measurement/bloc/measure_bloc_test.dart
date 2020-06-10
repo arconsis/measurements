@@ -29,6 +29,7 @@ void main() {
       mockedMeasurementRepository = MockedMeasurementRepository();
 
       when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
       when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);

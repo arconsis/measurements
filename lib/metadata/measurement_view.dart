@@ -149,24 +149,27 @@ class MeasurementView extends StatelessWidget {
   Widget _overlay(MetadataState state) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => MeasureBloc(),),
-        BlocProvider(create: (context) => PointsBloc(),),
+        BlocProvider(create: (context) => MeasureBloc()),
+        BlocProvider(create: (context) => PointsBloc()),
       ],
-      child: PhotoView.customChild(
-        basePosition: Alignment.topLeft,
-        enableRotation: false,
-        gestureDetectorBehavior: HitTestBehavior.opaque,
-        controller: state.controller,
-        initialScale: PhotoViewComputedScale.contained,
-        minScale: PhotoViewComputedScale.contained,
-        maxScale: PhotoViewComputedScale.contained * 5,
-        child: MeasureArea(
-          pointStyle: pointStyle,
-          magnificationStyle: magnificationStyle,
-          distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
-          child: RepaintBoundary(
+      child: MeasureArea(
+        pointStyle: pointStyle,
+        magnificationStyle: magnificationStyle,
+        distanceStyle: distanceStyle,
+//        behavior: state.measure ? HitTestBehavior.opaque : HitTestBehavior.translucent,
+        child: AbsorbPointer(
+          absorbing: state.measure,
+          child: PhotoView.customChild(
+            basePosition: Alignment.topLeft,
+            enableRotation: false,
+            controller: state.controller,
+            initialScale: PhotoViewComputedScale.contained,
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.contained * 5,
+            child: RepaintBoundary(
               key: _childKey,
-              child: child
+              child: child,
+            ),
           ),
         ),
       ),

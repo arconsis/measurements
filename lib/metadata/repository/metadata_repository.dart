@@ -137,6 +137,8 @@ class MetadataRepository {
       _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth * zoomLevel);
       _tolerance.value = _transformationFactor.value.value;
 
+      _toleranceCallback.value?.call(_tolerance.value);
+
       _logger.log("tolerance is: ${_transformationFactor.value} ${measurementInfo.unitAbbreviation}");
       _logger.log("updated transformationFactor");
     }

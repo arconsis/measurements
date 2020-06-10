@@ -143,9 +143,7 @@ class MeasurementRepository {
       points.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
-      if (_callback != null) {
-        _callback(distances.map((unit) => unit.value).toList());
-      }
+      _callback?.call(distances.map((unit) => unit.value).toList());
     }
   }
 

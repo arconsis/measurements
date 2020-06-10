@@ -20,7 +20,6 @@ void main() {
     final expectedShowDistance = true;
     final Function(List<double>) expectedCallback = null;
     final Function(double) expectedToleranceCallback = null;
-    final expectedZoom = 5.0;
     final expectedMeasurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(200), scale: 4.0);
     final expectedViewCenter = Offset(100, 150);
     final Image expectedImage = MockedImage.mock;
@@ -28,7 +27,7 @@ void main() {
 
     final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
-    final expectedTransformationFactor = Millimeter(1 / 20);
+    final expectedTransformationFactor = Millimeter(1 / 4);
 
     final viewSize = Size(200, 300);
 

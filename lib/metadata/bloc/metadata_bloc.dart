@@ -16,7 +16,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
 
   MetadataRepository _repository;
-  PhotoViewController _controller;
+  PhotoViewController _controller = PhotoViewController();
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
@@ -24,8 +24,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
     _repository.measurement.listen((bool measure) {
       add(MetadataUpdatedEvent(measure));
     });
-
-    _controller = PhotoViewController();
 
     _controller.outputStateStream.listen((state) {
 
@@ -35,7 +33,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   }
 
   @override
-  MetadataState get initialState => MetadataState(_controller);
+  MetadataState get initialState => MetadataState(_controller, false);
 
   @override
   void onEvent(MetadataEvent event) {
@@ -59,7 +57,9 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
-    yield MetadataState(_controller);
+    if (event is MetadataUpdatedEvent) {
+      yield MetadataState(_controller, event.measure);
+    }
   }
 
   @override
