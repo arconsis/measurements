@@ -126,6 +126,7 @@ class MeasureArea extends StatelessWidget {
       return CustomPaint(
         foregroundPainter: MagnifyingPainter(
           fingerPosition: state.position,
+          absolutePosition: state.absolutePosition,
           image: state.backgroundImage,
           imageScaleFactor: state.imageScaleFactor,
           style: magnificationStyle,

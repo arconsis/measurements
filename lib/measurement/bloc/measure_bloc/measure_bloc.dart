@@ -73,6 +73,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
             nextState: MeasureActiveState(
               state.position,
               state.magnificationOffset,
+              absolutePosition: _measureRepository.convertIntoAbsolutePosition(state.position),
               backgroundImage: _backgroundImage,
               imageScaleFactor: _imageScaleFactor,
             )
@@ -86,7 +87,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
   @override
   Stream<MeasureState> mapEventToState(MeasureEvent event) async* {
     if (!_measuring) return;
-    
+
     if (event is MeasureDownEvent || event is MeasureMoveEvent) {
       Offset magnificationPosition = event.position - _magnificationOffset;
 

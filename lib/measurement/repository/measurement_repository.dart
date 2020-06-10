@@ -68,7 +68,7 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset absolutePosition = _convertIntoAbsolutePosition(position);
+    Offset absolutePosition = convertIntoAbsolutePosition(position);
 
     int closestIndex = _getClosestPointIndex(absolutePosition);
 
@@ -92,14 +92,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(convertIntoAbsolutePosition(position), _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(convertIntoAbsolutePosition(position), _currentIndex);
     _currentIndex = -1;
     _movementFinished();
 
@@ -112,7 +112,7 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  Offset _convertIntoAbsolutePosition(Offset position) {
+  Offset convertIntoAbsolutePosition(Offset position) {
     return (position - _backgroundPosition) / _zoomLevel;
   }
 

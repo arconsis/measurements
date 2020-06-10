@@ -21,7 +21,7 @@ class MagnifyingPainter extends CustomPainter {
   RRect _outerCircle, _innerCircle;
   Rect _imageTargetRect, _imageSourceRect;
 
-  MagnifyingPainter({@required this.fingerPosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
+  MagnifyingPainter({@required this.fingerPosition, @required Offset absolutePosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
     _drawPosition = fingerPosition - magnificationOffset;
 
     double diameter = 2 * style.magnificationRadius;
@@ -29,7 +29,7 @@ class MagnifyingPainter extends CustomPainter {
     _outerCircle = getCircle(_drawPosition, style.magnificationRadius + style.outerCircleThickness);
     _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
 
-    _imageSourceRect = Rect.fromCenter(center: fingerPosition * imageScaleFactor, width: diameter, height: diameter);
+    _imageSourceRect = Rect.fromCenter(center: absolutePosition * imageScaleFactor, width: diameter, height: diameter);
     _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
 
     _drawPaint.color = style.magnificationColor;
