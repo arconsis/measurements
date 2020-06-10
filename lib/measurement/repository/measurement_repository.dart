@@ -33,7 +33,13 @@ class MeasurementRepository {
   int _currentIndex = -1;
   TouchState _currentState = TouchState.FREE;
 
+  List<Offset> _absolutePoints = List();
+  double _zoomLevel = 1.0;
+  Offset _backgroundPosition = Offset(0, 0);
+
   MeasurementRepository(MetadataRepository repository) {
+    repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
+    repository.callback.listen((callback) => _callback = callback);
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
@@ -42,8 +48,14 @@ class MeasurementRepository {
         _transformationFactor = factor;
       }
     });
-    repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
-    repository.callback.listen((callback) => _callback = callback);
+    repository.zoom.listen((zoom) {
+      _zoomLevel = zoom;
+      _publishPoints();
+    });
+    repository.backgroundPosition.listen((backgroundPosition) {
+      _backgroundPosition = backgroundPosition;
+      _publishPoints();
+    });
 
     _logger.log("Created Repository");
   }
@@ -56,22 +68,21 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    List<Offset> points = List()
-      ..addAll(_points.value);
+    Offset absolutePosition = _convertIntoAbsolutePosition(position);
 
-    int closestIndex = _getClosestPointIndex(points, position);
+    int closestIndex = _getClosestPointIndex(absolutePosition);
 
     if (closestIndex >= 0) {
-      Offset closestPoint = points[closestIndex];
+      Offset closestPoint = _absolutePoints[closestIndex];
 
-      if ((closestPoint - position).distance > 40.0) {
-        _currentIndex = _addNewPoint(points, position);
+      if ((_convertIntoRelativePosition(closestPoint) - position).distance > 40.0) {
+        _currentIndex = _addNewPoint(absolutePosition);
       } else {
         _currentIndex = closestIndex;
-        _updatePoint(position, _currentIndex);
+        _updatePoint(absolutePosition, _currentIndex);
       }
     } else {
-      _currentIndex = _addNewPoint(points, position);
+      _currentIndex = _addNewPoint(absolutePosition);
     }
 
     _movementStarted(_currentIndex);
@@ -81,14 +92,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(position, _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(position, _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
     _currentIndex = -1;
     _movementFinished();
 
@@ -101,35 +112,46 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  void _publishPoints(List<Offset> points) {
-    _points.add(points);
-    _drawingHolder.add(DrawingHolder(points, _distances.value));
+  Offset _convertIntoAbsolutePosition(Offset position) {
+    return (position - _backgroundPosition) / _zoomLevel;
   }
 
-  int _addNewPoint(List<Offset> points, Offset point) {
-    points.add(point);
-    _publishPoints(points);
+  Offset _convertIntoRelativePosition(Offset position) {
+    return position * _zoomLevel + _backgroundPosition;
+  }
 
-    _logger.log("added point: $points");
-    return points.length - 1;
+  List<Offset> _getRelativePoints() {
+    return _absolutePoints.map((point) => _convertIntoRelativePosition(point)).toList();
+  }
+
+  void _publishPoints() {
+    List<Offset> relativePoints = _getRelativePoints();
+
+    _points.add(relativePoints);
+    _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
+  }
+
+  int _addNewPoint(Offset point) {
+    _absolutePoints.add(point);
+    _publishPoints();
+
+    _logger.log("added point: $_absolutePoints");
+    return _absolutePoints.length - 1;
   }
 
   void _updatePoint(Offset point, int index) {
     if (index >= 0) {
-      List<Offset> points = List()
-        ..addAll(_points.value);
+      _absolutePoints.setRange(index, index + 1, [point]);
+      _publishPoints();
 
-      points.setRange(index, index + 1, [point]);
-      _publishPoints(points);
-
-      _logger.log("updated point $index: $points");
+      _logger.log("updated point $index: $_absolutePoints");
     }
   }
 
-  int _getClosestPointIndex(List<Offset> points, Offset reference) {
+  int _getClosestPointIndex(Offset reference) {
     int index = 0;
 
-    List<_CompareHolder> sortedPoints = points
+    List<_CompareHolder> sortedPoints = _absolutePoints
         .map((Offset point) => _CompareHolder(index++, (reference - point).distance))
         .toList();
 
@@ -140,7 +162,7 @@ class MeasurementRepository {
 
   void _publishDistances(List<LengthUnit> distances) {
     _distances.add(distances);
-    _drawingHolder.add(DrawingHolder(_points.value, distances));
+    _drawingHolder.add(DrawingHolder(_getRelativePoints(), distances));
   }
 
   void _movementStarted(int index) {
@@ -154,11 +176,9 @@ class MeasurementRepository {
   }
 
   void _movementFinished() {
-    List<Offset> points = _points.value;
-
-    if (_transformationFactor != null && points.length >= 2) {
+    if (_transformationFactor != null && _absolutePoints.length >= 2) {
       List<LengthUnit> distances = List();
-      points.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
+      _absolutePoints.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
       _callback?.call(distances.map((unit) => unit.value).toList());
@@ -166,8 +186,8 @@ class MeasurementRepository {
   }
 
   _updatePoints(double factor) {
-    final newPoints = _points.value.map((Offset point) => point * factor).toList();
-    _publishPoints(newPoints);
+    _absolutePoints = _absolutePoints.map((Offset point) => point * factor).toList();
+    _publishPoints();
   }
 }
 

@@ -26,7 +26,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
     });
 
     _controller.outputStateStream.listen((state) {
-
+      _repository.registerResizing(state.position, state.scale);
     });
 
     _logger.log("Created Bloc");

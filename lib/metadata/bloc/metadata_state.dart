@@ -17,6 +17,6 @@ class MetadataState extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " PhotoViewController: $controller measure: $measure";
+    return super.toString() + " PhotoViewController: $controller, measure: $measure";
   }
 }

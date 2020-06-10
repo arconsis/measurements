@@ -57,7 +57,7 @@ class PointsAndDistanceState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter -- tolerance: $tolerance";
+    return super.toString() + " drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance";
   }
 }
 
@@ -71,6 +71,6 @@ class PointsAndDistanceActiveState extends PointsAndDistanceState {
 
   @override
   String toString() {
-    return super.toString() + " -- nullIndex: $nullIndices";
+    return super.toString() + " nullIndex: $nullIndices";
   }
 }

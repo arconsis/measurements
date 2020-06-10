@@ -48,6 +48,10 @@ class MetadataRepository {
 
   Stream<LengthUnit> get unitOfMeasurement => _unitOfMeasurement.stream;
 
+  Stream<double> get zoom => _zoomLevel.stream;
+
+  Stream<Offset> get backgroundPosition => _contentPosition.stream;
+
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
   Stream<ui.Image> get backgroundImage => _currentBackgroundImage.stream;
@@ -103,6 +107,7 @@ class MetadataRepository {
     _logger.log("Offset: $position, zoom: $zoom");
     _contentPosition.value = position;
     _zoomLevel.value = zoom;
+    _updateTransformationFactor();
   }
 
   void dispose() {
@@ -134,7 +139,7 @@ class MetadataRepository {
       double viewWidth = _viewSize.value.width;
       MeasurementInformation measurementInfo = _measurementInformation.value;
 
-      _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth * zoomLevel);
+      _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth);
       _tolerance.value = _transformationFactor.value.value;
 
       _toleranceCallback.value?.call(_tolerance.value);

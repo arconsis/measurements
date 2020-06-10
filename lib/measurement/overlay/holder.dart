@@ -18,7 +18,7 @@ class Holder extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " First Point: $start - Second Point: $end - Distance: $distance";
+    return super.toString() + " First Point: $start, Second Point: $end, Distance: $distance";
   }
 
   @override

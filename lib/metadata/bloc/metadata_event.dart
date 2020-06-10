@@ -24,7 +24,7 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " size: $size -- backgroundImage: $backgroundImage";
+    return super.toString() + " size: $size, backgroundImage: $backgroundImage";
   }
 }
 
@@ -50,7 +50,7 @@ class MetadataStartedEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " MeasurementInformation: $measurementInformation -- measure: $measure -- showDistances: $showDistances -- magnificationStyle: $magnificationStyle";
+    return super.toString() + " MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle";
   }
 }
 

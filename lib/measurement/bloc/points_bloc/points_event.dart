@@ -36,6 +36,6 @@ class PointsAndDistancesEvent extends PointsEvent {
 
   @override
   String toString() {
-    return super.toString() + " -- distances: $distances";
+    return super.toString() + " distances: $distances";
   }
 }
