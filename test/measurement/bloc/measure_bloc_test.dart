@@ -77,6 +77,8 @@ void main() {
               mockedMeasurementRepository.registerDownEvent(Offset(0, 0)),
               mockedMeasurementRepository.registerMoveEvent(Offset(10, 10)),
               mockedMeasurementRepository.registerUpEvent(Offset(10, 10)),
+              mockedMeasurementRepository.convertIntoAbsolutePosition(Offset(0, 0)),
+              mockedMeasurementRepository.convertIntoAbsolutePosition(Offset(10, 10)),
             ]);
 
             verifyNoMoreInteractions(mockedMeasurementRepository);

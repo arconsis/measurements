@@ -11,6 +11,7 @@ import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:photo_view/photo_view.dart';
 
 Type typeOf<T>() => T;
 
@@ -45,11 +46,12 @@ void main() {
       GetIt.I.unregister(instance: measurementRepository);
     });
 
-    testWidgets("measurement should show only child when not measuring", (WidgetTester tester) async {
-      await tester.pumpWidget(Measurement(child: imageWidget,));
+    testWidgets("measurement should show child also when measure is false", (WidgetTester tester) async {
+      await tester.pumpWidget(fillTemplate(Measurement(child: imageWidget,)));
 
+      expect(find.byType(typeOf<PhotoView>()), findsOneWidget);
       expect(find.byType(typeOf<Image>()), findsOneWidget);
-      expect(find.byType(typeOf<MeasureArea>()), findsNothing);
+      expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
     });
 
     testWidgets("measurement should show child under measure area when measuring", (WidgetTester tester) async {
@@ -171,7 +173,7 @@ void main() {
             child: imageWidget,
             measure: true,
             showDistanceOnLine: true,
-            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), scale: 2.0),
+            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), scale: 2.0),
           )
       ));
 

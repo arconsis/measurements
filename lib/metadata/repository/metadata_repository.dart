@@ -140,7 +140,7 @@ class MetadataRepository {
       MeasurementInformation measurementInfo = _measurementInformation.value;
 
       _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth);
-      _tolerance.value = _transformationFactor.value.value;
+      _tolerance.value = _transformationFactor.value.value / zoomLevel;
 
       _toleranceCallback.value?.call(_tolerance.value);
 

@@ -30,6 +30,8 @@ void main() {
       when(metadataRepository.viewScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
       when(metadataRepository.transformationFactor).thenAnswer((_) => transformationFactorController.stream);
       when(metadataRepository.callback).thenAnswer((_) => Stream.fromIterable([]));
+      when(metadataRepository.zoom).thenAnswer((_) => Stream.fromIterable([1.0]));
+      when(metadataRepository.backgroundPosition).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
       measurementRepository = MeasurementRepository(metadataRepository);
     });
@@ -69,8 +71,17 @@ void main() {
         final expectedPoints = [Offset(15, 15)];
 
         measurementRepository.registerDownEvent(Offset(10, 10));
-        measurementRepository.registerDownEvent(Offset(10, 5));
-        measurementRepository.registerDownEvent(Offset(5, 10));
+        measurementRepository.registerUpEvent(Offset(10, 10));
+        measurementRepository.registerDownEvent(Offset(15, 15));
+        measurementRepository.registerUpEvent(Offset(15, 15));
+
+        measurementRepository.points.listen((actual) => expect(actual, expectedPoints));
+      });
+
+      test("update same point without releasing", () {
+        final expectedPoints = [Offset(10, 10)];
+
+        measurementRepository.registerDownEvent(Offset(10, 10));
         measurementRepository.registerDownEvent(Offset(15, 15));
 
         measurementRepository.points.listen((actual) => expect(actual, expectedPoints));

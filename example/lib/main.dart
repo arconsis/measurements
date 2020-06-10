@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
   bool showTolerance = false;
 
   List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
-  int unitIndex = 0;
+  int unitIndex = 1;
 
   Function(List<double>) distanceCallback;
 
