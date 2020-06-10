@@ -39,8 +39,6 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
       _magnificationRadius = radius;
       _magnificationOffset = Offset(_defaultMagnificationOffset.dx, _defaultMagnificationOffset.dy + radius);
     });
-
-    _logger.log("Created Bloc");
   }
 
   @override

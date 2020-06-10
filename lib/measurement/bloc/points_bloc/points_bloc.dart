@@ -65,8 +65,6 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _metadataRepository.viewCenter.listen((center) => _viewCenter = center);
     _metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance);
     _metadataRepository.unitOfMeasurement.listen((unitOfMeasurement) => _unitOfMeasurement = unitOfMeasurement);
-
-    _logger.log("Created Bloc");
   }
 
   @override

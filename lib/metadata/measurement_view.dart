@@ -15,6 +15,7 @@ import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
+import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -103,16 +104,16 @@ class MeasurementView extends StatelessWidget {
       this.magnificationStyle,
       this.distanceStyle);
 
-  void _setBackgroundImageToBloc(BuildContext context) {
+  void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_childKey.currentContext != null) {
         RenderRepaintBoundary boundary = _childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: magnificationZoomFactor), boundary.size));
+          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: magnificationZoomFactor * zoom), boundary.size));
         } else {
           _logger.log("image dimensions are 0");
-          _setBackgroundImageToBloc(context);
+          _setBackgroundImageToBloc(context, zoom);
         }
       }
     });
@@ -133,45 +134,49 @@ class MeasurementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _logger.log("building");
     _setStartupArgumentsToBloc(context);
 
-    return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-      _setBackgroundImageToBloc(context);
-      return BlocBuilder<MetadataBloc, MetadataState>(
-          builder: (context, state) {
-            return _overlay(state);
-          }
-      );
-    });
+    return Container(
+      color: drawColor,
+      child: BlocBuilder<MetadataBloc, MetadataState>(
+        builder: (context, state) => _overlay(state),
+      ),
+    );
   }
 
   Widget _overlay(MetadataState state) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => MeasureBloc()),
-        BlocProvider(create: (context) => PointsBloc()),
-      ],
-      child: MeasureArea(
-        pointStyle: pointStyle,
-        magnificationStyle: magnificationStyle,
-        distanceStyle: distanceStyle,
-        child: AbsorbPointer(
-          absorbing: state.measure,
-          child: PhotoView.customChild(
-            basePosition: Alignment.topLeft,
-            enableRotation: false,
-            controller: state.controller,
-            initialScale: PhotoViewComputedScale.contained,
-            minScale: PhotoViewComputedScale.contained,
-            maxScale: PhotoViewComputedScale.contained * 5,
-            child: RepaintBoundary(
-              key: _childKey,
-              child: child,
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
+        _setBackgroundImageToBloc(context, state.zoom);
+
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => MeasureBloc()),
+            BlocProvider(create: (context) => PointsBloc()),
+          ],
+          child: MeasureArea(
+            pointStyle: pointStyle,
+            magnificationStyle: magnificationStyle,
+            distanceStyle: distanceStyle,
+            child: AbsorbPointer(
+              absorbing: state.measure,
+              child: PhotoView.customChild(
+                basePosition: Alignment.topLeft,
+                enableRotation: false,
+                controller: state.controller,
+                initialScale: PhotoViewComputedScale.contained,
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.contained * 5,
+                child: RepaintBoundary(
+                  key: _childKey,
+                  child: child,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

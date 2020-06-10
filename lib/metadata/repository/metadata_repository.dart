@@ -20,6 +20,7 @@ class MetadataRepository {
   final _measurementInformation = BehaviorSubject<MeasurementInformation>();
   final _unitOfMeasurement = BehaviorSubject<LengthUnit>();
   final _magnificationRadius = BehaviorSubject<double>();
+  final _orientation = BehaviorSubject<Orientation>();
   final _distanceCallback = BehaviorSubject<Function(List<double>)>();
   final _toleranceCallback = BehaviorSubject<Function(double)>();
 
@@ -36,13 +37,13 @@ class MetadataRepository {
   final _contentPosition = BehaviorSubject<Offset>();
 
 
-  MetadataRepository() {
-    _logger.log("Created repository");
-  }
+  MetadataRepository();
 
   Stream<bool> get measurement => _enableMeasure.stream;
 
   Stream<bool> get showDistances => _showDistance.stream;
+
+  Stream<Orientation> get orientation => _orientation.stream;
 
   Stream<LengthUnit> get transformationFactor => _transformationFactor.stream;
 
@@ -100,7 +101,13 @@ class MetadataRepository {
       _viewSize.value = size;
     }
 
+    _logger.log("view size: ${_viewSize.value}");
+
     _updateTransformationFactor();
+  }
+
+  void registerOrientation(Orientation orientation) {
+    _orientation.value = orientation;
   }
 
   void registerResizing(Offset position, double zoom) {
@@ -115,10 +122,10 @@ class MetadataRepository {
     _showDistance.close();
     _measurementInformation.close();
     _unitOfMeasurement.close();
+    _magnificationRadius.close();
+    _orientation.close();
     _distanceCallback.close();
     _toleranceCallback.close();
-    _magnificationRadius.close();
-
 
     _currentBackgroundImage.close();
     _imageScaleFactor.close();
@@ -144,7 +151,7 @@ class MetadataRepository {
 
       _toleranceCallback.value?.call(_tolerance.value);
 
-      _logger.log("tolerance is: ${_transformationFactor.value} ${measurementInfo.unitAbbreviation}");
+      _logger.log("tolerance is: ${_transformationFactor.value}");
       _logger.log("updated transformationFactor");
     }
   }

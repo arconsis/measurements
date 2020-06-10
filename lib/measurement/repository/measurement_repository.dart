@@ -56,8 +56,6 @@ class MeasurementRepository {
       _backgroundPosition = backgroundPosition;
       _publishPoints();
     });
-
-    _logger.log("Created Repository");
   }
 
   Stream<List<Offset>> get points => _points.stream;
@@ -186,7 +184,9 @@ class MeasurementRepository {
   }
 
   _updatePoints(double factor) {
+    _logger.log("before update: $_absolutePoints with factor: $factor");
     _absolutePoints = _absolutePoints.map((Offset point) => point * factor).toList();
+    _logger.log("after update: $_absolutePoints");
     _publishPoints();
   }
 }

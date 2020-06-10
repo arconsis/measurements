@@ -25,7 +25,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = true;
+  bool measure = false;
   bool showDistanceOnLine = true;
   bool showTolerance = false;
 

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -17,23 +19,35 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   MetadataRepository _repository;
   PhotoViewController _controller = PhotoViewController();
+  bool _measure = false;
+  double _zoom = 1.0;
+  Orientation _orientation = Orientation.portrait;
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
 
     _repository.measurement.listen((bool measure) {
-      add(MetadataUpdatedEvent(measure));
+      _measure = measure;
+      _updateState();
+    });
+    _repository.zoom.listen((zoom) {
+      _zoom = zoom;
+      _updateState();
+    });
+    _repository.orientation.listen((orientation) {
+      _orientation = orientation;
+      _updateState();
     });
 
-    _controller.outputStateStream.listen((state) {
-      _repository.registerResizing(state.position, state.scale);
-    });
+    _controller.outputStateStream.listen((state) => _repository.registerResizing(state.position, state.scale));
+  }
 
-    _logger.log("Created Bloc");
+  void _updateState() {
+    add(MetadataUpdatedEvent(_measure, _orientation, _zoom));
   }
 
   @override
-  MetadataState get initialState => MetadataState(_controller, false);
+  MetadataState get initialState => MetadataState(_controller, _measure, _zoom, _orientation);
 
   @override
   void onEvent(MetadataEvent event) {
@@ -50,6 +64,8 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
+    } else if (event is MetadataOrientationEvent) {
+      _repository.registerOrientation(event.orientation);
     }
 
     super.onEvent(event);
@@ -58,7 +74,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
     if (event is MetadataUpdatedEvent) {
-      yield MetadataState(_controller, event.measure);
+      yield MetadataState(_controller, event.measure, event.zoom, event.orientation);
     }
   }
 

@@ -54,16 +54,32 @@ class MetadataStartedEvent extends MetadataEvent {
   }
 }
 
-class MetadataUpdatedEvent extends MetadataEvent {
-  final bool measure;
+class MetadataOrientationEvent extends MetadataEvent {
+  final Orientation orientation;
 
-  MetadataUpdatedEvent(this.measure);
+  MetadataOrientationEvent(this.orientation);
 
   @override
-  List<Object> get props => [measure];
+  List<Object> get props => [orientation];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure";
+    return super.toString() + " orientation: $orientation";
+  }
+}
+
+class MetadataUpdatedEvent extends MetadataEvent {
+  final bool measure;
+  final Orientation orientation;
+  final double zoom;
+
+  MetadataUpdatedEvent(this.measure, this.orientation, this.zoom);
+
+  @override
+  List<Object> get props => [measure, orientation, zoom];
+
+  @override
+  String toString() {
+    return super.toString() + " measure: $measure, orientation: $orientation, zoom: $zoom";
   }
 }
