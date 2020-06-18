@@ -4,6 +4,7 @@
 ///
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
@@ -25,10 +26,26 @@ final imageWidget = Image.asset(
 );
 
 Widget fillTemplate(Widget measurement) {
-  return MaterialApp(home: Scaffold(body: measurement,),);
+  return MaterialApp(
+    home: Scaffold(
+      body: measurement,
+    ),
+  );
+}
+
+double getZoom() {
+  return (find
+      .byType(typeOf<PhotoView>())
+      .evaluate()
+      .first
+      .widget as PhotoView).controller.scale;
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  final controller = MeasurementController();
+
   group("Measurement Widget Integration Test", () {
     MetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
@@ -95,6 +112,7 @@ void main() {
               child: imageWidget,
               measure: true,
               showDistanceOnLine: true,
+              controller: controller,
               measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
             )
         ));
@@ -121,6 +139,8 @@ void main() {
         );
 
         measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
       });
 
       testWidgets("add points without distances and then turn on distances", (WidgetTester tester) async {
@@ -129,6 +149,7 @@ void main() {
               child: imageWidget,
               measure: true,
               showDistanceOnLine: false,
+              controller: controller,
               measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
             )
         ));
@@ -150,6 +171,8 @@ void main() {
         await tester.pump();
 
         measurementRepository.points.listen((actual) => expectSync(actual, [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)]));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
 
         await tester.pumpWidget(fillTemplate(
             Measurement(
@@ -168,6 +191,8 @@ void main() {
         );
 
         measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
       });
 
       testWidgets("adding multiple points and getting distances with set scale", (WidgetTester tester) async {
@@ -176,6 +201,7 @@ void main() {
               child: imageWidget,
               measure: true,
               showDistanceOnLine: true,
+              controller: controller,
               measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), scale: 2.0),
             )
         ));
@@ -202,6 +228,44 @@ void main() {
         );
 
         measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([100, 100, 100]));
+        expect(controller.tolerance, equals(0.5));
+      });
+    });
+
+    group("controller interaction", () {
+      final channel = MethodChannel("measurements");
+      setUp(() {
+        channel.setMockMethodCallHandler((call) async {
+          if (call.method == "getPhysicalPixelsPerInch") {
+            return 4.0;
+          } else {
+            return -1.0;
+          }
+        });
+      });
+
+      testWidgets("set zoom to original size and reset zoom level", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: true,
+              controller: controller,
+              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Inch(imageWidth), scale: 2.0),
+            )
+        ));
+
+        await tester.pump();
+        expect(getZoom(), equals(1.0));
+
+        controller.zoomToOriginalSize();
+        await tester.pump();
+        expect(getZoom(), equals(2 / 3));
+
+        controller.resetZoom();
+        await tester.pump();
+        expect(getZoom(), equals(1.0));
       });
     });
   });
