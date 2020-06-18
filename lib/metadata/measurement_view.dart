@@ -164,7 +164,6 @@ class MeasurementView extends StatelessWidget {
             child: AbsorbPointer(
               absorbing: state.measure,
               child: PhotoView.customChild(
-                basePosition: Alignment.topLeft,
                 controller: state.controller,
                 initialScale: PhotoViewComputedScale.contained,
                 minScale: PhotoViewComputedScale.contained,

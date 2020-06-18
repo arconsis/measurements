@@ -36,10 +36,12 @@ class MeasurementRepository {
   List<Offset> _absolutePoints = List();
   double _zoomLevel = 1.0;
   Offset _backgroundPosition = Offset(0, 0);
+  Offset _viewCenterPosition = Offset(0, 0);
 
   MeasurementRepository(MetadataRepository repository) {
     repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
     repository.controller.listen((controller) => _controller = controller);
+    repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
@@ -53,7 +55,7 @@ class MeasurementRepository {
       _publishPoints();
     });
     repository.backgroundPosition.listen((backgroundPosition) {
-      _backgroundPosition = backgroundPosition;
+      _backgroundPosition = Offset(backgroundPosition.dx, -backgroundPosition.dy);
       _publishPoints();
     });
   }
@@ -66,21 +68,21 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset absolutePosition = convertIntoAbsolutePosition(position);
+    Offset absoluteCenteredPosition = convertIntoAbsolutePosition(position);
 
-    int closestIndex = _getClosestPointIndex(absolutePosition);
+    int closestIndex = _getClosestPointIndex(absoluteCenteredPosition);
 
     if (closestIndex >= 0) {
       Offset closestPoint = _absolutePoints[closestIndex];
 
       if ((_convertIntoRelativePosition(closestPoint) - position).distance > 40.0) {
-        _currentIndex = _addNewPoint(absolutePosition);
+        _currentIndex = _addNewPoint(absoluteCenteredPosition);
       } else {
         _currentIndex = closestIndex;
-        _updatePoint(absolutePosition, _currentIndex);
+        _updatePoint(absoluteCenteredPosition, _currentIndex);
       }
     } else {
-      _currentIndex = _addNewPoint(absolutePosition);
+      _currentIndex = _addNewPoint(absoluteCenteredPosition);
     }
 
     _movementStarted(_currentIndex);
@@ -111,11 +113,13 @@ class MeasurementRepository {
   }
 
   Offset convertIntoAbsolutePosition(Offset position) {
-    return (position - _backgroundPosition) / _zoomLevel;
+    return (Offset(position.dx - _viewCenterPosition.dx, _viewCenterPosition.dy - position.dy) - _backgroundPosition) / _zoomLevel;
   }
 
   Offset _convertIntoRelativePosition(Offset position) {
-    return position * _zoomLevel + _backgroundPosition;
+    Offset scaledPosition = position * _zoomLevel;
+
+    return Offset(scaledPosition.dx + _viewCenterPosition.dx + _backgroundPosition.dx, _viewCenterPosition.dy - scaledPosition.dy - _backgroundPosition.dy);
   }
 
   List<Offset> _getRelativePoints() {
