@@ -29,7 +29,6 @@ class MetadataRepository {
   final _currentBackgroundImage = BehaviorSubject<ui.Image>();
   final _viewSize = BehaviorSubject<Size>();
   final _viewCenter = BehaviorSubject<Offset>();
-  final _viewWidthChangeFactor = BehaviorSubject<double>();
 
   final _transformationFactor = BehaviorSubject<LengthUnit>();
   final _tolerance = BehaviorSubject<double>();
@@ -67,8 +66,6 @@ class MetadataRepository {
 
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
 
-  Stream<double> get viewScaleFactor => _viewWidthChangeFactor.stream;
-
 
   void registerStartupValuesChange({
     @required MeasurementInformation measurementInformation,
@@ -89,15 +86,9 @@ class MetadataRepository {
 
   void registerBackgroundChange(ui.Image backgroundImage, Size size) {
     _currentBackgroundImage.value = backgroundImage;
+    _viewSize.value = size;
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
-
-    if (_viewSize.value == null) {
-      _viewSize.value = size;
-    } else if (_viewSize.value.width != size.width) {
-      _viewWidthChangeFactor.value = size.width / _viewSize.value.width;
-      _viewSize.value = size;
-    }
 
     _logger.log("view size: ${_viewSize.value}");
 
@@ -128,7 +119,6 @@ class MetadataRepository {
     _imageScaleFactor.close();
     _viewSize.close();
     _viewCenter.close();
-    _viewWidthChangeFactor.close();
 
     _transformationFactor.close();
     _tolerance.close();

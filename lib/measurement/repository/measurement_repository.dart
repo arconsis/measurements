@@ -36,12 +36,19 @@ class MeasurementRepository {
   List<Offset> _absolutePoints = List();
   double _zoomLevel = 1.0;
   Offset _backgroundPosition = Offset(0, 0);
+  Offset _oldViewCenterPosition = Offset(0, 0);
   Offset _viewCenterPosition = Offset(0, 0);
 
   MeasurementRepository(MetadataRepository repository) {
-    repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
     repository.controller.listen((controller) => _controller = controller);
-    repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
+    repository.viewCenter.listen((viewCenter) {
+      _oldViewCenterPosition = _viewCenterPosition;
+      _viewCenterPosition = viewCenter;
+
+      if (_oldViewCenterPosition != Offset(0, 0) && _oldViewCenterPosition != _viewCenterPosition) {
+        _updatePoints();
+      }
+    });
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
@@ -68,14 +75,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset absoluteCenteredPosition = _convertIntoAbsolutePosition(position);
+    Offset absoluteCenteredPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition);
 
     int closestIndex = _getClosestPointIndex(absoluteCenteredPosition);
 
     if (closestIndex >= 0) {
       Offset closestPoint = _absolutePoints[closestIndex];
 
-      if ((_convertIntoRelativePosition(closestPoint) - position).distance > 40.0) {
+      if ((_convertIntoRelativePosition(closestPoint, _viewCenterPosition) - position).distance > 40.0) {
         _currentIndex = _addNewPoint(absoluteCenteredPosition);
       } else {
         _currentIndex = closestIndex;
@@ -92,14 +99,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
     _currentIndex = -1;
     _movementFinished();
 
@@ -113,23 +120,23 @@ class MeasurementRepository {
   }
 
   Offset convertIntoAbsoluteTopLeftPosition(Offset position) {
-    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position);
+    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition);
 
     return Offset(absoluteCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - absoluteCenterPosition.dy);
   }
 
-  Offset _convertIntoAbsolutePosition(Offset position) {
-    return (Offset(position.dx - _viewCenterPosition.dx, _viewCenterPosition.dy - position.dy) - _backgroundPosition) / _zoomLevel;
+  Offset _convertIntoAbsolutePosition(Offset position, Offset viewCenter) {
+    return (Offset(position.dx - viewCenter.dx, viewCenter.dy - position.dy) - _backgroundPosition) / _zoomLevel;
   }
 
-  Offset _convertIntoRelativePosition(Offset position) {
+  Offset _convertIntoRelativePosition(Offset position, Offset viewCenter) {
     Offset scaledPosition = position * _zoomLevel;
 
-    return Offset(scaledPosition.dx + _viewCenterPosition.dx + _backgroundPosition.dx, _viewCenterPosition.dy - scaledPosition.dy - _backgroundPosition.dy);
+    return Offset(scaledPosition.dx + viewCenter.dx + _backgroundPosition.dx, viewCenter.dy - scaledPosition.dy - _backgroundPosition.dy);
   }
 
   List<Offset> _getRelativePoints() {
-    return _absolutePoints.map((point) => _convertIntoRelativePosition(point)).toList();
+    return _absolutePoints.map((point) => _convertIntoRelativePosition(point, _viewCenterPosition)).toList();
   }
 
   void _publishPoints() {
@@ -193,9 +200,10 @@ class MeasurementRepository {
     }
   }
 
-  _updatePoints(double factor) {
-    _logger.log("before update: $_absolutePoints with factor: $factor");
-    _absolutePoints = _absolutePoints.map((Offset point) => point * factor).toList();
+  _updatePoints() {
+    _logger.log("before update: $_absolutePoints old view center $_oldViewCenterPosition new view center $_viewCenterPosition");
+    List<Offset> relativePoints = _absolutePoints.map((point) => _convertIntoRelativePosition(point, _oldViewCenterPosition)).toList();
+    _absolutePoints = relativePoints.map((point) => _convertIntoAbsolutePosition(point, _viewCenterPosition)).toList();
     _logger.log("after update: $_absolutePoints");
     _publishPoints();
   }
