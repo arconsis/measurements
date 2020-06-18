@@ -11,15 +11,16 @@ class MetadataState extends Equatable {
   final PhotoViewController controller;
   final bool measure;
   final double zoom;
+  final double maxZoom;
   final Orientation orientation;
 
-  MetadataState(this.controller, this.measure, this.zoom, this.orientation);
+  MetadataState(this.controller, this.measure, this.zoom, this.maxZoom, this.orientation);
 
   @override
-  List<Object> get props => [controller, measure, zoom, this.orientation];
+  List<Object> get props => [controller, measure, zoom, maxZoom, orientation];
 
   @override
   String toString() {
-    return super.toString() + " PhotoViewController: $controller, measure: $measure, zoom: $zoom, orientation: $orientation";
+    return super.toString() + " PhotoViewController: $controller, measure: $measure, zoom: $zoom, maxZoom: $maxZoom, orientation: $orientation";
   }
 }

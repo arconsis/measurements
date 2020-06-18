@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 
@@ -33,20 +34,18 @@ class MetadataStartedEvent extends MetadataEvent {
   final bool showDistances;
   final MeasurementInformation measurementInformation;
   final MagnificationStyle magnificationStyle;
-  final Function(List<double>) callback;
-  final Function(double) toleranceCallback;
+  final MeasurementController controller;
 
   MetadataStartedEvent({
     @required this.measure,
     @required this.showDistances,
     @required this.measurementInformation,
     @required this.magnificationStyle,
-    @required this.callback,
-    @required this.toleranceCallback
+    @required this.controller,
   });
 
   @override
-  List<Object> get props => [measurementInformation, callback, toleranceCallback, measure, showDistances, magnificationStyle];
+  List<Object> get props => [measurementInformation, controller, measure, showDistances, magnificationStyle];
 
   @override
   String toString() {
@@ -72,14 +71,15 @@ class MetadataUpdatedEvent extends MetadataEvent {
   final bool measure;
   final Orientation orientation;
   final double zoom;
+  final double maxZoom;
 
-  MetadataUpdatedEvent(this.measure, this.orientation, this.zoom);
+  MetadataUpdatedEvent(this.measure, this.orientation, this.zoom, this.maxZoom);
 
   @override
-  List<Object> get props => [measure, orientation, zoom];
+  List<Object> get props => [measure, orientation, zoom, maxZoom];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure, orientation: $orientation, zoom: $zoom";
+    return super.toString() + " measure: $measure, orientation: $orientation, zoom: $zoom, maxZoom: $maxZoom";
   }
 }

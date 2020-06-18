@@ -9,27 +9,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
+import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../metadata/bloc/metadata_bloc_test.dart';
+import '../../mocks/test_mocks.dart';
 
 void main() {
   group("Measurement Repository Unit Test", () {
     final transformationFactor = Millimeter(5.0);
 
-    MockMetadataRepository metadataRepository;
+    MetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
     BehaviorSubject<LengthUnit> transformationFactorController;
 
     setUp(() {
-      metadataRepository = MockMetadataRepository();
+      metadataRepository = MockedMetadataRepository();
 
       transformationFactorController = BehaviorSubject.seeded(transformationFactor);
 
       when(metadataRepository.viewScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
       when(metadataRepository.transformationFactor).thenAnswer((_) => transformationFactorController.stream);
-      when(metadataRepository.callback).thenAnswer((_) => Stream.fromIterable([]));
+      when(metadataRepository.controller).thenAnswer((_) => Stream.fromIterable([]));
       when(metadataRepository.zoom).thenAnswer((_) => Stream.fromIterable([1.0]));
       when(metadataRepository.backgroundPosition).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 

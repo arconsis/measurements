@@ -10,8 +10,6 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** MeasurementsPlugin */
 class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
-	private val mmPerInch = 25.4
-
 	override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 		val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "measurements")
 		channel.setMethodCallHandler(MeasurementsPlugin())
@@ -38,8 +36,8 @@ class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	}
 
 	override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-		if (call.method == "getPhysicalPixelsPerMM") {
-			result.success(Resources.getSystem().displayMetrics.xdpi / mmPerInch)
+		if (call.method == "getPhysicalPixelsPerInch") {
+			result.success(Resources.getSystem().displayMetrics.xdpi)
 		} else {
 			result.notImplemented()
 		}

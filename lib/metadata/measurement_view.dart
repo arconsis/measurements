@@ -11,6 +11,7 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
@@ -27,12 +28,11 @@ import 'repository/metadata_repository.dart';
 
 class Measurement extends StatelessWidget {
   final Widget child;
-  final MeasurementInformation measurementInformation;
-  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Function(List<double>) distanceCallback;
-  final Function(double) distanceToleranceCallback;
+  final MeasurementInformation measurementInformation;
+  final double magnificationZoomFactor;
+  final MeasurementController controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -40,12 +40,11 @@ class Measurement extends StatelessWidget {
   Measurement({
     Key key,
     @required this.child,
-    this.measurementInformation = const MeasurementInformation(),
     this.measure = false,
     this.showDistanceOnLine = false,
-    this.distanceCallback,
-    this.distanceToleranceCallback,
+    this.measurementInformation = const MeasurementInformation(),
     this.magnificationZoomFactor = 2.0,
+    this.controller,
     this.pointStyle = const PointStyle(),
     this.magnificationStyle = const MagnificationStyle(),
     this.distanceStyle = const DistanceStyle()
@@ -64,12 +63,11 @@ class Measurement extends StatelessWidget {
       create: (context) => MetadataBloc(),
       child: MeasurementView(
           child,
-          measurementInformation,
           measure,
           showDistanceOnLine,
-          distanceCallback,
-          distanceToleranceCallback,
+          measurementInformation,
           magnificationZoomFactor,
+          controller,
           pointStyle,
           magnificationStyle,
           distanceStyle
@@ -83,23 +81,21 @@ class MeasurementView extends StatelessWidget {
   final GlobalKey _childKey = GlobalKey();
 
   final Widget child;
-  final MeasurementInformation measurementInformation;
-  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Function(List<double>) distanceCallback;
-  final Function(double) distanceToleranceCallback;
+  final MeasurementInformation measurementInformation;
+  final double magnificationZoomFactor;
+  final MeasurementController controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
   MeasurementView(this.child,
-      this.measurementInformation,
       this.measure,
       this.showDistanceOnLine,
-      this.distanceCallback,
-      this.distanceToleranceCallback,
+      this.measurementInformation,
       this.magnificationZoomFactor,
+      this.controller,
       this.pointStyle,
       this.magnificationStyle,
       this.distanceStyle);
@@ -126,8 +122,7 @@ class MeasurementView extends StatelessWidget {
           measure: measure,
           showDistances: showDistanceOnLine,
           magnificationStyle: magnificationStyle,
-          callback: distanceCallback,
-          toleranceCallback: distanceToleranceCallback,
+          controller: controller,
         )
     );
   }
@@ -167,7 +162,7 @@ class MeasurementView extends StatelessWidget {
                 controller: state.controller,
                 initialScale: PhotoViewComputedScale.contained,
                 minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.contained * 5,
+                maxScale: PhotoViewComputedScale.contained * state.maxZoom,
                 child: RepaintBoundary(
                   key: _childKey,
                   child: child,

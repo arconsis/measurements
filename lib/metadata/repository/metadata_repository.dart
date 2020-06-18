@@ -4,7 +4,9 @@
 ///
 
 import 'dart:ui' as ui;
+import 'dart:ui';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
@@ -21,8 +23,7 @@ class MetadataRepository {
   final _unitOfMeasurement = BehaviorSubject<LengthUnit>();
   final _magnificationRadius = BehaviorSubject<double>();
   final _orientation = BehaviorSubject<Orientation>();
-  final _distanceCallback = BehaviorSubject<Function(List<double>)>();
-  final _toleranceCallback = BehaviorSubject<Function(double)>();
+  final _controller = BehaviorSubject<MeasurementController>();
 
   final _imageScaleFactor = BehaviorSubject<double>();
   final _currentBackgroundImage = BehaviorSubject<ui.Image>();
@@ -36,7 +37,6 @@ class MetadataRepository {
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _contentPosition = BehaviorSubject<Offset>();
 
-
   MetadataRepository();
 
   Stream<bool> get measurement => _enableMeasure.stream;
@@ -46,6 +46,8 @@ class MetadataRepository {
   Stream<Orientation> get orientation => _orientation.stream;
 
   Stream<LengthUnit> get transformationFactor => _transformationFactor.stream;
+
+  Stream<MeasurementController> get controller => _controller.stream;
 
   Stream<LengthUnit> get unitOfMeasurement => _unitOfMeasurement.stream;
 
@@ -67,24 +69,20 @@ class MetadataRepository {
 
   Stream<double> get viewScaleFactor => _viewWidthChangeFactor.stream;
 
-  Stream<Function(List<double>)> get callback => _distanceCallback.stream;
-
 
   void registerStartupValuesChange({
     @required MeasurementInformation measurementInformation,
     @required bool measure,
     @required bool showDistance,
     @required MagnificationStyle magnificationStyle,
-    @required Function(List<double>) callback,
-    @required Function(double) toleranceCallback,
+    @required MeasurementController controller,
   }) {
     _measurementInformation.value = measurementInformation;
     _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
     _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
-    _distanceCallback.value = callback;
-    _toleranceCallback.value = toleranceCallback;
+    _controller.value = controller;
 
     _updateTransformationFactor();
   }
@@ -124,8 +122,7 @@ class MetadataRepository {
     _unitOfMeasurement.close();
     _magnificationRadius.close();
     _orientation.close();
-    _distanceCallback.close();
-    _toleranceCallback.close();
+    _controller.close();
 
     _currentBackgroundImage.close();
     _imageScaleFactor.close();
@@ -149,10 +146,23 @@ class MetadataRepository {
       _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth);
       _tolerance.value = _transformationFactor.value.value / zoomLevel;
 
-      _toleranceCallback.value?.call(_tolerance.value);
+      _controller.value?.tolerance = _tolerance.value;
 
       _logger.log("tolerance is: ${_transformationFactor.value}");
       _logger.log("updated transformationFactor");
     }
+  }
+
+  Future<double> get zoomFactorForOriginalSize async {
+    double pixelPerInch = await MethodChannel("measurements").invokeMethod("getPhysicalPixelsPerInch");
+    double screenWidth = _viewSize.value?.width ?? 0;
+
+    if (screenWidth == 0) return 1;
+
+    MeasurementInformation information = _measurementInformation.value;
+
+    return information.documentWidthInLengthUnits
+        .convertToInch()
+        .value * pixelPerInch / (screenWidth * information.scale * window.devicePixelRatio);
   }
 }

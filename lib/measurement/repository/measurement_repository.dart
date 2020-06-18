@@ -27,7 +27,7 @@ class MeasurementRepository {
   final _distances = BehaviorSubject<List<LengthUnit>>.seeded(List());
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
 
-  Function(List<double>) _callback;
+  MeasurementController _controller;
   LengthUnit _transformationFactor;
 
   int _currentIndex = -1;
@@ -39,7 +39,7 @@ class MeasurementRepository {
 
   MeasurementRepository(MetadataRepository repository) {
     repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
-    repository.callback.listen((callback) => _callback = callback);
+    repository.controller.listen((controller) => _controller = controller);
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
@@ -179,7 +179,7 @@ class MeasurementRepository {
       _absolutePoints.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
-      _callback?.call(distances.map((unit) => unit.value).toList());
+      _controller?.distances = distances.map((unit) => unit.value).toList();
     }
   }
 

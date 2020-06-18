@@ -28,21 +28,18 @@ class _MyAppState extends State<MyApp> {
   bool measure = false;
   bool showDistanceOnLine = true;
   bool showTolerance = false;
+  bool zoomed = false;
 
   List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
   int unitIndex = 1;
 
-  Function(List<double>) distanceCallback;
+  MeasurementController controller;
 
   @override
   void initState() {
     super.initState();
 
-    distanceCallback = (List<double> distance) {
-      setState(() {
-        this.title = "Measurement#: ${distance.length}";
-      });
-    };
+    controller = MeasurementController();
   }
 
   Color getButtonColor(bool selected) {
@@ -94,7 +91,17 @@ class _MyAppState extends State<MyApp> {
                 ),
                 size: Size(64, 64),
               ),
-              Text(title),
+              IconButton(onPressed: () {
+                if (zoomed) {
+                  controller.resetZoom();
+                } else {
+                  controller.zoomToOriginalSize();
+                }
+
+                zoomed = !zoomed;
+              },
+                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))
+              ),
             ],
           ),
         ),
@@ -106,7 +113,7 @@ class _MyAppState extends State<MyApp> {
               documentWidthInLengthUnits: Millimeter(210),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
-            distanceCallback: distanceCallback,
+            controller: controller,
             showDistanceOnLine: showDistanceOnLine,
             distanceStyle: DistanceStyle(numDecimalPlaces: 2, showTolerance: showTolerance),
             measure: measure,
