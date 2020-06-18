@@ -27,7 +27,6 @@ void main() {
     final Image expectedImage = MockedImage.mock;
     final expectedMagnificationStyle = MagnificationStyle();
 
-    final expectedViewScaleFactor = 1.0;
     final expectedImageScaleFactor = 3.0;
     final expectedTransformationFactor = Inch(1 / 4);
 
@@ -81,7 +80,6 @@ void main() {
       metadataRepository.viewCenter.listen((actual) => expect(actual, expectedViewCenter));
       metadataRepository.backgroundImage.listen((actual) => expect(actual, expectedImage));
 
-      metadataRepository.viewScaleFactor.listen((actual) => expect(actual, expectedViewScaleFactor));
       metadataRepository.imageScaleFactor.listen((actual) => expect(actual, expectedImageScaleFactor));
       metadataRepository.transformationFactor.listen((actual) => expect(actual, expectedTransformationFactor));
     });
@@ -102,8 +100,6 @@ void main() {
 
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
       metadataRepository.registerBackgroundChange(expectedImage, updatedViewSize);
-
-      metadataRepository.viewScaleFactor.listen((actual) => expect(actual, expectedUpdatedViewScaleFactor));
     });
 
     group("original zoom factor", () {

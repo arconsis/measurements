@@ -31,7 +31,6 @@ void main() {
 
       controller = MeasurementController();
 
-      when(metadataRepository.viewScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
       when(metadataRepository.transformationFactor).thenAnswer((_) => transformationFactorController.stream);
       when(metadataRepository.controller).thenAnswer((_) => Stream.fromIterable([controller]));
       when(metadataRepository.zoom).thenAnswer((_) => Stream.fromIterable([1.0]));
