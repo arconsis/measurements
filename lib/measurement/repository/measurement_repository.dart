@@ -68,7 +68,7 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset absoluteCenteredPosition = convertIntoAbsolutePosition(position);
+    Offset absoluteCenteredPosition = _convertIntoAbsolutePosition(position);
 
     int closestIndex = _getClosestPointIndex(absoluteCenteredPosition);
 
@@ -92,14 +92,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(convertIntoAbsolutePosition(position), _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position), _currentIndex);
     _currentIndex = -1;
     _movementFinished();
 
@@ -112,7 +112,13 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  Offset convertIntoAbsolutePosition(Offset position) {
+  Offset convertIntoAbsoluteTopLeftPosition(Offset position) {
+    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position);
+
+    return Offset(absoluteCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - absoluteCenterPosition.dy);
+  }
+
+  Offset _convertIntoAbsolutePosition(Offset position) {
     return (Offset(position.dx - _viewCenterPosition.dx, _viewCenterPosition.dy - position.dy) - _backgroundPosition) / _zoomLevel;
   }
 

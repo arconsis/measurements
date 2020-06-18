@@ -71,7 +71,7 @@ class MeasureBloc extends Bloc<MeasureEvent, MeasureState> {
             nextState: MeasureActiveState(
               state.position,
               state.magnificationOffset,
-              absolutePosition: _measureRepository.convertIntoAbsolutePosition(state.position),
+              absolutePosition: _measureRepository.convertIntoAbsoluteTopLeftPosition(state.position),
               backgroundImage: _backgroundImage,
               imageScaleFactor: _imageScaleFactor,
             )
