@@ -35,6 +35,7 @@ void main() {
       when(metadataRepository.transformationFactor).thenAnswer((_) => transformationFactorController.stream);
       when(metadataRepository.controller).thenAnswer((_) => Stream.fromIterable([controller]));
       when(metadataRepository.zoom).thenAnswer((_) => Stream.fromIterable([1.0]));
+      when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
       when(metadataRepository.backgroundPosition).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
       measurementRepository = MeasurementRepository(metadataRepository);
