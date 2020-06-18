@@ -98,7 +98,9 @@ class _MyAppState extends State<MyApp> {
                   controller.zoomToOriginalSize();
                 }
 
-                zoomed = !zoomed;
+                setState(() {
+                  zoomed = !zoomed;
+                });
               },
                   icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))
               ),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -106,7 +108,12 @@ class MeasurementView extends StatelessWidget {
         RenderRepaintBoundary boundary = _childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: magnificationZoomFactor * zoom), boundary.size));
+          final pixelRatio = min(10.0, max(1.0, magnificationZoomFactor * zoom));
+          final image = await boundary.toImage(pixelRatio: pixelRatio);
+
+          if (image.width > 0) {
+            BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(image, boundary.size));
+          }
         } else {
           _logger.log("image dimensions are 0");
           _setBackgroundImageToBloc(context, zoom);
@@ -158,7 +165,6 @@ class MeasurementView extends StatelessWidget {
               absorbing: state.measure,
               child: PhotoView.customChild(
                 basePosition: Alignment.topLeft,
-                enableRotation: false,
                 controller: state.controller,
                 initialScale: PhotoViewComputedScale.contained,
                 minScale: PhotoViewComputedScale.contained,
