@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   bool zoomed = false;
 
   List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
-  int unitIndex = 1;
+  int unitIndex = 0;
 
   MeasurementController controller;
 
@@ -109,10 +109,10 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Measurement(
-            child: Image.asset("assets/images/example_portrait.png",),
+            child: Image.asset("assets/images/floorplan448x449mm.png",),
             measurementInformation: MeasurementInformation(
-              scale: 1 / 2.0,
-              documentWidthInLengthUnits: Millimeter(210),
+              scale: 1 / 50.0,
+              documentWidthInLengthUnits: Millimeter(448),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
             controller: controller,
