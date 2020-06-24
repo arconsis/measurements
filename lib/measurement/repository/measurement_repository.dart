@@ -44,7 +44,6 @@ class MeasurementRepository {
     repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
     repository.imageToDocumentScaleFactor.listen((scaleFactor) {
       _imageToDocumentScaleFactor = scaleFactor;
-      _logger.log("image to document factor: $_imageToDocumentScaleFactor");
       _updatePoints();
     });
     repository.transformationFactor.listen((factor) {

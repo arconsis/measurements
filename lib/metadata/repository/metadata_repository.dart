@@ -94,7 +94,7 @@ class MetadataRepository {
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
-    _logger.log("view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size ${size}");
+    _logger.log("view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size $size");
 
     _updateImageToDocumentFactor(size);
     _updateTransformationFactor();

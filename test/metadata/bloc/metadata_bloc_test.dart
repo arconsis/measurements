@@ -25,9 +25,8 @@ void main() {
     MetadataRepository mockedRepository;
     BehaviorSubject<bool> measurement;
     Image mockedImage;
-    PhotoViewController mockedPhotoController;
 
-    final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(210), scale: 1.0);
+    final measurementInformation = MeasurementInformation.A4(scale: 1.0);
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
@@ -45,7 +44,6 @@ void main() {
       mockedImage = MockedImage.mock;
       measurement = BehaviorSubject();
       mockedRepository = MockedMetadataRepository();
-      mockedPhotoController = MockedPhotoViewController();
       GetIt.I.registerSingleton(mockedRepository);
 
       when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
