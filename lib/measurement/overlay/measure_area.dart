@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
@@ -24,14 +23,12 @@ import 'painters/measure_painter.dart';
 class MeasureArea extends StatelessWidget {
   final _logger = Logger(LogDistricts.MEASURE_AREA);
 
-  final Widget child;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
-  final Paint dotPaint = Paint(),
-      pathPaint = Paint();
+  final Paint dotPaint = Paint(), pathPaint = Paint();
 
-  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
+  MeasureArea({@required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
     LineType lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
@@ -52,25 +49,21 @@ class MeasureArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-        onPointerDown: (PointerDownEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
-        onPointerMove: (PointerMoveEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
-        onPointerUp: (PointerUpEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
-        child: Stack(
-          children: <Widget>[
-            BlocBuilder<PointsBloc, PointsState>(
-              builder: (context, state) => _pointsOverlay(state, child),
-            ),
-            BlocBuilder<MeasureBloc, MeasureState>(
-              builder: (context, state) => _magnificationOverlay(state),
-            ),
-          ],
-        )
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        BlocBuilder<PointsBloc, PointsState>(
+          builder: (context, state) => _pointsOverlay(state),
+        ),
+        BlocBuilder<MeasureBloc, MeasureState>(
+          builder: (context, state) => _magnificationOverlay(state),
+        ),
+      ],
     );
   }
 
-  Stack _pointsOverlay(PointsState state, Widget child) {
-    List<Widget> widgets = List.of([child]);
+  Stack _pointsOverlay(PointsState state) {
+    List<Widget> widgets = List();
 
     if (state is PointsSingleState) {
       widgets.add(_pointPainter(state.point, state.point));
@@ -82,7 +75,9 @@ class MeasureArea extends StatelessWidget {
       widgets.addAll(_pointsAndDistances(state));
     }
 
-    return Stack(children: widgets,);
+    return Stack(
+      children: widgets,
+    );
   }
 
   List<Widget> _onlyPoints(PointsOnlyState state) {
@@ -156,6 +151,8 @@ class MeasureArea extends StatelessWidget {
       );
     }
 
-    return Opacity(opacity: 0.0,);
+    return Opacity(
+      opacity: 0.0,
+    );
   }
 }

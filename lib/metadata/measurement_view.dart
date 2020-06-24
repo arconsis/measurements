@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
+import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
@@ -27,7 +28,6 @@ import 'bloc/metadata_event.dart';
 import 'bloc/metadata_state.dart';
 import 'repository/metadata_repository.dart';
 
-
 class Measurement extends StatelessWidget {
   final Widget child;
   final bool measure;
@@ -39,18 +39,17 @@ class Measurement extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  Measurement({
-    Key key,
-    @required this.child,
-    this.measure = false,
-    this.showDistanceOnLine = false,
-    this.measurementInformation = const MeasurementInformation.A4(),
-    this.magnificationZoomFactor = 2.0,
-    this.controller,
-    this.pointStyle = const PointStyle(),
-    this.magnificationStyle = const MagnificationStyle(),
-    this.distanceStyle = const DistanceStyle()
-  }) {
+  Measurement(
+      {Key key,
+      @required this.child,
+      this.measure = false,
+      this.showDistanceOnLine = false,
+      this.measurementInformation = const MeasurementInformation.A4(),
+      this.magnificationZoomFactor = 2.0,
+      this.controller,
+      this.pointStyle = const PointStyle(),
+      this.magnificationStyle = const MagnificationStyle(),
+      this.distanceStyle = const DistanceStyle()}) {
     if (!GetIt.I.isRegistered<MetadataRepository>()) {
       GetIt.I.registerSingleton(MetadataRepository());
     }
@@ -61,18 +60,21 @@ class Measurement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MetadataBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => MetadataBloc()),
+        BlocProvider(create: (context) => MeasureBloc()),
+      ],
       child: MeasurementView(
-          child,
-          measure,
-          showDistanceOnLine,
-          measurementInformation,
-          magnificationZoomFactor,
-          controller,
-          pointStyle,
-          magnificationStyle,
-          distanceStyle
+        child,
+        measure,
+        showDistanceOnLine,
+        measurementInformation,
+        magnificationZoomFactor,
+        controller,
+        pointStyle,
+        magnificationStyle,
+        distanceStyle,
       ),
     );
   }
@@ -92,15 +94,8 @@ class MeasurementView extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  MeasurementView(this.child,
-      this.measure,
-      this.showDistanceOnLine,
-      this.measurementInformation,
-      this.magnificationZoomFactor,
-      this.controller,
-      this.pointStyle,
-      this.magnificationStyle,
-      this.distanceStyle);
+  MeasurementView(
+      this.child, this.measure, this.showDistanceOnLine, this.measurementInformation, this.magnificationZoomFactor, this.controller, this.pointStyle, this.magnificationStyle, this.distanceStyle);
 
   void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -123,15 +118,13 @@ class MeasurementView extends StatelessWidget {
   }
 
   void _setStartupArgumentsToBloc(BuildContext context) {
-    BlocProvider.of<MetadataBloc>(context).add(
-        MetadataStartedEvent(
-          measurementInformation: measurementInformation,
-          measure: measure,
-          showDistances: showDistanceOnLine,
-          magnificationStyle: magnificationStyle,
-          controller: controller,
-        )
-    );
+    BlocProvider.of<MetadataBloc>(context).add(MetadataStartedEvent(
+      measurementInformation: measurementInformation,
+      measure: measure,
+      showDistances: showDistanceOnLine,
+      magnificationStyle: magnificationStyle,
+      controller: controller,
+    ));
   }
 
   @override
@@ -152,27 +145,45 @@ class MeasurementView extends StatelessWidget {
         BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
         _setBackgroundImageToBloc(context, state.zoom);
 
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => MeasureBloc()),
-            BlocProvider(create: (context) => PointsBloc()),
-          ],
-          child: MeasureArea(
-            pointStyle: pointStyle,
-            magnificationStyle: magnificationStyle,
-            distanceStyle: distanceStyle,
-            child: AbsorbPointer(
-              absorbing: state.measure,
-              child: PhotoView.customChild(
-                controller: state.controller,
-                initialScale: PhotoViewComputedScale.contained,
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.contained * state.maxZoom,
-                child: RepaintBoundary(
-                  key: _childKey,
-                  child: child,
+        return BlocProvider(
+          create: (context) => PointsBloc(),
+          child: Listener(
+            onPointerDown: (PointerDownEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
+            onPointerMove: (PointerMoveEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
+            onPointerUp: (PointerUpEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
+            child: Stack(
+              children: <Widget>[
+                AbsorbPointer(
+                  absorbing: state.measure,
+                  child: PhotoView.customChild(
+                    controller: state.controller,
+                    initialScale: PhotoViewComputedScale.contained,
+                    minScale: PhotoViewComputedScale.contained,
+                    maxScale: PhotoViewComputedScale.contained * state.maxZoom,
+                    child: RepaintBoundary(
+                      key: _childKey,
+                      child: child,
+                    ),
+                  ),
                 ),
-              ),
+                MeasureArea(
+                  pointStyle: pointStyle,
+                  magnificationStyle: magnificationStyle,
+                  distanceStyle: distanceStyle,
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    color: Color.fromARGB(50, 100, 100, 255),
+                    child: Listener(
+                      onPointerDown: (PointerDownEvent event) => _logger.log("delete position down: $event"),
+                      onPointerMove: (PointerMoveEvent event) => _logger.log("delete position move: $event"),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
