@@ -113,6 +113,7 @@ class _MyAppState extends State<MyApp> {
             measurementInformation: MeasurementInformation(
               scale: 1 / 50.0,
               documentWidthInLengthUnits: Millimeter(448),
+              documentHeightInLengthUnits: Millimeter(449),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
             controller: controller,

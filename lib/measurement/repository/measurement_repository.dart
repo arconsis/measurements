@@ -29,6 +29,7 @@ class MeasurementRepository {
 
   MeasurementController _controller;
   LengthUnit _transformationFactor;
+  double _imageToDocumentScaleFactor = 1.0;
 
   int _currentIndex = -1;
   TouchState _currentState = TouchState.FREE;
@@ -36,25 +37,20 @@ class MeasurementRepository {
   List<Offset> _absolutePoints = List();
   double _zoomLevel = 1.0;
   Offset _backgroundPosition = Offset(0, 0);
-  Offset _oldViewCenterPosition = Offset(0, 0);
   Offset _viewCenterPosition = Offset(0, 0);
 
   MeasurementRepository(MetadataRepository repository) {
     repository.controller.listen((controller) => _controller = controller);
-    repository.viewCenter.listen((viewCenter) {
-      _oldViewCenterPosition = _viewCenterPosition;
-      _viewCenterPosition = viewCenter;
-
-      if (_oldViewCenterPosition != Offset(0, 0) && _oldViewCenterPosition != _viewCenterPosition) {
-        _updatePoints();
-      }
+    repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
+    repository.imageToDocumentScaleFactor.listen((scaleFactor) {
+      _imageToDocumentScaleFactor = scaleFactor;
+      _logger.log("image to document factor: $_imageToDocumentScaleFactor");
+      _updatePoints();
     });
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
         _movementFinished();
-      } else {
-        _transformationFactor = factor;
       }
     });
     repository.zoom.listen((zoom) {
@@ -120,17 +116,17 @@ class MeasurementRepository {
   }
 
   Offset convertIntoAbsoluteTopLeftPosition(Offset position) {
-    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition);
+    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
 
     return Offset(absoluteCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - absoluteCenterPosition.dy);
   }
 
   Offset _convertIntoAbsolutePosition(Offset position, Offset viewCenter) {
-    return (Offset(position.dx - viewCenter.dx, viewCenter.dy - position.dy) - _backgroundPosition) / _zoomLevel;
+    return (Offset(position.dx - viewCenter.dx, viewCenter.dy - position.dy) - _backgroundPosition) / _zoomLevel * _imageToDocumentScaleFactor;
   }
 
   Offset _convertIntoRelativePosition(Offset position, Offset viewCenter) {
-    Offset scaledPosition = position * _zoomLevel;
+    Offset scaledPosition = position / _imageToDocumentScaleFactor * _zoomLevel;
 
     return Offset(scaledPosition.dx + viewCenter.dx + _backgroundPosition.dx, viewCenter.dy - scaledPosition.dy - _backgroundPosition.dy);
   }
@@ -141,6 +137,8 @@ class MeasurementRepository {
 
   void _publishPoints() {
     List<Offset> relativePoints = _getRelativePoints();
+
+    _logger.log("relative points: $relativePoints");
 
     _points.add(relativePoints);
     _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
@@ -201,10 +199,7 @@ class MeasurementRepository {
   }
 
   _updatePoints() {
-    _logger.log("before update: $_absolutePoints old view center $_oldViewCenterPosition new view center $_viewCenterPosition");
-    List<Offset> relativePoints = _absolutePoints.map((point) => _convertIntoRelativePosition(point, _oldViewCenterPosition)).toList();
-    _absolutePoints = relativePoints.map((point) => _convertIntoAbsolutePosition(point, _viewCenterPosition)).toList();
-    _logger.log("after update: $_absolutePoints");
+    _logger.log("absolute position: $_absolutePoints new view center $_viewCenterPosition");
     _publishPoints();
   }
 }

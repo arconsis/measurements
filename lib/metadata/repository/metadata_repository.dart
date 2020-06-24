@@ -6,6 +6,7 @@
 import 'dart:ui' as ui;
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:measurements/measurements.dart';
@@ -26,6 +27,7 @@ class MetadataRepository {
   final _controller = BehaviorSubject<MeasurementController>();
 
   final _imageScaleFactor = BehaviorSubject<double>();
+  final _imageToDocumentFactor = BehaviorSubject<double>();
   final _currentBackgroundImage = BehaviorSubject<ui.Image>();
   final _viewSize = BehaviorSubject<Size>();
   final _viewCenter = BehaviorSubject<Offset>();
@@ -55,6 +57,8 @@ class MetadataRepository {
   Stream<Offset> get backgroundPosition => _contentPosition.stream;
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
+
+  Stream<double> get imageToDocumentScaleFactor => _imageToDocumentFactor.stream;
 
   Stream<ui.Image> get backgroundImage => _currentBackgroundImage.stream;
 
@@ -90,9 +94,23 @@ class MetadataRepository {
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
-    _logger.log("view size: ${_viewSize.value}");
+    _logger.log("view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size ${size}");
 
+    _updateImageToDocumentFactor(size);
     _updateTransformationFactor();
+  }
+
+  void _updateImageToDocumentFactor(Size viewSize) {
+    final documentWidth = _measurementInformation.value.documentWidthInLengthUnits.value.toDouble();
+    final documentHeight = _measurementInformation.value.documentHeightInLengthUnits.value.toDouble();
+    final documentAspectRatio = documentWidth / documentHeight;
+    final backgroundAspectRatio = viewSize.width / viewSize.height;
+
+    if (documentAspectRatio > backgroundAspectRatio) { // width of document is width of background
+      _imageToDocumentFactor.value = documentWidth / viewSize.width;
+    } else { // height of document is height of background
+      _imageToDocumentFactor.value = documentHeight / viewSize.height;
+    }
   }
 
   void registerOrientation(Orientation orientation) {
@@ -117,6 +135,7 @@ class MetadataRepository {
 
     _currentBackgroundImage.close();
     _imageScaleFactor.close();
+    _imageToDocumentFactor.close();
     _viewSize.close();
     _viewCenter.close();
 
@@ -133,8 +152,8 @@ class MetadataRepository {
       double viewWidth = _viewSize.value.width;
       MeasurementInformation measurementInfo = _measurementInformation.value;
 
-      _transformationFactor.value = measurementInfo.documentWidthInUnitOfMeasurement / (measurementInfo.scale * viewWidth);
-      _tolerance.value = _transformationFactor.value.value / zoomLevel;
+      _transformationFactor.value = measurementInfo.documentToTargetFactor / measurementInfo.scale;
+      _tolerance.value = measurementInfo.documentWidthInUnitOfMeasurement.value / (measurementInfo.scale * viewWidth) / zoomLevel;
 
       _controller.value?.tolerance = _tolerance.value;
 

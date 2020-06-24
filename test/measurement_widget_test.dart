@@ -45,6 +45,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final controller = MeasurementController();
+  final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), documentHeightInLengthUnits: Millimeter(imageHeight * 2));
 
   group("Measurement Widget Integration Test", () {
     MetadataRepository metadataRepository;
@@ -113,7 +114,7 @@ void main() {
               measure: true,
               showDistanceOnLine: true,
               controller: controller,
-              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
+              measurementInformation: measurementInformation,
             )
         ));
 
@@ -150,7 +151,7 @@ void main() {
               measure: true,
               showDistanceOnLine: false,
               controller: controller,
-              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
+              measurementInformation: measurementInformation,
             )
         ));
 
@@ -178,8 +179,8 @@ void main() {
             Measurement(
               child: imageWidget,
               measure: true,
-              showDistanceOnLine: false,
-              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
+              showDistanceOnLine: true,
+              measurementInformation: measurementInformation,
             )
         ));
 
@@ -202,7 +203,7 @@ void main() {
               measure: true,
               showDistanceOnLine: true,
               controller: controller,
-              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), scale: 2.0),
+              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), documentHeightInLengthUnits: Millimeter(imageHeight), scale: 2.0),
             )
         ));
 
@@ -252,7 +253,7 @@ void main() {
               measure: true,
               showDistanceOnLine: true,
               controller: controller,
-              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Inch(imageWidth), scale: 2.0),
+              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Inch(imageWidth), documentHeightInLengthUnits: Inch(imageHeight), scale: 2.0),
             )
         ));
 

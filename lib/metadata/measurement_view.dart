@@ -44,7 +44,7 @@ class Measurement extends StatelessWidget {
     @required this.child,
     this.measure = false,
     this.showDistanceOnLine = false,
-    this.measurementInformation = const MeasurementInformation(),
+    this.measurementInformation = const MeasurementInformation.A4(),
     this.magnificationZoomFactor = 2.0,
     this.controller,
     this.pointStyle = const PointStyle(),
@@ -113,7 +113,6 @@ class MeasurementView extends StatelessWidget {
 
           if (image.width > 0) {
             BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(image, boundary.size));
-            _logger.log("set new background and size");
           }
         } else {
           _logger.log("image dimensions are 0");
