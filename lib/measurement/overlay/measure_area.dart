@@ -28,8 +28,27 @@ class MeasureArea extends StatelessWidget {
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
+  final Paint dotPaint = Paint(),
+      pathPaint = Paint();
 
-  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle});
+  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
+    LineType lineType = pointStyle.lineType;
+    double strokeWidth;
+    if (lineType is SolidLine) {
+      strokeWidth = lineType.lineWidth;
+    } else if (lineType is DashedLine) {
+      strokeWidth = lineType.dashWidth;
+    } else {
+      throw UnimplementedError("This line type is not supported! Type was: $lineType");
+    }
+
+    dotPaint.color = pointStyle.dotColor;
+
+    pathPaint
+      ..style = PaintingStyle.stroke
+      ..color = pointStyle.lineType.lineColor
+      ..strokeWidth = strokeWidth;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +123,8 @@ class MeasureArea extends StatelessWidget {
         start: first,
         end: last,
         style: pointStyle,
+        dotPaint: dotPaint,
+        pathPaint: pathPaint,
       ),
     );
   }

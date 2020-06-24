@@ -11,9 +11,6 @@ enum LogDistricts {
   MEASURE_BLOC,
   POINTS_BLOC,
   MEASUREMENT_REPOSITORY,
-  DISTANCE_PAINTER,
-  MEASURE_PAINTER,
-  MAGNIFYING_PAINTER,
 }
 
 class Logger {
@@ -26,10 +23,6 @@ class Logger {
 //    LogDistricts.MEASURE_BLOC,
 //    LogDistricts.POINTS_BLOC,
 //    LogDistricts.MEASUREMENT_REPOSITORY,
-
-//    LogDistricts.MEASURE_PAINTER,
-//    LogDistricts.DISTANCE_PAINTER,
-//    LogDistricts.MAGNIFYING_PAINTER,
   ];
 
   final LogDistricts district;

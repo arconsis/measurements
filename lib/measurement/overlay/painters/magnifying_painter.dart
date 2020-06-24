@@ -10,7 +10,6 @@ import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 
 class MagnifyingPainter extends CustomPainter {
-  final Logger _logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
   final Offset fingerPosition;
   final ui.Image image;
   final MagnificationStyle style;
@@ -26,8 +25,8 @@ class MagnifyingPainter extends CustomPainter {
 
     double diameter = 2 * style.magnificationRadius;
 
-    _outerCircle = getCircle(_drawPosition, style.magnificationRadius + style.outerCircleThickness);
     _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
+    _outerCircle = _innerCircle.inflate(style.outerCircleThickness);
 
     _imageSourceRect = Rect.fromCenter(center: absolutePosition * imageScaleFactor, width: diameter, height: diameter);
     _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
