@@ -9,18 +9,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart' as material;
 import 'package:measurements/measurements.dart';
 import 'package:measurements/style/distance_style.dart';
-import 'package:measurements/util/logger.dart';
 
-/*
-
- */
 class DistancePainter extends material.CustomPainter {
-  final Logger _logger = Logger(LogDistricts.DISTANCE_PAINTER);
+  static final double _log10 = log(10);
+  static final double _offsetPerDigit = 4.57;
 
   final LengthUnit distance;
   final Offset viewCenter;
 
-  final double _offsetPerDigit = 4.57;
   Offset _zeroPoint;
   final Offset _zeroPointWithoutTolerance = Offset(-29, 0);
   final Offset _zeroPointWithTolerance = Offset(-47, 0);
@@ -28,6 +24,16 @@ class DistancePainter extends material.CustomPainter {
   Paragraph _paragraph;
   double _radians;
   Offset _position;
+
+  ParagraphBuilder paragraphBuilder = ParagraphBuilder(
+    ParagraphStyle(
+      textAlign: TextAlign.start,
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+      height: 0.5,
+      fontStyle: FontStyle.normal,
+    ),
+  );
 
   DistancePainter({@material.required Offset start,
     @material.required Offset end,
@@ -44,7 +50,7 @@ class DistancePainter extends material.CustomPainter {
     double distanceValue = distance.value;
 
     if (distanceValue > 0) {
-      _zeroPoint -= Offset(((log(distanceValue) / log(10)).floor() - 1) * _offsetPerDigit, 0);
+      _zeroPoint -= Offset(((log(distanceValue) / _log10).floor() - 1) * _offsetPerDigit, 0);
     }
 
     Offset difference = end - start;
@@ -62,16 +68,7 @@ class DistancePainter extends material.CustomPainter {
         .cosAlpha(positionToCenter)
         .sign;
 
-    ParagraphBuilder paragraphBuilder = ParagraphBuilder(
-      ParagraphStyle(
-        textAlign: TextAlign.start,
-        textDirection: TextDirection.ltr,
-        maxLines: 1,
-        height: 0.5,
-        fontStyle: FontStyle.normal,
-      ),
-    );
-    paragraphBuilder.pushStyle(TextStyle(color: style.textColor),);
+    paragraphBuilder.pushStyle(TextStyle(color: style.textColor));
     if (style.showTolerance) {
       paragraphBuilder.addText("${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}");
     } else {

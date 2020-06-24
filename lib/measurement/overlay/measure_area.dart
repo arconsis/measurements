@@ -28,18 +28,34 @@ class MeasureArea extends StatelessWidget {
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
+  final Paint dotPaint = Paint(),
+      pathPaint = Paint();
 
-  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle});
+  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
+    LineType lineType = pointStyle.lineType;
+    double strokeWidth;
+    if (lineType is SolidLine) {
+      strokeWidth = lineType.lineWidth;
+    } else if (lineType is DashedLine) {
+      strokeWidth = lineType.dashWidth;
+    } else {
+      throw UnimplementedError("This line type is not supported! Type was: $lineType");
+    }
+
+    dotPaint.color = pointStyle.dotColor;
+
+    pathPaint
+      ..style = PaintingStyle.stroke
+      ..color = pointStyle.lineType.lineColor
+      ..strokeWidth = strokeWidth;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Listener(
-        onPointerDown: (PointerDownEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
-        onPointerMove: (PointerMoveEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
-        onPointerUp: (PointerUpEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
+        onPointerDown: (PointerDownEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
+        onPointerMove: (PointerMoveEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
+        onPointerUp: (PointerUpEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
         child: Stack(
           children: <Widget>[
             BlocBuilder<PointsBloc, PointsState>(
@@ -107,6 +123,8 @@ class MeasureArea extends StatelessWidget {
         start: first,
         end: last,
         style: pointStyle,
+        dotPaint: dotPaint,
+        pathPaint: pathPaint,
       ),
     );
   }
@@ -129,6 +147,7 @@ class MeasureArea extends StatelessWidget {
       return CustomPaint(
         foregroundPainter: MagnifyingPainter(
           fingerPosition: state.position,
+          absolutePosition: state.absolutePosition,
           image: state.backgroundImage,
           imageScaleFactor: state.imageScaleFactor,
           style: magnificationStyle,

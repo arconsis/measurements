@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 
@@ -24,49 +25,61 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " size: $size -- backgroundImage: $backgroundImage";
+    return super.toString() + " size: $size, backgroundImage: $backgroundImage";
   }
 }
 
 class MetadataStartedEvent extends MetadataEvent {
   final bool measure;
-  final double zoom;
   final bool showDistances;
   final MeasurementInformation measurementInformation;
   final MagnificationStyle magnificationStyle;
-
-  final Function(List<double>) callback;
-  final Function(double) toleranceCallback;
+  final MeasurementController controller;
 
   MetadataStartedEvent({
-    @required this.measurementInformation,
-    @required this.zoom,
     @required this.measure,
     @required this.showDistances,
+    @required this.measurementInformation,
     @required this.magnificationStyle,
-    @required this.callback,
-    @required this.toleranceCallback
+    @required this.controller,
   });
 
   @override
-  List<Object> get props => [measurementInformation, callback, toleranceCallback, zoom, measure, showDistances, magnificationStyle];
+  List<Object> get props => [measurementInformation, controller, measure, showDistances, magnificationStyle];
 
   @override
   String toString() {
-    return super.toString() + " MeasurementInformation: $measurementInformation -- zoom: $zoom -- measure: $measure -- showDistances: $showDistances -- magnificationStyle: $magnificationStyle";
+    return super.toString() + " MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle";
+  }
+}
+
+class MetadataOrientationEvent extends MetadataEvent {
+  final Orientation orientation;
+
+  MetadataOrientationEvent(this.orientation);
+
+  @override
+  List<Object> get props => [orientation];
+
+  @override
+  String toString() {
+    return super.toString() + " orientation: $orientation";
   }
 }
 
 class MetadataUpdatedEvent extends MetadataEvent {
   final bool measure;
+  final Orientation orientation;
+  final double zoom;
+  final double maxZoom;
 
-  MetadataUpdatedEvent(this.measure);
+  MetadataUpdatedEvent(this.measure, this.orientation, this.zoom, this.maxZoom);
 
   @override
-  List<Object> get props => [measure];
+  List<Object> get props => [measure, orientation, zoom, maxZoom];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure";
+    return super.toString() + " measure: $measure, orientation: $orientation, zoom: $zoom, maxZoom: $maxZoom";
   }
 }

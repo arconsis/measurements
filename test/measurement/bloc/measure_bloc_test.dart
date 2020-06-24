@@ -29,6 +29,7 @@ void main() {
       mockedMeasurementRepository = MockedMeasurementRepository();
 
       when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
       when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);
@@ -76,6 +77,8 @@ void main() {
               mockedMeasurementRepository.registerDownEvent(Offset(0, 0)),
               mockedMeasurementRepository.registerMoveEvent(Offset(10, 10)),
               mockedMeasurementRepository.registerUpEvent(Offset(10, 10)),
+              mockedMeasurementRepository.convertIntoAbsoluteTopLeftPosition(Offset(0, 0)),
+              mockedMeasurementRepository.convertIntoAbsoluteTopLeftPosition(Offset(10, 10)),
             ]);
 
             verifyNoMoreInteractions(mockedMeasurementRepository);

@@ -13,6 +13,12 @@ import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
+enum TouchState {
+  FREE,
+  DOWN,
+  MOVE,
+  UP,
+}
 
 class MeasurementRepository {
   final _logger = Logger(LogDistricts.MEASUREMENT_REPOSITORY);
@@ -21,24 +27,39 @@ class MeasurementRepository {
   final _distances = BehaviorSubject<List<LengthUnit>>.seeded(List());
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
 
-  Function(List<double>) _callback;
+  MeasurementController _controller;
   LengthUnit _transformationFactor;
+  double _imageToDocumentScaleFactor = 1.0;
 
   int _currentIndex = -1;
+  TouchState _currentState = TouchState.FREE;
+
+  List<Offset> _absolutePoints = List();
+  double _zoomLevel = 1.0;
+  Offset _backgroundPosition = Offset(0, 0);
+  Offset _viewCenterPosition = Offset(0, 0);
 
   MeasurementRepository(MetadataRepository repository) {
+    repository.controller.listen((controller) => _controller = controller);
+    repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
+    repository.imageToDocumentScaleFactor.listen((scaleFactor) {
+      _imageToDocumentScaleFactor = scaleFactor;
+      _updatePoints();
+    });
     repository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
         _movementFinished();
-      } else {
-        _transformationFactor = factor;
       }
     });
-    repository.viewScaleFactor.listen((factor) => _updatePoints(factor));
-    repository.callback.listen((callback) => _callback = callback);
-
-    _logger.log("Created Repository");
+    repository.zoom.listen((zoom) {
+      _zoomLevel = zoom;
+      _publishPoints();
+    });
+    repository.backgroundPosition.listen((backgroundPosition) {
+      _backgroundPosition = Offset(backgroundPosition.dx, -backgroundPosition.dy);
+      _publishPoints();
+    });
   }
 
   Stream<List<Offset>> get points => _points.stream;
@@ -46,35 +67,45 @@ class MeasurementRepository {
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
   void registerDownEvent(Offset position) {
-    List<Offset> points = List()
-      ..addAll(_points.value);
+    if (_currentState != TouchState.FREE) return;
+    _currentState = TouchState.DOWN;
 
-    int closestIndex = _getClosestPointIndex(points, position);
+    Offset absoluteCenteredPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition);
+
+    int closestIndex = _getClosestPointIndex(absoluteCenteredPosition);
 
     if (closestIndex >= 0) {
-      Offset closestPoint = points[closestIndex];
+      Offset closestPoint = _absolutePoints[closestIndex];
 
-      if ((closestPoint - position).distance > 40.0) {
-        _currentIndex = _addNewPoint(points, position);
+      if ((_convertIntoRelativePosition(closestPoint, _viewCenterPosition) - position).distance > 40.0) {
+        _currentIndex = _addNewPoint(absoluteCenteredPosition);
       } else {
         _currentIndex = closestIndex;
-        _updatePoint(position, _currentIndex);
+        _updatePoint(absoluteCenteredPosition, _currentIndex);
       }
     } else {
-      _currentIndex = _addNewPoint(points, position);
+      _currentIndex = _addNewPoint(absoluteCenteredPosition);
     }
 
     _movementStarted(_currentIndex);
   }
 
   void registerMoveEvent(Offset position) {
-    _updatePoint(position, _currentIndex);
+    if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
+    _currentState = TouchState.MOVE;
+
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
   }
 
   void registerUpEvent(Offset position) {
-    _updatePoint(position, _currentIndex);
+    if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
+    _currentState = TouchState.UP;
+
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
     _currentIndex = -1;
     _movementFinished();
+
+    _currentState = TouchState.FREE;
   }
 
   void dispose() {
@@ -83,35 +114,56 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  void _publishPoints(List<Offset> points) {
-    _points.add(points);
-    _drawingHolder.add(DrawingHolder(points, _distances.value));
+  Offset convertIntoAbsoluteTopLeftPosition(Offset position) {
+    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
+
+    return Offset(absoluteCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - absoluteCenterPosition.dy);
   }
 
-  int _addNewPoint(List<Offset> points, Offset point) {
-    points.add(point);
-    _publishPoints(points);
+  Offset _convertIntoAbsolutePosition(Offset position, Offset viewCenter) {
+    return (Offset(position.dx - viewCenter.dx, viewCenter.dy - position.dy) - _backgroundPosition) / _zoomLevel * _imageToDocumentScaleFactor;
+  }
 
-    _logger.log("added point: $points");
-    return points.length - 1;
+  Offset _convertIntoRelativePosition(Offset position, Offset viewCenter) {
+    Offset scaledPosition = position / _imageToDocumentScaleFactor * _zoomLevel;
+
+    return Offset(scaledPosition.dx + viewCenter.dx + _backgroundPosition.dx, viewCenter.dy - scaledPosition.dy - _backgroundPosition.dy);
+  }
+
+  List<Offset> _getRelativePoints() {
+    return _absolutePoints.map((point) => _convertIntoRelativePosition(point, _viewCenterPosition)).toList();
+  }
+
+  void _publishPoints() {
+    List<Offset> relativePoints = _getRelativePoints();
+
+    _logger.log("relative points: $relativePoints");
+
+    _points.add(relativePoints);
+    _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
+  }
+
+  int _addNewPoint(Offset point) {
+    _absolutePoints.add(point);
+    _publishPoints();
+
+    _logger.log("added point: $_absolutePoints");
+    return _absolutePoints.length - 1;
   }
 
   void _updatePoint(Offset point, int index) {
     if (index >= 0) {
-      List<Offset> points = List()
-        ..addAll(_points.value);
+      _absolutePoints.setRange(index, index + 1, [point]);
+      _publishPoints();
 
-      points.setRange(index, index + 1, [point]);
-      _publishPoints(points);
-
-      _logger.log("updated point $index: $points");
+      _logger.log("updated point $index: $_absolutePoints");
     }
   }
 
-  int _getClosestPointIndex(List<Offset> points, Offset reference) {
+  int _getClosestPointIndex(Offset reference) {
     int index = 0;
 
-    List<_CompareHolder> sortedPoints = points
+    List<_CompareHolder> sortedPoints = _absolutePoints
         .map((Offset point) => _CompareHolder(index++, (reference - point).distance))
         .toList();
 
@@ -122,7 +174,7 @@ class MeasurementRepository {
 
   void _publishDistances(List<LengthUnit> distances) {
     _distances.add(distances);
-    _drawingHolder.add(DrawingHolder(_points.value, distances));
+    _drawingHolder.add(DrawingHolder(_getRelativePoints(), distances));
   }
 
   void _movementStarted(int index) {
@@ -136,22 +188,18 @@ class MeasurementRepository {
   }
 
   void _movementFinished() {
-    List<Offset> points = _points.value;
-
-    if (_transformationFactor != null && points.length >= 2) {
+    if (_transformationFactor != null && _absolutePoints.length >= 2) {
       List<LengthUnit> distances = List();
-      points.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
+      _absolutePoints.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
-      if (_callback != null) {
-        _callback(distances.map((unit) => unit.value).toList());
-      }
+      _controller?.distances = distances.map((unit) => unit.value).toList();
     }
   }
 
-  _updatePoints(double factor) {
-    final newPoints = _points.value.map((Offset point) => point * factor).toList();
-    _publishPoints(newPoints);
+  _updatePoints() {
+    _logger.log("absolute position: $_absolutePoints new view center $_viewCenterPosition");
+    _publishPoints();
   }
 }
 

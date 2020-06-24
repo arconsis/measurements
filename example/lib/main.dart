@@ -25,24 +25,21 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = true;
+  bool measure = false;
   bool showDistanceOnLine = true;
   bool showTolerance = false;
+  bool zoomed = false;
 
   List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
   int unitIndex = 0;
 
-  Function(List<double>) distanceCallback;
+  MeasurementController controller;
 
   @override
   void initState() {
     super.initState();
 
-    distanceCallback = (List<double> distance) {
-      setState(() {
-        this.title = "Measurement#: ${distance.length}";
-      });
-    };
+    controller = MeasurementController();
   }
 
   Color getButtonColor(bool selected) {
@@ -94,19 +91,32 @@ class _MyAppState extends State<MyApp> {
                 ),
                 size: Size(64, 64),
               ),
-              Text(title),
+              IconButton(onPressed: () {
+                if (zoomed) {
+                  controller.resetZoom();
+                } else {
+                  controller.zoomToOriginalSize();
+                }
+
+                setState(() {
+                  zoomed = !zoomed;
+                });
+              },
+                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))
+              ),
             ],
           ),
         ),
         body: Center(
           child: Measurement(
-            child: Image.asset("assets/images/example_portrait.png",),
+            child: Image.asset("assets/images/floorplan448x449mm.png",),
             measurementInformation: MeasurementInformation(
-              scale: 1 / 2.0,
-              documentWidthInLengthUnits: Millimeter(210),
+              scale: 1 / 50.0,
+              documentWidthInLengthUnits: Millimeter(448),
+              documentHeightInLengthUnits: Millimeter(449),
               targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
-            distanceCallback: distanceCallback,
+            controller: controller,
             showDistanceOnLine: showDistanceOnLine,
             distanceStyle: DistanceStyle(numDecimalPlaces: 2, showTolerance: showTolerance),
             measure: measure,

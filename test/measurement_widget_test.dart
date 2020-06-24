@@ -4,6 +4,7 @@
 ///
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
@@ -11,6 +12,7 @@ import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:photo_view/photo_view.dart';
 
 Type typeOf<T>() => T;
 
@@ -24,10 +26,27 @@ final imageWidget = Image.asset(
 );
 
 Widget fillTemplate(Widget measurement) {
-  return MaterialApp(home: Scaffold(body: measurement,),);
+  return MaterialApp(
+    home: Scaffold(
+      body: measurement,
+    ),
+  );
+}
+
+double getZoom() {
+  return (find
+      .byType(typeOf<PhotoView>())
+      .evaluate()
+      .first
+      .widget as PhotoView).controller.scale;
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  final controller = MeasurementController();
+  final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), documentHeightInLengthUnits: Millimeter(imageHeight * 2));
+
   group("Measurement Widget Integration Test", () {
     MetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
@@ -45,159 +64,210 @@ void main() {
       GetIt.I.unregister(instance: measurementRepository);
     });
 
-    testWidgets("measurement should show only child when not measuring", (WidgetTester tester) async {
-      await tester.pumpWidget(Measurement(child: imageWidget,));
+    group("widget setup", () {
+      testWidgets("measurement should show child also when measure is false", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(Measurement(child: imageWidget,)));
 
-      expect(find.byType(typeOf<Image>()), findsOneWidget);
-      expect(find.byType(typeOf<MeasureArea>()), findsNothing);
+        expect(find.byType(typeOf<PhotoView>()), findsOneWidget);
+        expect(find.byType(typeOf<Image>()), findsOneWidget);
+        expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
+      });
+
+      testWidgets("measurement should show child under measure area when measuring", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+            )
+        ));
+
+        await tester.pump();
+
+        expect(find.byType(typeOf<Image>()), findsOneWidget);
+        expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
+      });
     });
 
-    testWidgets("measurement should show child under measure area when measuring", (WidgetTester tester) async {
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-          )
-      ));
+    group("setting points", () {
+      testWidgets("adding single point", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+            )
+        ));
 
-      await tester.pump();
+        await tester.pump();
 
-      expect(find.byType(typeOf<Image>()), findsOneWidget);
-      expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
-    });
+        final gesture = await tester.startGesture(Offset(100, 100));
+        await gesture.up();
 
-    testWidgets("adding single point", (WidgetTester tester) async {
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-          )
-      ));
+        await tester.pump();
 
-      await tester.pump();
+        measurementRepository.points.listen((actual) => expect(actual, [Offset(100, 100)]));
+      });
 
-      final gesture = await tester.startGesture(Offset(100, 100));
-      await gesture.up();
+      testWidgets("adding multiple points and getting distances", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: true,
+              controller: controller,
+              measurementInformation: measurementInformation,
+            )
+        ));
 
-      await tester.pump();
+        await tester.pump();
 
-      measurementRepository.points.listen((actual) => expect(actual, [Offset(100, 100)]));
-    });
+        final gesture = await tester.startGesture(Offset(100, 100));
+        await gesture.up();
 
-    testWidgets("adding multiple points and getting distances", (WidgetTester tester) async {
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-            showDistanceOnLine: true,
-            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
-          )
-      ));
+        await gesture.down(Offset(100, 300));
+        await gesture.up();
 
-      await tester.pump();
+        await gesture.down(Offset(300, 300));
+        await gesture.up();
 
-      final gesture = await tester.startGesture(Offset(100, 100));
-      await gesture.up();
+        await gesture.down(Offset(300, 100));
+        await gesture.up();
 
-      await gesture.down(Offset(100, 300));
-      await gesture.up();
+        await tester.pump();
 
-      await gesture.down(Offset(300, 300));
-      await gesture.up();
+        final expectedDrawingHolder = DrawingHolder(
+            [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
+            [Millimeter(400), Millimeter(400), Millimeter(400)]
+        );
 
-      await gesture.down(Offset(300, 100));
-      await gesture.up();
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
+      });
 
-      await tester.pump();
+      testWidgets("add points without distances and then turn on distances", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: false,
+              controller: controller,
+              measurementInformation: measurementInformation,
+            )
+        ));
 
-      final expectedDrawingHolder = DrawingHolder(
+        await tester.pump();
+
+        final gesture = await tester.startGesture(Offset(100, 100));
+        await gesture.up();
+
+        await gesture.down(Offset(100, 300));
+        await gesture.up();
+
+        await gesture.down(Offset(300, 300));
+        await gesture.up();
+
+        await gesture.down(Offset(300, 100));
+        await gesture.up();
+
+        await tester.pump();
+
+        measurementRepository.points.listen((actual) => expectSync(actual, [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)]));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
+
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: true,
+              measurementInformation: measurementInformation,
+            )
+        ));
+
+        await tester.pump();
+
+        final expectedDrawingHolder = DrawingHolder(
+            [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
+            [Millimeter(400), Millimeter(400), Millimeter(400)]
+        );
+
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([400, 400, 400]));
+        expect(controller.tolerance, equals(2));
+      });
+
+      testWidgets("adding multiple points and getting distances with set scale", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: true,
+              controller: controller,
+              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), documentHeightInLengthUnits: Millimeter(imageHeight), scale: 2.0),
+            )
+        ));
+
+        await tester.pump();
+
+        final gesture = await tester.startGesture(Offset(100, 100));
+        await gesture.up();
+
+        await gesture.down(Offset(100, 300));
+        await gesture.up();
+
+        await gesture.down(Offset(300, 300));
+        await gesture.up();
+
+        await gesture.down(Offset(300, 100));
+        await gesture.up();
+
+        await tester.pump();
+
+        final expectedDrawingHolder = DrawingHolder(
           [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [Millimeter(400), Millimeter(400), Millimeter(400)]
-      );
+          [Millimeter(100), Millimeter(100), Millimeter(100)],
+        );
 
-      measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        expect(controller.distances, equals([100, 100, 100]));
+        expect(controller.tolerance, equals(0.5));
+      });
     });
 
-    testWidgets("add points without distances and then turn on distances", (WidgetTester tester) async {
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-            showDistanceOnLine: false,
-            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
-          )
-      ));
+    group("controller interaction", () {
+      final channel = MethodChannel("measurements");
+      setUp(() {
+        channel.setMockMethodCallHandler((call) async {
+          if (call.method == "getPhysicalPixelsPerInch") {
+            return 4.0;
+          } else {
+            return -1.0;
+          }
+        });
+      });
 
-      await tester.pump();
+      testWidgets("set zoom to original size and reset zoom level", (WidgetTester tester) async {
+        await tester.pumpWidget(fillTemplate(
+            Measurement(
+              child: imageWidget,
+              measure: true,
+              showDistanceOnLine: true,
+              controller: controller,
+              measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Inch(imageWidth), documentHeightInLengthUnits: Inch(imageHeight), scale: 2.0),
+            )
+        ));
 
-      final gesture = await tester.startGesture(Offset(100, 100));
-      await gesture.up();
+        await tester.pump();
+        expect(getZoom(), equals(1.0));
 
-      await gesture.down(Offset(100, 300));
-      await gesture.up();
+        controller.zoomToOriginalSize();
+        await tester.pump();
+        expect(getZoom(), equals(2 / 3));
 
-      await gesture.down(Offset(300, 300));
-      await gesture.up();
-
-      await gesture.down(Offset(300, 100));
-      await gesture.up();
-
-      await tester.pump();
-
-      measurementRepository.points.listen((actual) => expectSync(actual, [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)]));
-
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-            showDistanceOnLine: false,
-            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2)),
-          )
-      ));
-
-      await tester.pump();
-
-      final expectedDrawingHolder = DrawingHolder(
-          [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [Millimeter(400), Millimeter(400), Millimeter(400)]
-      );
-
-      measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
-    });
-
-    testWidgets("adding multiple points and getting distances with set scale and zoom", (WidgetTester tester) async {
-      await tester.pumpWidget(fillTemplate(
-          Measurement(
-            child: imageWidget,
-            measure: true,
-            showDistanceOnLine: true,
-            measurementInformation: MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), scale:  2.0),
-            zoom: 2.0,
-          )
-      ));
-
-      await tester.pump();
-
-      final gesture = await tester.startGesture(Offset(100, 100));
-      await gesture.up();
-
-      await gesture.down(Offset(100, 300));
-      await gesture.up();
-
-      await gesture.down(Offset(300, 300));
-      await gesture.up();
-
-      await gesture.down(Offset(300, 100));
-      await gesture.up();
-
-      await tester.pump();
-
-      final expectedDrawingHolder = DrawingHolder(
-          [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
-          [Millimeter(100), Millimeter(100), Millimeter(100)]
-      );
-
-      measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
+        controller.resetZoom();
+        await tester.pump();
+        expect(getZoom(), equals(1.0));
+      });
     });
   });
 }

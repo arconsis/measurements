@@ -1,3 +1,5 @@
+import 'dart:math';
+
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -11,11 +13,14 @@ import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
+import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/metadata/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
+import 'package:measurements/util/colors.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:photo_view/photo_view.dart';
 
 import 'bloc/metadata_bloc.dart';
 import 'bloc/metadata_event.dart';
@@ -25,13 +30,11 @@ import 'repository/metadata_repository.dart';
 
 class Measurement extends StatelessWidget {
   final Widget child;
-  final MeasurementInformation measurementInformation;
-  final double zoom;
-  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Function(List<double>) distanceCallback;
-  final Function(double) distanceToleranceCallback;
+  final MeasurementInformation measurementInformation;
+  final double magnificationZoomFactor;
+  final MeasurementController controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -39,13 +42,11 @@ class Measurement extends StatelessWidget {
   Measurement({
     Key key,
     @required this.child,
-    this.measurementInformation = const MeasurementInformation(),
-    this.zoom = 1.0,
     this.measure = false,
     this.showDistanceOnLine = false,
-    this.distanceCallback,
-    this.distanceToleranceCallback,
+    this.measurementInformation = const MeasurementInformation.A4(),
     this.magnificationZoomFactor = 2.0,
+    this.controller,
     this.pointStyle = const PointStyle(),
     this.magnificationStyle = const MagnificationStyle(),
     this.distanceStyle = const DistanceStyle()
@@ -64,13 +65,11 @@ class Measurement extends StatelessWidget {
       create: (context) => MetadataBloc(),
       child: MeasurementView(
           child,
-          measurementInformation,
-          zoom,
           measure,
           showDistanceOnLine,
-          distanceCallback,
-          distanceToleranceCallback,
+          measurementInformation,
           magnificationZoomFactor,
+          controller,
           pointStyle,
           magnificationStyle,
           distanceStyle
@@ -84,39 +83,40 @@ class MeasurementView extends StatelessWidget {
   final GlobalKey _childKey = GlobalKey();
 
   final Widget child;
-  final MeasurementInformation measurementInformation;
-  final double zoom;
-  final double magnificationZoomFactor;
   final bool measure;
   final bool showDistanceOnLine;
-  final Function(List<double>) distanceCallback;
-  final Function(double) distanceToleranceCallback;
+  final MeasurementInformation measurementInformation;
+  final double magnificationZoomFactor;
+  final MeasurementController controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
   MeasurementView(this.child,
-      this.measurementInformation,
-      this.zoom,
       this.measure,
       this.showDistanceOnLine,
-      this.distanceCallback,
-      this.distanceToleranceCallback,
+      this.measurementInformation,
       this.magnificationZoomFactor,
+      this.controller,
       this.pointStyle,
       this.magnificationStyle,
       this.distanceStyle);
 
-  void _setBackgroundImageToBloc(BuildContext context) {
+  void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_childKey.currentContext != null) {
         RenderRepaintBoundary boundary = _childKey.currentContext.findRenderObject();
 
         if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(await boundary.toImage(pixelRatio: magnificationZoomFactor), boundary.size));
+          final pixelRatio = min(10.0, max(1.0, magnificationZoomFactor * zoom));
+          final image = await boundary.toImage(pixelRatio: pixelRatio);
+
+          if (image.width > 0) {
+            BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(image, boundary.size));
+          }
         } else {
           _logger.log("image dimensions are 0");
-          _setBackgroundImageToBloc(context);
+          _setBackgroundImageToBloc(context, zoom);
         }
       }
     });
@@ -128,48 +128,55 @@ class MeasurementView extends StatelessWidget {
           measurementInformation: measurementInformation,
           measure: measure,
           showDistances: showDistanceOnLine,
-          zoom: zoom,
           magnificationStyle: magnificationStyle,
-          callback: distanceCallback,
-          toleranceCallback: distanceToleranceCallback,
+          controller: controller,
         )
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _logger.log("building");
     _setStartupArgumentsToBloc(context);
 
-    return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-      _setBackgroundImageToBloc(context);
-      return BlocBuilder<MetadataBloc, MetadataState>(
-          builder: (context, state) {
-            return _overlay(state);
-          }
-      );
-    });
+    return Container(
+      color: drawColor,
+      child: BlocBuilder<MetadataBloc, MetadataState>(
+        builder: (context, state) => _overlay(state),
+      ),
+    );
   }
 
   Widget _overlay(MetadataState state) {
-    if (state.measure) {
-      return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => MeasureBloc(),),
-          BlocProvider(create: (context) => PointsBloc(),),
-        ],
-        child: MeasureArea(
-          pointStyle: pointStyle,
-          magnificationStyle: magnificationStyle,
-          distanceStyle: distanceStyle, // TODO can UI-only parameters be passed like this?
-          child: RepaintBoundary(
-            key: _childKey,
-            child: child,
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
+        _setBackgroundImageToBloc(context, state.zoom);
+
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => MeasureBloc()),
+            BlocProvider(create: (context) => PointsBloc()),
+          ],
+          child: MeasureArea(
+            pointStyle: pointStyle,
+            magnificationStyle: magnificationStyle,
+            distanceStyle: distanceStyle,
+            child: AbsorbPointer(
+              absorbing: state.measure,
+              child: PhotoView.customChild(
+                controller: state.controller,
+                initialScale: PhotoViewComputedScale.contained,
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.contained * state.maxZoom,
+                child: RepaintBoundary(
+                  key: _childKey,
+                  child: child,
+                ),
+              ),
+            ),
           ),
-        ),
-      );
-    } else {
-      return child;
-    }
+        );
+      },
+    );
   }
 }

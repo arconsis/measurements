@@ -4,30 +4,71 @@
 ///
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 abstract class LengthUnit extends Equatable {
   final double value;
 
   const LengthUnit(this.value);
 
-  Millimeter convertToMillimeter();
+  @override
+  String toString() => super.toString() + "$value${getAbbreviation()}";
 
-  Meter convertToMeter();
+  @override
+  List<Object> get props => [value];
 
-  Inch convertToInch();
+  Millimeter convertToMillimeter() => Millimeter(value * millimeterFactor());
 
-  Foot convertToFoot();
+  Meter convertToMeter() => Meter(value * meterFactor());
 
-  LengthUnit convertFrom(LengthUnit lengthUnit);
+  Inch convertToInch() => Inch(value * inchFactor());
+
+  Foot convertToFoot() => Foot(value * footFactor());
+
+  LengthUnit factorTo(LengthUnit unit) {
+    switch (unit.runtimeType) {
+      case Meter:
+        return Meter(meterFactor());
+      case Millimeter:
+        return Millimeter(millimeterFactor());
+      case Inch:
+        return Inch(inchFactor());
+      case Foot:
+        return Foot(footFactor());
+      default:
+        return Meter(-1);
+    }
+  }
+
+  LengthUnit convertTo(LengthUnit unit) {
+    switch (unit.runtimeType) {
+      case Meter:
+        return convertToMeter();
+      case Millimeter:
+        return convertToMillimeter();
+      case Inch:
+        return convertToInch();
+      case Foot:
+        return convertToFoot();
+      default:
+        return Meter(-1);
+    }
+  }
+
+  double meterFactor();
+
+  double millimeterFactor();
+
+  double inchFactor();
+
+  double footFactor();
 
   String getAbbreviation();
 
   LengthUnit operator /(double value);
 
   LengthUnit operator *(double value);
-
-  @override
-  List<Object> get props => [value];
 }
 
 class Meter extends LengthUnit {
@@ -36,22 +77,16 @@ class Meter extends LengthUnit {
   Meter(double meters) : super(meters);
 
   @override
-  Foot convertToFoot() => Foot(value / 0.3048);
+  double footFactor() => 1 / 0.3048;
 
   @override
-  Inch convertToInch() => Inch(value / 0.0254);
+  double inchFactor() => 1 / 0.0254;
 
   @override
-  Meter convertToMeter() => Meter(value);
+  double meterFactor() => 1;
 
   @override
-  Millimeter convertToMillimeter() => Millimeter(value * 1000);
-
-  @override
-  Meter convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMeter();
-
-  @override
-  String toString() => super.toString() + " ${value}m";
+  double millimeterFactor() => 1000;
 
   @override
   String getAbbreviation() => "m";
@@ -69,22 +104,16 @@ class Millimeter extends LengthUnit {
   const Millimeter(double millimeters) : super(millimeters);
 
   @override
-  Foot convertToFoot() => Foot(value / 304.8);
+  double footFactor() => 1 / 304.8;
 
   @override
-  Inch convertToInch() => Inch(value / 25.4);
+  double inchFactor() => 1 / 25.4;
 
   @override
-  Meter convertToMeter() => Meter(value / 1000);
+  double meterFactor() => 1 / 1000;
 
   @override
-  Millimeter convertToMillimeter() => Millimeter(value);
-
-  @override
-  Millimeter convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToMillimeter();
-
-  @override
-  String toString() => super.toString() + " ${value}mm";
+  double millimeterFactor() => 1;
 
   @override
   String getAbbreviation() => "mm";
@@ -94,6 +123,7 @@ class Millimeter extends LengthUnit {
 
   @override
   Millimeter operator /(double value) => Millimeter(this.value / value);
+
 }
 
 class Inch extends LengthUnit {
@@ -102,22 +132,16 @@ class Inch extends LengthUnit {
   Inch(double inches) : super(inches);
 
   @override
-  Foot convertToFoot() => Foot(value / 12);
+  double footFactor() => 1 / 12;
 
   @override
-  Inch convertToInch() => Inch(value);
+  double inchFactor() => 1;
 
   @override
-  Meter convertToMeter() => Meter(value * 0.0254);
+  double meterFactor() => 0.0254;
 
   @override
-  Millimeter convertToMillimeter() => Millimeter(value * 25.4);
-
-  @override
-  Inch convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToInch();
-
-  @override
-  String toString() => super.toString() + " ${value}in";
+  double millimeterFactor() => 25.4;
 
   @override
   String getAbbreviation() => "in";
@@ -135,22 +159,16 @@ class Foot extends LengthUnit {
   Foot(double feet) : super(feet);
 
   @override
-  Foot convertToFoot() => Foot(value);
+  double footFactor() => 1;
 
   @override
-  Inch convertToInch() => Inch(value * 12);
+  double inchFactor() => 12;
 
   @override
-  Meter convertToMeter() => Meter(value * 0.3048);
+  double meterFactor() => 0.3048;
 
   @override
-  Millimeter convertToMillimeter() => Millimeter(value * 304.8);
-
-  @override
-  Foot convertFrom(LengthUnit lengthUnit) => lengthUnit.convertToFoot();
-
-  @override
-  String toString() => super.toString() + " ${value}ft";
+  double millimeterFactor() => 304.8;
 
   @override
   String getAbbreviation() => "ft";
@@ -165,23 +183,32 @@ class Foot extends LengthUnit {
 class MeasurementInformation extends Equatable {
   final double scale;
   final LengthUnit documentWidthInLengthUnits;
+  final LengthUnit documentHeightInLengthUnits;
   final LengthUnit targetLengthUnit;
 
   const MeasurementInformation({
+    @required this.documentWidthInLengthUnits,
+    @required this.documentHeightInLengthUnits,
     this.scale = 1.0,
-    this.documentWidthInLengthUnits = const Millimeter(210.0),
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
-  LengthUnit get documentWidthInUnitOfMeasurement => targetLengthUnit.convertFrom(documentWidthInLengthUnits);
+  const MeasurementInformation.A4({
+    this.scale = 1.0,
+    this.documentWidthInLengthUnits = const Millimeter(210.0),
+    this.documentHeightInLengthUnits = const Millimeter(297.0),
+    this.targetLengthUnit = const Millimeter.asUnit(),
+  });
 
-  String get unitAbbreviation => targetLengthUnit.getAbbreviation();
+  LengthUnit get documentToTargetFactor => documentWidthInLengthUnits.factorTo(targetLengthUnit);
+
+  LengthUnit get documentWidthInUnitOfMeasurement => documentWidthInLengthUnits.convertTo(targetLengthUnit);
 
   @override
   List<Object> get props => [scale, documentWidthInLengthUnits, targetLengthUnit];
 
   @override
   String toString() {
-    return super.toString() + " scale: $scale, documentWidth: $documentWidthInLengthUnits, targetLengthUnit: $targetLengthUnit";
+    return super.toString() + " scale: $scale, documentWidth: $documentWidthInLengthUnits, documentHeight: $documentHeightInLengthUnits, targetLengthUnit: $targetLengthUnit";
   }
 }
