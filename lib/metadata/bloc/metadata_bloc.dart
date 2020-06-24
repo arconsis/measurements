@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -23,7 +21,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   bool _measure = false;
   double _zoom = 1.0;
   double _maxZoom = 5.0;
-  Orientation _orientation = Orientation.portrait;
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
@@ -37,7 +34,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
       _updateState();
     });
     _repository.orientation.listen((orientation) {
-      _orientation = orientation;
       _updateState();
     });
 
@@ -45,11 +41,11 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   }
 
   void _updateState() {
-    add(MetadataUpdatedEvent(_measure, _orientation, _zoom, _maxZoom));
+    add(MetadataUpdatedEvent(_measure, _zoom, _maxZoom));
   }
 
   @override
-  MetadataState get initialState => MetadataState(_controller, _measure, _zoom, _maxZoom, _orientation);
+  MetadataState get initialState => MetadataState(_controller, _measure, _zoom, _maxZoom);
 
   @override
   void onEvent(MetadataEvent event) async {
@@ -69,8 +65,8 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
 
       _maxZoom = await _repository.zoomFactorForOriginalSize;
-    } else if (event is MetadataOrientationEvent) {
-      _repository.registerOrientation(event.orientation);
+    } else if (event is MetadataDeleteRegionEvent) {
+      _repository.registerDeleteRegion(event.position, event.deleteSize);
     }
 
     super.onEvent(event);
@@ -79,7 +75,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
     if (event is MetadataUpdatedEvent) {
-      yield MetadataState(_controller, event.measure, event.zoom, event.maxZoom, event.orientation);
+      yield MetadataState(_controller, event.measure, event.zoom, event.maxZoom);
     }
   }
 

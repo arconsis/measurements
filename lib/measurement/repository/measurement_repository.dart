@@ -8,7 +8,6 @@ import 'dart:ui';
 
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 import 'package:rxdart/rxdart.dart';
@@ -26,6 +25,7 @@ class MeasurementRepository {
   final _points = BehaviorSubject<List<Offset>>.seeded(List());
   final _distances = BehaviorSubject<List<LengthUnit>>.seeded(List());
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
+  final _metadataRepository;
 
   MeasurementController _controller;
   LengthUnit _transformationFactor;
@@ -39,24 +39,24 @@ class MeasurementRepository {
   Offset _backgroundPosition = Offset(0, 0);
   Offset _viewCenterPosition = Offset(0, 0);
 
-  MeasurementRepository(MetadataRepository repository) {
-    repository.controller.listen((controller) => _controller = controller);
-    repository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
-    repository.imageToDocumentScaleFactor.listen((scaleFactor) {
+  MeasurementRepository(this._metadataRepository) {
+    _metadataRepository.controller.listen((controller) => _controller = controller);
+    _metadataRepository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
+    _metadataRepository.imageToDocumentScaleFactor.listen((scaleFactor) {
       _imageToDocumentScaleFactor = scaleFactor;
       _updatePoints();
     });
-    repository.transformationFactor.listen((factor) {
+    _metadataRepository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
         _movementFinished();
       }
     });
-    repository.zoom.listen((zoom) {
+    _metadataRepository.zoom.listen((zoom) {
       _zoomLevel = zoom;
       _publishPoints();
     });
-    repository.backgroundPosition.listen((backgroundPosition) {
+    _metadataRepository.backgroundPosition.listen((backgroundPosition) {
       _backgroundPosition = Offset(backgroundPosition.dx, -backgroundPosition.dy);
       _publishPoints();
     });
@@ -81,7 +81,7 @@ class MeasurementRepository {
         _currentIndex = _addNewPoint(absoluteCenteredPosition);
       } else {
         _currentIndex = closestIndex;
-        _updatePoint(absoluteCenteredPosition, _currentIndex);
+        _updatePoint(absoluteCenteredPosition);
       }
     } else {
       _currentIndex = _addNewPoint(absoluteCenteredPosition);
@@ -94,14 +94,19 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition), _currentIndex);
+    if (_metadataRepository.isInDeleteRegion(position)) {
+      _removeCurrentPoint();
+    } else {
+      _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
+    }
+
     _currentIndex = -1;
     _movementFinished();
 
@@ -151,21 +156,26 @@ class MeasurementRepository {
     return _absolutePoints.length - 1;
   }
 
-  void _updatePoint(Offset point, int index) {
-    if (index >= 0) {
-      _absolutePoints.setRange(index, index + 1, [point]);
+  void _updatePoint(Offset point) {
+    if (_currentIndex >= 0) {
+      _absolutePoints.setRange(_currentIndex, _currentIndex + 1, [point]);
       _publishPoints();
 
-      _logger.log("updated point $index: $_absolutePoints");
+      _logger.log("updated point $_currentIndex: $_absolutePoints");
+    }
+  }
+
+  void _removeCurrentPoint() {
+    if (_currentIndex >= 0) {
+      _absolutePoints.removeAt(_currentIndex);
+      _publishPoints();
     }
   }
 
   int _getClosestPointIndex(Offset reference) {
     int index = 0;
 
-    List<_CompareHolder> sortedPoints = _absolutePoints
-        .map((Offset point) => _CompareHolder(index++, (reference - point).distance))
-        .toList();
+    List<_CompareHolder> sortedPoints = _absolutePoints.map((Offset point) => _CompareHolder(index++, (reference - point).distance)).toList();
 
     sortedPoints.sort((_CompareHolder a, _CompareHolder b) => a.distance.compareTo(b.distance));
 
@@ -178,8 +188,7 @@ class MeasurementRepository {
   }
 
   void _movementStarted(int index) {
-    List<LengthUnit> distances = List()
-      ..addAll(_distances.value);
+    List<LengthUnit> distances = List()..addAll(_distances.value);
 
     distances.setRange(max(0, index - 1), min(distances.length, index + 1), [null, null]);
     _publishDistances(distances);
@@ -197,7 +206,7 @@ class MeasurementRepository {
     }
   }
 
-  _updatePoints() {
+  void _updatePoints() {
     _logger.log("absolute position: $_absolutePoints new view center $_viewCenterPosition");
     _publishPoints();
   }

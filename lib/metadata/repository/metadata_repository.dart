@@ -14,7 +14,6 @@ import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:rxdart/subjects.dart';
 
-
 class MetadataRepository {
   final _logger = Logger(LogDistricts.METADATA_REPOSITORY);
 
@@ -37,6 +36,9 @@ class MetadataRepository {
 
   final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
   final _contentPosition = BehaviorSubject<Offset>();
+
+  Offset _deleteRegionPosition;
+  Size _deleteRegionSize;
 
   MetadataRepository();
 
@@ -69,7 +71,6 @@ class MetadataRepository {
   Stream<Size> get viewSize => _viewSize.stream;
 
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
-
 
   void registerStartupValuesChange({
     @required MeasurementInformation measurementInformation,
@@ -106,9 +107,11 @@ class MetadataRepository {
     final documentAspectRatio = documentWidth / documentHeight;
     final backgroundAspectRatio = viewSize.width / viewSize.height;
 
-    if (documentAspectRatio > backgroundAspectRatio) { // width of document is width of background
+    if (documentAspectRatio > backgroundAspectRatio) {
+      // width of document is width of background
       _imageToDocumentFactor.value = documentWidth / viewSize.width;
-    } else { // height of document is height of background
+    } else {
+      // height of document is height of background
       _imageToDocumentFactor.value = documentHeight / viewSize.height;
     }
   }
@@ -122,6 +125,18 @@ class MetadataRepository {
     _contentPosition.value = position;
     _zoomLevel.value = zoom;
     _updateTransformationFactor();
+  }
+
+  void registerDeleteRegion(Offset position, Size size) {
+    _deleteRegionPosition = position;
+    _deleteRegionSize = size;
+  }
+
+  bool isInDeleteRegion(Offset position) {
+    return position.dx > _deleteRegionPosition.dx &&
+        position.dx < _deleteRegionPosition.dx + _deleteRegionSize.width &&
+        position.dy > _deleteRegionPosition.dy &&
+        position.dy < _deleteRegionPosition.dy + _deleteRegionSize.height;
   }
 
   void dispose() {
@@ -170,8 +185,6 @@ class MetadataRepository {
 
     MeasurementInformation information = _measurementInformation.value;
 
-    return information.documentWidthInLengthUnits
-        .convertToInch()
-        .value * pixelPerInch / (screenWidth * information.scale * window.devicePixelRatio);
+    return information.documentWidthInLengthUnits.convertToInch().value * pixelPerInch / (screenWidth * information.scale * window.devicePixelRatio);
   }
 }
