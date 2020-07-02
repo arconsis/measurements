@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
+
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -11,7 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/input_state/input_bloc.dart';
 import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
-import 'package:photo_view/photo_view.dart';
 
 import 'input_state/input_event.dart';
 import 'measurement/bloc/points_bloc/points_bloc.dart';
@@ -187,25 +188,33 @@ class MeasurementView extends StatelessWidget {
         child: Listener(
           onPointerDown: (PointerDownEvent event) => BlocProvider.of<InputBloc>(context).add(InputDownEvent(event.localPosition)),
           onPointerMove: (PointerMoveEvent event) {
-            _logger.log("move event ${event.toStringFull()}");
+//            _logger.log("move event ${event.toStringFull()}");
             BlocProvider.of<InputBloc>(context).add(InputMoveEvent(event.localPosition));
           },
           onPointerUp: (PointerUpEvent event) => BlocProvider.of<InputBloc>(context).add(InputUpEvent(event.localPosition)),
           child: Stack(
             children: <Widget>[
-              AbsorbPointer(
-                absorbing: state.measure,
-                child: PhotoView.customChild(
-                  controller: state.controller,
-                  initialScale: PhotoViewComputedScale.contained,
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * state.maxZoom,
-                  child: RepaintBoundary(
-                    key: _childKey,
-                    child: child,
-                  ),
-                ),
-              ),
+//              AbsorbPointer(
+//                absorbing: state.measure,
+//                child: PhotoView.customChild(
+//                  controller: state.controller,
+//                  initialScale: PhotoViewComputedScale.contained,
+//                  minScale: PhotoViewComputedScale.contained,
+//                  maxScale: PhotoViewComputedScale.contained * state.maxZoom,
+//                  child: RepaintBoundary(
+//                    key: _childKey,
+//                    child: child,
+//                  ),
+//                ),
+//              ),
+//              Transform(
+//                transform: state.transform,
+//                alignment: Alignment.center,
+//                child: RepaintBoundary(
+//                  key: _childKey,
+//                  child: child,
+//                ),
+//              ),
               MeasureArea(
                 pointStyle: pointStyle,
                 magnificationStyle: magnificationStyle,
@@ -222,6 +231,14 @@ class MeasurementView extends StatelessWidget {
                     child: deleteChild,
                   ),
                 ),
+              ),
+              GestureDetector(
+                onScaleStart: (ScaleStartDetails details) {
+                  _logger.log("Scale Start: $details");
+                },
+                onScaleUpdate: (ScaleUpdateDetails details) {
+                  _logger.log("Scale Update: $details");
+                },
               ),
             ],
           ),
