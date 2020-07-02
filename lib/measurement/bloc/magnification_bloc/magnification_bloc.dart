@@ -9,8 +9,8 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/input_state/input_bloc.dart';
-import 'package:measurements/input_state/input_state.dart';
+import 'package:measurements/input_bloc/input_bloc.dart';
+import 'package:measurements/input_bloc/input_state.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';

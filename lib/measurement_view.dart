@@ -11,10 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/input_state/input_bloc.dart';
 import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:measurements/scale_bloc/scale_bloc.dart';
+import 'package:measurements/scale_bloc/scale_event.dart';
 
-import 'input_state/input_event.dart';
+import 'input_bloc/input_bloc.dart';
+import 'input_bloc/input_event.dart';
 import 'measurement/bloc/points_bloc/points_bloc.dart';
 import 'measurement/overlay/measure_area.dart';
 import 'measurement/repository/measurement_repository.dart';
@@ -24,6 +26,7 @@ import 'metadata/bloc/metadata_bloc.dart';
 import 'metadata/bloc/metadata_event.dart';
 import 'metadata/bloc/metadata_state.dart';
 import 'metadata/repository/metadata_repository.dart';
+import 'scale_bloc/scale_state.dart';
 import 'style/distance_style.dart';
 import 'style/magnification_style.dart';
 import 'style/point_style.dart';
@@ -69,6 +72,7 @@ class Measurement extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => MetadataBloc()),
         BlocProvider(create: (context) => InputBloc()),
+        BlocProvider(create: (context) => GestureBloc()),
       ],
       child: MeasurementView(
         child,
@@ -169,15 +173,17 @@ class MeasurementView extends StatelessWidget {
       key: _parentKey,
       color: drawColor,
       child: BlocBuilder<MetadataBloc, MetadataState>(
-        builder: (context, state) => _overlay(context, state),
+        builder: (context, metadataState) => BlocBuilder<GestureBloc, GestureState>(
+          builder: (context, scaleState) => _overlay(context, metadataState, scaleState),
+        ),
       ),
     );
   }
 
-  Widget _overlay(BuildContext context, MetadataState state) {
+  Widget _overlay(BuildContext context, MetadataState metadataState, GestureState scaleState) {
     return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
       BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
-      _setBackgroundImageToBloc(context, state.zoom);
+      _setBackgroundImageToBloc(context, scaleState.scale);
       _setDeleteChildInfoToBloc(context);
 
       return MultiBlocProvider(
@@ -207,14 +213,14 @@ class MeasurementView extends StatelessWidget {
 //                  ),
 //                ),
 //              ),
-//              Transform(
-//                transform: state.transform,
-//                alignment: Alignment.center,
-//                child: RepaintBoundary(
-//                  key: _childKey,
-//                  child: child,
-//                ),
-//              ),
+              Transform(
+                transform: scaleState.transform,
+                alignment: Alignment.center,
+                child: RepaintBoundary(
+                  key: _childKey,
+                  child: child,
+                ),
+              ),
               MeasureArea(
                 pointStyle: pointStyle,
                 magnificationStyle: magnificationStyle,
@@ -234,11 +240,14 @@ class MeasurementView extends StatelessWidget {
               ),
               GestureDetector(
                 onScaleStart: (ScaleStartDetails details) {
+                  BlocProvider.of<GestureBloc>(context).add(GestureScaleStartEvent(details.localFocalPoint));
                   _logger.log("Scale Start: $details");
                 },
                 onScaleUpdate: (ScaleUpdateDetails details) {
+                  BlocProvider.of<GestureBloc>(context).add(GestureScaleUpdateEvent(details.localFocalPoint, details.scale));
                   _logger.log("Scale Update: $details");
                 },
+//              TODO  onDoubleTap: , zoom to 1 or to some zoom level
               ),
             ],
           ),

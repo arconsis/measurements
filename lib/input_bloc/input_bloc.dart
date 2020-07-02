@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/input_state/input_event.dart';
-import 'package:measurements/input_state/input_state.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+
+import 'input_event.dart';
+import 'input_state.dart';
 
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
