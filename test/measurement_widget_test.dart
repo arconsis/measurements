@@ -12,7 +12,6 @@ import 'package:measurements/measurement/overlay/measure_area.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
-import 'package:photo_view/photo_view.dart';
 
 Type typeOf<T>() => T;
 

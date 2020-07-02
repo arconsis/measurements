@@ -15,7 +15,6 @@ dependencies:
   get_it: 4.0.2
   image: 2.1.12
   path_provider: 1.6.9
-  photo_view: 0.9.2
   rxdart: 0.24.1
 
 dev_dependencies:

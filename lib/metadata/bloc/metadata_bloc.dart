@@ -7,20 +7,17 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
-import 'package:photo_view/photo_view.dart';
 
 import 'metadata_event.dart';
 import 'metadata_state.dart';
 
-class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements MeasurementFunction {
+class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
   final List<StreamSubscription> _streamSubscriptions = List();
 
   MetadataRepository _repository;
-  PhotoViewController _controller = PhotoViewController();
   bool _measure = false;
   double _zoom = 1.0;
   double _maxZoom = 5.0;
@@ -37,8 +34,6 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
       _updateState();
     }));
     _streamSubscriptions.add(_repository.orientation.listen((orientation) => _updateState()));
-
-    _streamSubscriptions.add(_controller.outputStateStream.listen((state) => _repository.registerResizing(state.position, state.scale)));
   }
 
   void _updateState() {
@@ -46,15 +41,13 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   }
 
   @override
-  MetadataState get initialState => MetadataState(_controller, _measure, _zoom, _maxZoom);
+  MetadataState get initialState => MetadataState(_measure, _zoom, _maxZoom);
 
   @override
   void onEvent(MetadataEvent event) async {
     _logger.log("received event: $event");
 
     if (event is MetadataStartedEvent) {
-      event.controller?.measurementFunction = this;
-
       _repository.registerStartupValuesChange(
         measurementInformation: event.measurementInformation,
         measure: event.measure,
@@ -76,19 +69,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   @override
   Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
     if (event is MetadataUpdatedEvent) {
-      yield MetadataState(_controller, event.measure, event.zoom, event.maxZoom);
+      yield MetadataState(event.measure, event.zoom, event.maxZoom);
     }
   }
-
-  @override
-  Future<void> close() {
-    _controller?.dispose();
-    return super.close();
-  }
-
-  @override
-  void zoomToOriginal() async => _controller.scale = await _repository.zoomFactorForOriginalSize;
-
-  @override
-  void resetZoom() => _controller.scale = 1.0;
 }
