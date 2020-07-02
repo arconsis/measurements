@@ -56,61 +56,56 @@ void main() {
       measurement?.close();
     });
 
-    blocTest("initial state",
+    blocTest(
+      "initial state",
       skip: 0,
       build: () async => MetadataBloc(),
-      verify: (MetadataBloc bloc) {
+      verify: (MetadataBloc bloc) async {
         expect(bloc.state.controller, isA<PhotoViewController>());
         expect(bloc.state.measure, equals(false));
-
-        return;
       },
     );
 
     group("metadata events", () {
-      blocTest("started event should show measurements",
+      blocTest(
+        "started event should show measurements",
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
 
           return MetadataBloc();
         },
         act: (bloc) => bloc.add(startedEvent),
-        verify: (MetadataBloc bloc) {
+        verify: (MetadataBloc bloc) async {
           expect(bloc.state.controller, isA<PhotoViewController>());
           expect(bloc.state.measure, equals(true));
-
-          return;
         },
       );
 
-      blocTest("background registered",
+      blocTest(
+        "background registered",
         skip: 0,
         build: () async => MetadataBloc(),
         act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-        verify: (MetadataBloc bloc) {
+        verify: (MetadataBloc bloc) async {
           expect(bloc.state.controller, isA<PhotoViewController>());
           expect(bloc.state.measure, equals(false));
-
-          return;
         },
       );
 
-      blocTest("started and background event",
+      blocTest(
+        "started and background event",
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
 
           return MetadataBloc();
         },
-        act: (bloc) {
+        act: (bloc) async {
           bloc.add(startedEvent);
           bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
-          return;
         },
-        verify: (MetadataBloc bloc) {
+        verify: (MetadataBloc bloc) async {
           expect(bloc.state.controller, isA<PhotoViewController>());
           expect(bloc.state.measure, equals(true));
-
-          return;
         },
       );
     });
@@ -122,7 +117,8 @@ void main() {
         states = List();
       });
 
-      blocTest("enable and disable measurement",
+      blocTest(
+        "enable and disable measurement",
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
 
@@ -137,8 +133,6 @@ void main() {
           expect(states[0].measure, equals(false));
           expect(states[1].measure, equals(true));
           expect(states[2].measure, equals(false));
-
-          return;
         },
       );
     });
@@ -146,11 +140,10 @@ void main() {
     group("measure functions", () {
       final expectedZoomFactor = 5.5;
 
-      blocTest("reset zoom",
+      blocTest(
+        "reset zoom",
         build: () async => MetadataBloc(),
-        act: (bloc) async {
-          (bloc as MeasurementFunction).resetZoom();
-        },
+        act: (bloc) async => (bloc as MeasurementFunction).resetZoom(),
         verify: (bloc) async {
           final initialState = (bloc as MetadataBloc).initialState;
 
@@ -158,15 +151,14 @@ void main() {
         },
       );
 
-      blocTest("zoom to original",
+      blocTest(
+        "zoom to original",
         build: () async {
           when(mockedRepository.zoomFactorForOriginalSize).thenAnswer((realInvocation) async => expectedZoomFactor);
 
           return MetadataBloc();
         },
-        act: (bloc) async {
-          (bloc as MeasurementFunction).zoomToOriginal();
-        },
+        act: (bloc) async => (bloc as MeasurementFunction).zoomToOriginal(),
         verify: (bloc) async {
           final initialState = (bloc as MetadataBloc).initialState;
 

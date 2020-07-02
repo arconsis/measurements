@@ -9,24 +9,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
-import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
-import 'package:measurements/measurement/overlay/measure_area.dart';
-import 'package:measurements/measurement/repository/measurement_repository.dart';
-import 'package:measurements/measurement_controller.dart';
-import 'package:measurements/metadata/measurement_information.dart';
-import 'package:measurements/style/distance_style.dart';
-import 'package:measurements/style/magnification_style.dart';
-import 'package:measurements/style/point_style.dart';
-import 'package:measurements/util/colors.dart';
-import 'package:measurements/util/logger.dart';
+import 'package:measurements/input_state/input_bloc.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
 import 'package:photo_view/photo_view.dart';
 
-import 'bloc/metadata_bloc.dart';
-import 'bloc/metadata_event.dart';
-import 'bloc/metadata_state.dart';
-import 'repository/metadata_repository.dart';
+import 'input_state/input_event.dart';
+import 'measurement/bloc/points_bloc/points_bloc.dart';
+import 'measurement/overlay/measure_area.dart';
+import 'measurement/repository/measurement_repository.dart';
+import 'measurement_controller.dart';
+import 'measurement_information.dart';
+import 'metadata/bloc/metadata_bloc.dart';
+import 'metadata/bloc/metadata_event.dart';
+import 'metadata/bloc/metadata_state.dart';
+import 'metadata/repository/metadata_repository.dart';
+import 'style/distance_style.dart';
+import 'style/magnification_style.dart';
+import 'style/point_style.dart';
+import 'util/colors.dart';
+import 'util/logger.dart';
 
 class Measurement extends StatelessWidget {
   final Widget child;
@@ -66,7 +67,7 @@ class Measurement extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => MetadataBloc()),
-        BlocProvider(create: (context) => MeasureBloc()),
+        BlocProvider(create: (context) => InputBloc()),
       ],
       child: MeasurementView(
         child,
@@ -162,7 +163,6 @@ class MeasurementView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _setStartupArgumentsToBloc(context);
-    _setDeleteChildInfoToBloc(context);
 
     return Container(
       key: _parentKey,
@@ -177,19 +177,20 @@ class MeasurementView extends StatelessWidget {
     return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
       BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
       _setBackgroundImageToBloc(context, state.zoom);
+      _setDeleteChildInfoToBloc(context);
 
-      return BlocProvider(
-        create: (context) => PointsBloc(),
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => PointsBloc()),
+          BlocProvider(create: (context) => MagnificationBloc(BlocProvider.of<InputBloc>(context))),
+        ],
         child: Listener(
-          onPointerDown: (PointerDownEvent event) {
-            _logger.log("down event ${event.toStringFull()}");
-            BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition));
-          },
+          onPointerDown: (PointerDownEvent event) => BlocProvider.of<InputBloc>(context).add(InputDownEvent(event.localPosition)),
           onPointerMove: (PointerMoveEvent event) {
             _logger.log("move event ${event.toStringFull()}");
-            BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition));
+            BlocProvider.of<InputBloc>(context).add(InputMoveEvent(event.localPosition));
           },
-          onPointerUp: (PointerUpEvent event) => BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
+          onPointerUp: (PointerUpEvent event) => BlocProvider.of<InputBloc>(context).add(InputUpEvent(event.localPosition)),
           child: Stack(
             children: <Widget>[
               AbsorbPointer(

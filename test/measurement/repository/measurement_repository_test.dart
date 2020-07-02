@@ -10,6 +10,7 @@ import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/util/utils.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -130,26 +131,23 @@ void main() {
         measurementRepository.registerUpEvent(Offset(100, 100));
         measurementRepository.registerDownEvent(Offset(100, 100));
 
-
         measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedHolder));
         expect(controller.distances, [100 * transformationFactor.value]);
       });
 
       test("set five points with distances", () {
-        final expectedHolder = DrawingHolder(
-            [
-              Offset(0, 100),
-              Offset(100, 100),
-              Offset(100, 200),
-              Offset(200, 200),
-              Offset(300, 200),
-            ],
-            [
-              transformationFactor * 100,
-              transformationFactor * 100,
-              transformationFactor * 100,
-              transformationFactor * 100,
-            ]);
+        final expectedHolder = DrawingHolder([
+          Offset(0, 100),
+          Offset(100, 100),
+          Offset(100, 200),
+          Offset(200, 200),
+          Offset(300, 200),
+        ], [
+          transformationFactor * 100,
+          transformationFactor * 100,
+          transformationFactor * 100,
+          transformationFactor * 100,
+        ]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
         measurementRepository.registerUpEvent(Offset(0, 100));
@@ -200,5 +198,60 @@ void main() {
         expect(controller.distances, [100 * transformationFactor.value * 2]);
       });
     });
+
+    group("remove points", () {
+      test("add one point and delete it", () async {
+        testRemoval(measurementRepository, transformationFactor, [Offset(10, 10)], [0]);
+      });
+
+      test("add two points and delete one", () async {
+        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0)], [0]);
+      });
+
+      test("add three points and delete the middle one", () async {
+        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1]);
+      });
+
+      test("add three points and delete two", () async {
+        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1, 0]);
+      });
+    });
   });
+}
+
+Future<void> testRemoval(MeasurementRepository repository, LengthUnit transformationFactor, List<Offset> points, List<int> deleteIndices) async {
+  final distances = List<LengthUnit>();
+  points.doInBetween((Offset first, Offset second) => distances.add(transformationFactor * (second - first).distance));
+
+  final removedPoints = List<Offset>();
+  deleteIndices.forEach((index) => removedPoints.add(points[index]));
+
+  final trimmedPoints = List<Offset>();
+  final trimmedDistances = List<LengthUnit>();
+  trimmedPoints.addAll(points);
+  deleteIndices.forEach((index) => trimmedPoints.removeAt(index));
+  trimmedPoints.doInBetween((Offset first, Offset second) => trimmedDistances.add(transformationFactor * (second - first).distance));
+
+  final expectedHolderWithPoints = DrawingHolder(points, distances);
+  final expectedHolderAfterRemoval = DrawingHolder(trimmedPoints, trimmedDistances);
+
+  points.forEach((point) {
+    repository.registerDownEvent(point);
+    repository.registerUpEvent(point);
+  });
+
+  StreamSubscription subscription;
+  subscription = repository.drawingHolder.listen((actual) {
+    expect(actual, expectedHolderWithPoints);
+    subscription.cancel();
+  });
+
+  await Future.delayed(Duration(microseconds: 1));
+
+  removedPoints.forEach((point) {
+    repository.registerDownEvent(point);
+    repository.removeCurrentPoint();
+  });
+
+  repository.drawingHolder.listen((actual) => expect(actual, expectedHolderAfterRemoval));
 }

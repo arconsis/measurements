@@ -5,11 +5,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
-import 'package:measurements/metadata/measurement_information.dart';
+import 'package:measurements/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -55,7 +55,7 @@ class MeasureArea extends StatelessWidget {
         BlocBuilder<PointsBloc, PointsState>(
           builder: (context, state) => _pointsOverlay(state),
         ),
-        BlocBuilder<MeasureBloc, MeasureState>(
+        BlocBuilder<MagnificationBloc, MagnificationState>(
           builder: (context, state) => _magnificationOverlay(state),
         ),
       ],
@@ -137,8 +137,8 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  Widget _magnificationOverlay(MeasureState state) {
-    if (state is MeasureActiveState) {
+  Widget _magnificationOverlay(MagnificationState state) {
+    if (state is MagnificationActiveState) {
       return CustomPaint(
         foregroundPainter: MagnifyingPainter(
           fingerPosition: state.position,

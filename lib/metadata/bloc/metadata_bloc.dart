@@ -1,3 +1,5 @@
+import 'dart:async';
+
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -15,6 +17,7 @@ import 'metadata_state.dart';
 
 class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements MeasurementFunction {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
+  final List<StreamSubscription> _streamSubscriptions = List();
 
   MetadataRepository _repository;
   PhotoViewController _controller = PhotoViewController();
@@ -25,19 +28,17 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> implements Measure
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
 
-    _repository.measurement.listen((bool measure) {
+    _streamSubscriptions.add(_repository.measurement.listen((bool measure) {
       _measure = measure;
       _updateState();
-    });
-    _repository.zoom.listen((zoom) {
+    }));
+    _streamSubscriptions.add(_repository.zoom.listen((zoom) {
       _zoom = zoom;
       _updateState();
-    });
-    _repository.orientation.listen((orientation) {
-      _updateState();
-    });
+    }));
+    _streamSubscriptions.add(_repository.orientation.listen((orientation) => _updateState()));
 
-    _controller.outputStateStream.listen((state) => _repository.registerResizing(state.position, state.scale));
+    _streamSubscriptions.add(_controller.outputStateStream.listen((state) => _repository.registerResizing(state.position, state.scale)));
   }
 
   void _updateState() {

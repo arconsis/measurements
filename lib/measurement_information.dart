@@ -13,7 +13,7 @@ abstract class LengthUnit extends Equatable {
   const LengthUnit(this.value);
 
   @override
-  String toString() => super.toString() + "$value${getAbbreviation()}";
+  String toString() => super.toString() + " $value${getAbbreviation()}";
 
   @override
   List<Object> get props => [value];

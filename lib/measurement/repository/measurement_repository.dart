@@ -8,6 +8,7 @@ import 'dart:ui';
 
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurements.dart';
+import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:measurements/util/utils.dart';
 import 'package:rxdart/rxdart.dart';
@@ -25,7 +26,7 @@ class MeasurementRepository {
   final _points = BehaviorSubject<List<Offset>>.seeded(List());
   final _distances = BehaviorSubject<List<LengthUnit>>.seeded(List());
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
-  final _metadataRepository;
+  final MetadataRepository _metadataRepository;
 
   MeasurementController _controller;
   LengthUnit _transformationFactor;
@@ -49,7 +50,7 @@ class MeasurementRepository {
     _metadataRepository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
         _transformationFactor = factor;
-        _movementFinished();
+        _synchronizeDistances();
       }
     });
     _metadataRepository.zoom.listen((zoom) {
@@ -101,16 +102,17 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    if (_metadataRepository.isInDeleteRegion(position)) {
-      _removeCurrentPoint();
-    } else {
-      _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
-    }
-
-    _currentIndex = -1;
+    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
     _movementFinished();
+  }
 
-    _currentState = TouchState.FREE;
+  void removeCurrentPoint() {
+    if (_currentIndex >= 0) {
+      _absolutePoints.removeAt(_currentIndex);
+      _publishPoints();
+
+      _movementFinished();
+    }
   }
 
   void dispose() {
@@ -165,13 +167,6 @@ class MeasurementRepository {
     }
   }
 
-  void _removeCurrentPoint() {
-    if (_currentIndex >= 0) {
-      _absolutePoints.removeAt(_currentIndex);
-      _publishPoints();
-    }
-  }
-
   int _getClosestPointIndex(Offset reference) {
     int index = 0;
 
@@ -197,12 +192,21 @@ class MeasurementRepository {
   }
 
   void _movementFinished() {
+    _currentIndex = -1;
+    _synchronizeDistances();
+    _currentState = TouchState.FREE;
+  }
+
+  void _synchronizeDistances() {
     if (_transformationFactor != null && _absolutePoints.length >= 2) {
       List<LengthUnit> distances = List();
       _absolutePoints.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
       _controller?.distances = distances.map((unit) => unit.value).toList();
+    } else if (_absolutePoints.length == 1) {
+      _publishDistances([]);
+      _controller?.distances = [];
     }
   }
 

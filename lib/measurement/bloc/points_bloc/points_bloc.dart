@@ -20,13 +20,13 @@ import 'package:measurements/util/utils.dart';
 
 class PointsBloc extends Bloc<PointsEvent, PointsState> {
   final _logger = Logger(LogDistricts.POINTS_BLOC);
+  final List<StreamSubscription> _streamSubscriptions = List();
 
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
 
   StreamSubscription _onlyPointsSubscription;
   StreamSubscription _pointsAndDistancesSubscription;
-  StreamSubscription _showDistanceSubscription;
 
   Function(List<Offset>) _pointsListener;
   Function(DrawingHolder) _pointsAndDistanceListener;
@@ -41,14 +41,13 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _showDistanceSubscription = _metadataRepository.showDistances.listen((showDistances) {
+    _streamSubscriptions.add(_metadataRepository.showDistances.listen((showDistances) {
       if (showDistances) {
         if (_pointsAndDistancesSubscription == null) {
           _onlyPointsSubscription?.cancel();
           _onlyPointsSubscription = null;
 
           _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
-          _logger.log("created points and distances subscription $_pointsAndDistancesSubscription ${_pointsAndDistancesSubscription.hashCode}");
         }
       } else {
         if (_onlyPointsSubscription == null) {
@@ -56,13 +55,12 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
           _pointsAndDistancesSubscription = null;
 
           _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
-          _logger.log("created points subscription $_onlyPointsSubscription ${_onlyPointsSubscription.hashCode}");
         }
       }
-    });
+    }));
 
-    _metadataRepository.viewCenter.listen((center) => _viewCenter = center);
-    _metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance);
+    _streamSubscriptions.add(_metadataRepository.viewCenter.listen((center) => _viewCenter = center));
+    _streamSubscriptions.add(_metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance));
   }
 
   @override
@@ -76,8 +74,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   Future<void> close() {
-    _logger.log("closing Points Bloc $this ${this.hashCode}");
-    _showDistanceSubscription?.cancel();
+    _streamSubscriptions.forEach((subscription) => subscription.cancel());
     _onlyPointsSubscription?.cancel();
     _pointsAndDistancesSubscription?.cancel();
     return super.close();
@@ -93,22 +90,26 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       if (event is PointsOnlyEvent) {
         yield PointsOnlyState(event.points);
       } else if (event is PointsAndDistancesEvent) {
-        List<Holder> holders = List();
-        event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-        event.distances.zip(holders, (LengthUnit distance, Holder holder) => holder.distance = distance);
-
-        if (event.distances.contains(null)) {
-          List<int> nullIndices = List();
-          nullIndices.add(event.distances.indexOf(null));
-          nullIndices.add(event.distances.lastIndexOf(null));
-
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
-        } else if (event.points.length - 1 > event.distances.length) {
-          yield PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
-        } else {
-          yield PointsAndDistanceState(holders, _viewCenter, _tolerance);
-        }
+        yield _mapMultiplePointsWithDistancesToState(event);
       }
+    }
+  }
+
+  PointsState _mapMultiplePointsWithDistancesToState(PointsAndDistancesEvent event) {
+    List<Holder> holders = List();
+    event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
+    event.distances.zip(holders, (LengthUnit distance, Holder holder) => holder.distance = distance);
+
+    if (event.distances.contains(null)) {
+      List<int> nullIndices = List();
+      nullIndices.add(event.distances.indexOf(null));
+      nullIndices.add(event.distances.lastIndexOf(null));
+
+      return PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
+    } else if (event.points.length - 1 > event.distances.length) {
+      return PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
+    } else {
+      return PointsAndDistanceState(holders, _viewCenter, _tolerance);
     }
   }
 }

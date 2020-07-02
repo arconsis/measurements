@@ -7,10 +7,12 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 
-abstract class MeasureEvent extends Equatable {
+abstract class MagnificationEvent extends Equatable {}
+
+class MagnificationShowEvent extends MagnificationEvent {
   final Offset position;
 
-  MeasureEvent(this.position);
+  MagnificationShowEvent(this.position);
 
   @override
   List<Object> get props => [position];
@@ -21,15 +23,7 @@ abstract class MeasureEvent extends Equatable {
   }
 }
 
-class MeasureDownEvent extends MeasureEvent {
-  MeasureDownEvent(Offset position) : super(position);
+class MagnificationHideEvent extends MagnificationEvent {
+  @override
+  List<Object> get props => [];
 }
-
-class MeasureMoveEvent extends MeasureEvent {
-  MeasureMoveEvent(Offset position) : super(position);
-}
-
-class MeasureUpEvent extends MeasureEvent {
-  MeasureUpEvent(Offset position) : super(position);
-}
-
