@@ -131,8 +131,11 @@ void main() {
     });
 
     group("without measuring", () {
+      Rect deleteRegion = Rect.fromPoints(Offset(0, 0), Offset(0, 0));
+
       setUp(() {
         when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
+        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer((realInvocation) => deleteRegion.contains(realInvocation.positionalArguments[0]));
       });
 
       blocTest(
@@ -144,9 +147,10 @@ void main() {
           bloc.add(InputUpEvent(Offset(70, 70)));
         },
         expect: [
-          InputEmptyState(),
-          InputEmptyState(),
-          InputEmptyState(),
+          // Same states as initial state, therefore no will be emitted
+//          InputEmptyState(),
+//          InputEmptyState(),
+//          InputEmptyState(),
         ],
       );
     });
