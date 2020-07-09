@@ -1,4 +1,7 @@
 import 'dart:math';
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
@@ -39,6 +42,16 @@ extension NumberExtension on num {
   bool isInBounds(num lower, num upper) => this > lower && this < upper;
 
   num fit(num lower, num upper) => min(max(lower, this), upper);
+}
+
+extension OffsetExtension on Offset {
+  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target, double threshold, double scale) {
+    Offset currentOffset = this + offset;
+    double thresholdOffset = min(mySize.width, mySize.height) * threshold;
+
+    return Offset((currentOffset.dx + target.dx).fit(-mySize.width + thresholdOffset, bounds.width - thresholdOffset),
+        (currentOffset.dy + target.dy).fit(-mySize.height + thresholdOffset, bounds.height - thresholdOffset));
+  }
 }
 
 void measure(Logger logger, String text, Function() f) {

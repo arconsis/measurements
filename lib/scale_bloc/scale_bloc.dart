@@ -34,7 +34,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   Size _screenSize;
   Size _viewSize;
-  Offset defaultOffset = Offset(0, 0);
+  Offset _defaultOffset = Offset(0, 0);
 
   double _currentScale = 1.0;
   double _accumulatedScale = 1.0;
@@ -86,7 +86,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       _currentScale = _accumulatedScale;
     } else if (event is ScaleUpdateEvent) {
       if (event.scale == 1.0) {
-        _workingTranslate = _currentTranslate + (event.position - _translateStart);
+        _workingTranslate = _currentTranslate.fitInto(_viewSize, _screenSize, _defaultOffset, event.position - _translateStart, 0.01, _accumulatedScale) - _defaultOffset;
       } else {
         _accumulatedScale = (_currentScale * event.scale).fit(_minScale, _maxScale);
       }
@@ -120,25 +120,28 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
     if (event is ScaleOriginalEvent) {
       yield ScaleState(
-          offset,
-          _originalScale,
-          Matrix4.identity()
-            ..translate(offset.dx, offset.dy)
-            ..scale(_originalScale));
+        offset,
+        _originalScale,
+        Matrix4.identity()
+          ..translate(offset.dx, offset.dy)
+          ..scale(_originalScale),
+      );
     } else if (event is ScaleResetEvent) {
       yield ScaleState(
-          defaultOffset,
-          1.0,
-          Matrix4.identity()
-            ..translate(defaultOffset.dx, defaultOffset.dy)
-            ..scale(1.0));
+        _defaultOffset,
+        1.0,
+        Matrix4.identity()
+          ..translate(_defaultOffset.dx, _defaultOffset.dy)
+          ..scale(1.0),
+      );
     } else {
       yield ScaleState(
-          offset,
-          _accumulatedScale,
-          Matrix4.identity()
-            ..translate(offset.dx, offset.dy)
-            ..scale(_accumulatedScale));
+        offset,
+        _accumulatedScale,
+        Matrix4.identity()
+          ..translate(offset.dx, offset.dy)
+          ..scale(_accumulatedScale),
+      );
     }
   }
 
@@ -158,12 +161,12 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   void _registerResizing() => _metadataRepository.registerResizing(_getTranslate(), _accumulatedScale);
 
-  Offset _getTranslate() => defaultOffset + _workingTranslate;
+  Offset _getTranslate() => _defaultOffset + _workingTranslate;
 
   void _updateDefaultOffset() {
     if (_screenSize == null || _viewSize == null) return;
 
-    defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, (_screenSize.height - _viewSize.height) / 2.0);
+    _defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, (_screenSize.height - _viewSize.height) / 2.0);
 
     add(ScaleCenterUpdatedEvent());
     _registerResizing();
