@@ -77,7 +77,7 @@ class MetadataRepository {
 
     MeasurementInformation information = _measurementInformation.value;
 
-    if (_isDocumentWidthAlignedWithScreenWidth(screenSize)) {
+    if (isDocumentWidthAlignedWithScreenWidth(screenSize)) {
       return information.documentWidthInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.width * information.scale * window.devicePixelRatio);
     } else {
       return information.documentHeightInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.height * information.scale * window.devicePixelRatio);
@@ -87,7 +87,7 @@ class MetadataRepository {
   double get zoomFactorToFillScreen {
     if (_screenSize.value == null) return 1.0;
 
-    if (_isDocumentWidthAlignedWithScreenWidth(_screenSize.value)) {
+    if (isDocumentWidthAlignedWithScreenWidth(_screenSize.value)) {
       return _screenSize.value.height / _screenSize.value.width;
     } else {
       return _screenSize.value.width / _screenSize.value.height;
@@ -140,6 +140,13 @@ class MetadataRepository {
 
   bool isInDeleteRegion(Offset position) => _deleteRegion.contains(position);
 
+  bool isDocumentWidthAlignedWithScreenWidth(Size screenSize) {
+    final documentAspectRatio = _getDocumentWidth() / _getDocumentHeight();
+    final backgroundAspectRatio = screenSize.width / screenSize.height;
+
+    return documentAspectRatio > backgroundAspectRatio;
+  }
+
   void dispose() {
     _enableMeasure.close();
     _showDistance.close();
@@ -166,17 +173,10 @@ class MetadataRepository {
 
   double _getDocumentHeight() => _measurementInformation.value.documentHeightInLengthUnits.value.toDouble();
 
-  bool _isDocumentWidthAlignedWithScreenWidth(Size screenSize) {
-    final documentAspectRatio = _getDocumentWidth() / _getDocumentHeight();
-    final backgroundAspectRatio = screenSize.width / screenSize.height;
-
-    return documentAspectRatio > backgroundAspectRatio;
-  }
-
   void _updateImageToDocumentFactor(Size viewSize) {
     if (_screenSize.value == null) return;
 
-    if (_isDocumentWidthAlignedWithScreenWidth(_screenSize.value)) {
+    if (isDocumentWidthAlignedWithScreenWidth(viewSize)) {
       _imageToDocumentFactor.value = _getDocumentWidth() / viewSize.width;
     } else {
       _imageToDocumentFactor.value = _getDocumentHeight() / viewSize.height;

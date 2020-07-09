@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement_controller.dart';
@@ -19,6 +21,9 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   final logger = Logger(LogDistricts.SCALE_BLOC);
   final List<StreamSubscription> subscriptions = List();
 
+  final double minScale = 1.0;
+  final double maxScale = 10.0;
+
   MetadataRepository _metadataRepository;
 
   Matrix4 _transformation = Matrix4.identity();
@@ -26,6 +31,10 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   Offset _translateStart;
   Offset _workingTranslate = Offset(0, 0);
   Offset _currentTranslate = Offset(0, 0);
+
+  Size _screenSize;
+  Size _viewSize;
+  Offset defaultOffset = Offset(0, 0);
 
   double _currentScale = 1.0;
   double _accumulatedScale = 1.0;
@@ -38,7 +47,14 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
     _metadataRepository = GetIt.I<MetadataRepository>();
 
     subscriptions.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
+    subscriptions.add(_metadataRepository.viewSize.listen((size) {
+      _viewSize = size;
+      _updateDefaultOffset();
+    }));
     subscriptions.add(_metadataRepository.screenSize.listen((size) async {
+      _screenSize = size;
+      _updateDefaultOffset();
+
       _doubleTapScale = _metadataRepository.zoomFactorToFillScreen;
       _originalScale = await _metadataRepository.zoomFactorForOriginalSize;
     }));
@@ -70,7 +86,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       if (event.scale == 1.0) {
         _workingTranslate = _currentTranslate + (event.position - _translateStart);
       } else {
-        _accumulatedScale = _currentScale * event.scale;
+        _accumulatedScale = min(max(minScale, _currentScale * event.scale), maxScale);
       }
 
       _metadataRepository.registerResizing(_workingTranslate, _accumulatedScale);
@@ -99,26 +115,28 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   @override
   Stream<ScaleState> mapEventToState(ScaleEvent event) async* {
+    final offset = defaultOffset + _workingTranslate;
+
     if (event is ScaleOriginalEvent) {
       yield ScaleState(
-          Offset(_workingTranslate.dx, _workingTranslate.dy),
+          offset,
           _originalScale,
           Matrix4.identity()
-            ..translate(_workingTranslate.dx, _workingTranslate.dy)
+            ..translate(offset.dx, offset.dy)
             ..scale(_originalScale));
     } else if (event is ScaleResetEvent) {
       yield ScaleState(
-          Offset(_workingTranslate.dx, _workingTranslate.dy),
+          defaultOffset,
           1.0,
           Matrix4.identity()
-            ..translate(_workingTranslate.dx, _workingTranslate.dy)
+            ..translate(defaultOffset.dx, defaultOffset.dy)
             ..scale(1.0));
     } else {
       yield ScaleState(
-          Offset(_workingTranslate.dx, _workingTranslate.dy),
+          offset,
           _accumulatedScale,
           Matrix4.identity()
-            ..translate(_workingTranslate.dx, _workingTranslate.dy)
+            ..translate(offset.dx, offset.dy)
             ..scale(_accumulatedScale));
     }
   }
@@ -131,5 +149,17 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   @override
   void zoomToOriginal() {
     add(ScaleOriginalEvent());
+  }
+
+  void _updateDefaultOffset() {
+    if (_screenSize == null || _viewSize == null) return;
+
+    if (_metadataRepository.isDocumentWidthAlignedWithScreenWidth(_screenSize)) {
+      defaultOffset = Offset(0, (_screenSize.height - _viewSize.height) / 2.0);
+    } else {
+      defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, 0);
+    }
+
+    add(ScaleCenterUpdatedEvent());
   }
 }

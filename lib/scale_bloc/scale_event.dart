@@ -14,6 +14,8 @@ class ScaleOriginalEvent extends ScaleEvent {}
 
 class ScaleResetEvent extends ScaleEvent {}
 
+class ScaleCenterUpdatedEvent extends ScaleEvent {}
+
 abstract class ScalePositionEvent extends ScaleEvent implements Equatable {
   final Offset position;
 

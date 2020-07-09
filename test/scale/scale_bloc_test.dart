@@ -23,9 +23,11 @@ void main() {
       mockedMetadataRepository = MockedMetadataRepository();
 
       when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
-      when(mockedMetadataRepository.screenSize).thenAnswer((_) => Stream.fromIterable([Size(10, 10)]));
+      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 100)]));
+      when(mockedMetadataRepository.screenSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
       when(mockedMetadataRepository.zoomFactorForOriginalSize).thenAnswer((_) async => 2.0);
       when(mockedMetadataRepository.zoomFactorToFillScreen).thenReturn(5.0);
+      when(mockedMetadataRepository.isDocumentWidthAlignedWithScreenWidth(any)).thenReturn(true);
 
       GetIt.I.registerSingleton(mockedMetadataRepository);
     });
@@ -52,7 +54,7 @@ void main() {
           bloc.add(ScaleUpdateEvent(Offset(10, 0), 1.0));
         },
         expect: [
-          ScaleState(Offset(10, 0), 1.0, Matrix4.identity()..translate(10.0)),
+          ScaleState(Offset(10, 50), 1.0, Matrix4.identity()..translate(10.0, 50.0)),
         ],
       );
 
@@ -64,7 +66,29 @@ void main() {
           bloc.add(ScaleUpdateEvent(Offset(10, 0), 2.0));
         },
         expect: [
-          ScaleState(Offset(0, 0), 2.0, Matrix4.identity()..scale(2.0)),
+          ScaleState(
+              Offset(0, 50),
+              2.0,
+              Matrix4.identity()
+                ..translate(0.0, 50.0)
+                ..scale(2.0)),
+        ],
+      );
+
+      blocTest(
+        "zooming out should clamp at 1.0",
+        build: () async => ScaleBloc(),
+        act: (bloc) async {
+          bloc.add(ScaleStartEvent(Offset(0, 0)));
+          bloc.add(ScaleUpdateEvent(Offset(10, 0), 0.12));
+        },
+        expect: [
+          ScaleState(
+              Offset(0, 50),
+              1.0,
+              Matrix4.identity()
+                ..translate(0.0, 50.0)
+                ..scale(1.0)),
         ],
       );
 
@@ -80,10 +104,10 @@ void main() {
         },
         expect: [
           ScaleState(
-              Offset(10, 0),
+              Offset(10, 50),
               2.0,
               Matrix4.identity()
-                ..translate(10.0)
+                ..translate(10.0, 50.0)
                 ..scale(2.0)),
         ],
       );
@@ -99,7 +123,12 @@ void main() {
           bloc.add(ScaleUpdateEvent(Offset(10, 0), 3.0));
         },
         expect: [
-          ScaleState(Offset(0, 0), 6.0, Matrix4.identity()..scale(6.0)),
+          ScaleState(
+              Offset(0, 50),
+              6.0,
+              Matrix4.identity()
+                ..translate(0.0, 50.0)
+                ..scale(6.0)),
         ],
       );
     });
@@ -110,20 +139,30 @@ void main() {
         build: () async => ScaleBloc(),
         act: (bloc) async => bloc.add(ScaleDoubleTapEvent()),
         expect: [
-          ScaleState(Offset(0, 0), 5.0, Matrix4.identity()..scale(5.0)),
+          ScaleState(
+              Offset(0, 50),
+              5.0,
+              Matrix4.identity()
+                ..translate(0.0, 50.0)
+                ..scale(5.0)),
         ],
       );
     });
 
     group("measurement function calls", () {
       blocTest(
-        "single double tap event",
+        "zoom to original",
         build: () async => ScaleBloc(),
         act: (bloc) async {
           (bloc as ScaleBloc).zoomToOriginal();
         },
         expect: [
-          ScaleState(Offset(0, 0), 2.0, Matrix4.identity()..scale(2.0)),
+          ScaleState(
+              Offset(0, 50),
+              2.0,
+              Matrix4.identity()
+                ..translate(0.0, 50.0)
+                ..scale(2.0)),
         ],
       );
     });

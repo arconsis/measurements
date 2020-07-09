@@ -45,6 +45,7 @@ class MeasurementRepository {
     _metadataRepository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
     _metadataRepository.imageToDocumentScaleFactor.listen((scaleFactor) {
       _imageToDocumentScaleFactor = scaleFactor;
+      _logger.log("imageToDocumentScaleFactor: $_imageToDocumentScaleFactor");
       _updatePoints();
     });
     _metadataRepository.transformationFactor.listen((factor) {
@@ -55,6 +56,7 @@ class MeasurementRepository {
     });
     _metadataRepository.zoom.listen((zoom) {
       _zoomLevel = zoom;
+      _logger.log("zoomLevel: $_zoomLevel");
       _publishPoints();
     });
     _metadataRepository.backgroundPosition.listen((backgroundPosition) {
