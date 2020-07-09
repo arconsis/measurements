@@ -58,22 +58,17 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Color(0xff1280b3),
           title: Row(
             children: <Widget>[
-              IconButton(onPressed: () =>
-                  setState(() {
-                    measure = !measure;
-                    title = originalTitle;
-                  }),
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))
-              ),
-              IconButton(onPressed: () =>
-                  setState(() => showDistanceOnLine = !showDistanceOnLine),
-                  icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
-              ),
+              IconButton(
+                  onPressed: () => setState(() {
+                        measure = !measure;
+                        title = originalTitle;
+                      }),
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+              IconButton(onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine), icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))),
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
-                  onPressed: () =>
-                      setState(() => showTolerance = !showTolerance),
+                  onPressed: () => setState(() => showTolerance = !showTolerance),
                   child: Text("±"),
                   textColor: getButtonColor(showTolerance),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -83,27 +78,26 @@ class _MyAppState extends State<MyApp> {
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
-                  onPressed: () =>
-                      setState(() => unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
+                  onPressed: () => setState(() => unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
                   child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
                   textColor: unselectedColor,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 size: Size(64, 64),
               ),
-              IconButton(onPressed: () {
-                if (zoomed) {
-                  controller.resetZoom();
-                } else {
-                  controller.zoomToOriginalSize();
-                }
+              IconButton(
+                  onPressed: () {
+                    if (zoomed) {
+                      controller.resetZoom();
+                    } else {
+                      controller.zoomToOriginalSize();
+                    }
 
-                setState(() {
-                  zoomed = !zoomed;
-                });
-              },
-                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))
-              ),
+                    setState(() {
+                      zoomed = !zoomed;
+                    });
+                  },
+                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
             ],
           ),
         ),

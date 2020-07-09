@@ -18,12 +18,13 @@ import '../mocks/test_mocks.dart';
 void main() {
   group("Scale Bloc Test", () {
     MetadataRepository mockedMetadataRepository;
+    final defaultOffset = Offset(25, 50);
 
     setUp(() {
       mockedMetadataRepository = MockedMetadataRepository();
 
       when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
-      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 100)]));
+      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(50, 100)]));
       when(mockedMetadataRepository.screenSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
       when(mockedMetadataRepository.zoomFactorForOriginalSize).thenAnswer((_) async => 2.0);
       when(mockedMetadataRepository.zoomFactorToFillScreen).thenReturn(5.0);
@@ -42,6 +43,7 @@ void main() {
       skip: 0,
       expect: [
         ScaleState(Offset(0, 0), 1.0, Matrix4.identity()),
+        ScaleState(defaultOffset, 1.0, Matrix4.identity()..translate(defaultOffset.dx, defaultOffset.dy)),
       ],
     );
 
@@ -54,7 +56,7 @@ void main() {
           bloc.add(ScaleUpdateEvent(Offset(10, 0), 1.0));
         },
         expect: [
-          ScaleState(Offset(10, 50), 1.0, Matrix4.identity()..translate(10.0, 50.0)),
+          ScaleState(defaultOffset + Offset(10, 0), 1.0, Matrix4.identity()..translate(defaultOffset.dx + 10.0, defaultOffset.dy)),
         ],
       );
 
@@ -67,10 +69,10 @@ void main() {
         },
         expect: [
           ScaleState(
-              Offset(0, 50),
+              defaultOffset,
               2.0,
               Matrix4.identity()
-                ..translate(0.0, 50.0)
+                ..translate(defaultOffset.dx, defaultOffset.dy)
                 ..scale(2.0)),
         ],
       );
@@ -84,10 +86,10 @@ void main() {
         },
         expect: [
           ScaleState(
-              Offset(0, 50),
+              defaultOffset,
               1.0,
               Matrix4.identity()
-                ..translate(0.0, 50.0)
+                ..translate(defaultOffset.dx, defaultOffset.dy)
                 ..scale(1.0)),
         ],
       );
@@ -104,10 +106,10 @@ void main() {
         },
         expect: [
           ScaleState(
-              Offset(10, 50),
+              defaultOffset + Offset(10, 0),
               2.0,
               Matrix4.identity()
-                ..translate(10.0, 50.0)
+                ..translate(defaultOffset.dx + 10, defaultOffset.dy)
                 ..scale(2.0)),
         ],
       );
@@ -124,10 +126,10 @@ void main() {
         },
         expect: [
           ScaleState(
-              Offset(0, 50),
+              defaultOffset,
               6.0,
               Matrix4.identity()
-                ..translate(0.0, 50.0)
+                ..translate(defaultOffset.dx, defaultOffset.dy)
                 ..scale(6.0)),
         ],
       );
@@ -140,29 +142,11 @@ void main() {
         act: (bloc) async => bloc.add(ScaleDoubleTapEvent()),
         expect: [
           ScaleState(
-              Offset(0, 50),
+              defaultOffset,
               5.0,
               Matrix4.identity()
-                ..translate(0.0, 50.0)
+                ..translate(defaultOffset.dx, defaultOffset.dy)
                 ..scale(5.0)),
-        ],
-      );
-    });
-
-    group("measurement function calls", () {
-      blocTest(
-        "zoom to original",
-        build: () async => ScaleBloc(),
-        act: (bloc) async {
-          (bloc as ScaleBloc).zoomToOriginal();
-        },
-        expect: [
-          ScaleState(
-              Offset(0, 50),
-              2.0,
-              Matrix4.identity()
-                ..translate(0.0, 50.0)
-                ..scale(2.0)),
         ],
       );
     });

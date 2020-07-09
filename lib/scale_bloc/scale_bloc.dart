@@ -150,7 +150,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   @override
   bool zoomToOriginal() {
-    if (!_originalScale.isInBounds(_minScale, _maxScale)) return false;
+    if (!(_originalScale?.isInBounds(_minScale, _maxScale) ?? false)) return false;
 
     add(ScaleOriginalEvent());
     return true;
@@ -163,11 +163,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   void _updateDefaultOffset() {
     if (_screenSize == null || _viewSize == null) return;
 
-    if (_metadataRepository.isDocumentWidthAlignedWithScreenWidth(_screenSize)) {
-      defaultOffset = Offset(0, (_screenSize.height - _viewSize.height) / 2.0);
-    } else {
-      defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, 0);
-    }
+    defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, (_screenSize.height - _viewSize.height) / 2.0);
 
     add(ScaleCenterUpdatedEvent());
     _registerResizing();
