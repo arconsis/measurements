@@ -7,23 +7,21 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 
-abstract class MeasureState extends Equatable {
-}
+abstract class MagnificationState extends Equatable {}
 
-class MeasureInactiveState extends MeasureState {
+class MagnificationInactiveState extends MagnificationState {
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
 }
 
-class MeasureActiveState extends MeasureState {
+class MagnificationActiveState extends MagnificationState {
   final Offset position;
   final Offset absolutePosition;
   final Offset magnificationOffset;
   final Image backgroundImage;
   final double imageScaleFactor;
 
-
-  MeasureActiveState(this.position, this.magnificationOffset, {this.absolutePosition, this.backgroundImage, this.imageScaleFactor});
+  MagnificationActiveState(this.position, this.magnificationOffset, {this.absolutePosition, this.backgroundImage, this.imageScaleFactor});
 
   @override
   List<Object> get props => [position, absolutePosition, magnificationOffset, backgroundImage, imageScaleFactor];

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 ///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
@@ -15,7 +14,6 @@ import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
-
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -136,6 +134,7 @@ void main() {
         );
 
         metadataRepository.registerBackgroundChange(expectedImage, viewSize);
+        metadataRepository.registerScreenSize(Size(200, 300));
 
         expect(await metadataRepository.zoomFactorForOriginalSize, equals(expectedZoomFactor));
       });

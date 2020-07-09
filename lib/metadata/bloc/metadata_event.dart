@@ -11,8 +11,7 @@ import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 
-abstract class MetadataEvent extends Equatable {
-}
+abstract class MetadataEvent extends Equatable {}
 
 class MetadataBackgroundEvent extends MetadataEvent {
   final ui.Image backgroundImage;
@@ -67,19 +66,31 @@ class MetadataOrientationEvent extends MetadataEvent {
   }
 }
 
-class MetadataUpdatedEvent extends MetadataEvent {
-  final bool measure;
-  final Orientation orientation;
-  final double zoom;
-  final double maxZoom;
+class MetadataScreenSizeEvent extends MetadataEvent {
+  final Size screenSize;
 
-  MetadataUpdatedEvent(this.measure, this.orientation, this.zoom, this.maxZoom);
+  MetadataScreenSizeEvent(this.screenSize);
 
   @override
-  List<Object> get props => [measure, orientation, zoom, maxZoom];
+  List<Object> get props => [screenSize];
 
   @override
   String toString() {
-    return super.toString() + " measure: $measure, orientation: $orientation, zoom: $zoom, maxZoom: $maxZoom";
+    return super.toString() + " screenSize: $screenSize";
+  }
+}
+
+class MetadataDeleteRegionEvent extends MetadataEvent {
+  final Offset position;
+  final Size deleteSize;
+
+  MetadataDeleteRegionEvent(this.position, this.deleteSize);
+
+  @override
+  List<Object> get props => [position, deleteSize];
+
+  @override
+  String toString() {
+    return super.toString() + " position: $position, deleteSize: $deleteSize";
   }
 }

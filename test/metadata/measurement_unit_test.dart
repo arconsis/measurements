@@ -4,7 +4,7 @@
 ///
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measurements/metadata/measurement_information.dart';
+import 'package:measurements/measurement_information.dart';
 
 void main() {
   final differenceThreshold = 0.0000001;
