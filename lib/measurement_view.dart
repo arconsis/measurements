@@ -48,6 +48,7 @@ class _DeleteChild extends StatelessWidget {
 class Measurement extends StatelessWidget {
   final Widget child;
   final Widget deleteChild;
+  final Alignment deleteChildAlignment;
   final bool measure;
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
@@ -61,6 +62,7 @@ class Measurement extends StatelessWidget {
     Key key,
     @required this.child,
     this.deleteChild = const _DeleteChild(),
+    this.deleteChildAlignment = Alignment.bottomCenter,
     this.measure = false,
     this.showDistanceOnLine = false,
     this.measurementInformation = const MeasurementInformation.A4(),
@@ -89,6 +91,7 @@ class Measurement extends StatelessWidget {
       child: MeasurementView(
         child,
         deleteChild,
+        deleteChildAlignment,
         measure,
         showDistanceOnLine,
         measurementInformation,
@@ -110,6 +113,7 @@ class MeasurementView extends StatelessWidget {
 
   final Widget child;
   final Widget deleteChild;
+  final Alignment deleteChildAlignment;
   final bool measure;
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
@@ -122,6 +126,7 @@ class MeasurementView extends StatelessWidget {
   MeasurementView(
     this.child,
     this.deleteChild,
+    this.deleteChildAlignment,
     this.measure,
     this.showDistanceOnLine,
     this.measurementInformation,
@@ -221,7 +226,7 @@ class MeasurementView extends StatelessWidget {
                 distanceStyle: distanceStyle,
               ),
               Align(
-                alignment: Alignment.bottomCenter,
+                alignment: deleteChildAlignment,
                 child: Container(
                   key: _deleteKey,
                   child: deleteChild,
