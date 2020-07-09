@@ -1,8 +1,14 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/bloc/metadata_bloc.dart';
 import 'package:measurements/metadata/bloc/metadata_event.dart';
 import 'package:measurements/metadata/bloc/metadata_state.dart';
@@ -11,9 +17,7 @@ import 'package:measurements/style/magnification_style.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MockMetadataRepository extends Mock implements MetadataRepository {}
-
-class MockImage extends Mock implements Image {}
+import '../../mocks/test_mocks.dart';
 
 void main() {
   group("Metadata Bloc Unit Test", () {
@@ -21,28 +25,24 @@ void main() {
     BehaviorSubject<bool> measurement;
     Image mockedImage;
 
-    final documentSize = Size(210, 297);
-    final scale = 1.0;
-    final zoom = 1.0;
+    final measurementInformation = MeasurementInformation.A4(scale: 1.0);
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
+    final measurementController = MeasurementController();
 
     final startedEvent = MetadataStartedEvent(
-        documentSize,
-        null,
-        null,
-        scale,
-        zoom,
-        measure,
-        showDistance,
-        magnificationStyle
+      measurementInformation: measurementInformation,
+      measure: measure,
+      showDistances: showDistance,
+      magnificationStyle: magnificationStyle,
+      controller: measurementController,
     );
 
     setUp(() {
-      mockedImage = MockImage();
+      mockedImage = MockedImage.mock;
       measurement = BehaviorSubject();
-      mockedRepository = MockMetadataRepository();
+      mockedRepository = MockedMetadataRepository();
       GetIt.I.registerSingleton(mockedRepository);
     });
 
@@ -51,60 +51,82 @@ void main() {
       measurement?.close();
     });
 
-    blocTest("initial state",
+    blocTest(
+      "initial state",
+      skip: 0,
+      build: () async => MetadataBloc(),
+      expect: [MetadataState()],
+    );
+
+    group("metadata events", () {
+      blocTest(
+        "started event",
+        build: () async => MetadataBloc(),
+        act: (bloc) => bloc.add(startedEvent),
+        verify: (MetadataBloc bloc) async {
+          verify(mockedRepository.registerStartupValuesChange(
+            measurementInformation: measurementInformation,
+            measure: measure,
+            showDistance: showDistance,
+            magnificationStyle: magnificationStyle,
+            controller: measurementController,
+          )).called(1);
+        },
+      );
+
+      blocTest(
+        "background event",
         skip: 0,
+        build: () async => MetadataBloc(),
+        act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
+        verify: (MetadataBloc bloc) async {
+          verify(mockedRepository.registerBackgroundChange(
+            mockedImage,
+            Size(300, 400),
+          )).called(1);
+        },
+      );
+
+      blocTest(
+        "delete region event",
+        build: () async => MetadataBloc(),
+        act: (bloc) => bloc.add(MetadataDeleteRegionEvent(Offset(10, 10), Size(10, 10))),
+        verify: (MetadataBloc bloc) async {
+          verify(mockedRepository.registerDeleteRegion(Offset(10, 10), Size(10, 10)));
+        },
+      );
+
+      blocTest(
+        "started, background and delete event",
         build: () async {
-          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
 
           return MetadataBloc();
         },
-        expect: [MetadataState(false)]);
-
-    group("metadata events", () {
-      blocTest("started event should show measurements",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-
-            return MetadataBloc();
-          },
-          act: (bloc) => bloc.add(startedEvent),
-          expect: [MetadataState(true)]
-      );
-
-      blocTest("background registered",
-          skip: 0,
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
-
-            return MetadataBloc();
-          },
-          act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
-          expect: [MetadataState(false)]
-      );
-
-      blocTest("started and background event",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-
-            return MetadataBloc();
-          },
-          act: (bloc) {
-            bloc.add(startedEvent);
-            bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
-            return;
-          },
-          expect: [MetadataState(true)]
-      );
-    });
-
-    group("UI events", () {
-      blocTest("enable and disable measurement",
-          build: () async {
-            when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true, false]));
-
-            return MetadataBloc();
-          },
-          expect: [MetadataState(true), MetadataState(false)]
+        act: (bloc) async {
+          bloc.add(startedEvent);
+          bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400)));
+          bloc.add(MetadataDeleteRegionEvent(Offset(10, 10), Size(10, 10)));
+        },
+        verify: (MetadataBloc bloc) async {
+          verifyInOrder([
+            mockedRepository.registerStartupValuesChange(
+              measurementInformation: measurementInformation,
+              measure: measure,
+              showDistance: showDistance,
+              magnificationStyle: magnificationStyle,
+              controller: measurementController,
+            ),
+            mockedRepository.registerBackgroundChange(
+              mockedImage,
+              Size(300, 400),
+            ),
+            mockedRepository.registerDeleteRegion(
+              Offset(10, 10),
+              Size(10, 10),
+            ),
+          ]);
+        },
       );
     });
   });

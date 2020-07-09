@@ -1,38 +1,31 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
 import 'package:measurements/style/point_style.dart';
-import 'package:measurements/util/logger.dart';
 
 class MeasurePainter extends material.CustomPainter {
-  final Logger _logger = Logger(LogDistricts.MEASURE_PAINTER);
   final Offset start, end;
   final PointStyle style;
+  final Paint dotPaint, pathPaint;
 
-  final Paint _dotPaint = Paint(),
-      _pathPaint = Paint();
-
-  Path _drawPath;
+  final Path _drawPath = Path();
   double _dotRadius;
 
-  MeasurePainter({@material.required this.start, @material.required this.end, @material.required this.style}) {
-    _dotPaint.color = style.dotColor;
+  MeasurePainter({@material.required this.start, @material.required this.end, @material.required this.style, @material.required this.dotPaint, @material.required this.pathPaint}) {
     _dotRadius = style.dotRadius;
 
     LineType lineType = style.lineType;
-    _pathPaint.style = PaintingStyle.stroke;
-    _drawPath = Path();
+    _drawPath.reset();
     _drawPath.moveTo(start.dx, start.dy);
 
     if (lineType is SolidLine) {
-      _pathPaint.color = lineType.lineColor;
-      _pathPaint.strokeWidth = lineType.lineWidth;
-
       _drawPath.lineTo(end.dx, end.dy);
     } else if (lineType is DashedLine) {
-      _pathPaint.color = lineType.lineColor;
-      _pathPaint.strokeWidth = lineType.dashWidth;
-
       double distance = (end - start).distance;
 
       Offset solidOffset = (end - start) * lineType.dashLength / distance;
@@ -58,16 +51,14 @@ class MeasurePainter extends material.CustomPainter {
     } else {
       throw UnimplementedError("This line type is not supported! Type was: $style");
     }
-
-    _logger.log("drawing from $start to $end");
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(start, _dotRadius, _dotPaint);
-    canvas.drawCircle(end, _dotRadius, _dotPaint);
+    canvas.drawCircle(start, _dotRadius, dotPaint);
+    canvas.drawCircle(end, _dotRadius, dotPaint);
 
-    canvas.drawPath(_drawPath, _pathPaint);
+    canvas.drawPath(_drawPath, pathPaint);
   }
 
   @override

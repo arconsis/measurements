@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -5,7 +10,6 @@ import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 
 class MagnifyingPainter extends CustomPainter {
-  final Logger _logger = Logger(LogDistricts.MAGNIFYING_PAINTER);
   final Offset fingerPosition;
   final ui.Image image;
   final MagnificationStyle style;
@@ -16,15 +20,15 @@ class MagnifyingPainter extends CustomPainter {
   RRect _outerCircle, _innerCircle;
   Rect _imageTargetRect, _imageSourceRect;
 
-  MagnifyingPainter({@required this.fingerPosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
+  MagnifyingPainter({@required this.fingerPosition, @required Offset absolutePosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
     _drawPosition = fingerPosition - magnificationOffset;
 
     double diameter = 2 * style.magnificationRadius;
 
-    _outerCircle = getCircle(_drawPosition, style.magnificationRadius + style.outerCircleThickness);
     _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
+    _outerCircle = _innerCircle.inflate(style.outerCircleThickness);
 
-    _imageSourceRect = Rect.fromCenter(center: fingerPosition * imageScaleFactor, width: diameter, height: diameter);
+    _imageSourceRect = Rect.fromCenter(center: absolutePosition * imageScaleFactor, width: diameter, height: diameter);
     _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
 
     _drawPaint.color = style.magnificationColor;

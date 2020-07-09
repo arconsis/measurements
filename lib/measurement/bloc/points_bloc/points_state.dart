@@ -1,3 +1,8 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
@@ -52,7 +57,7 @@ class PointsAndDistanceState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + " drawingHolder: $holders -- viewCenter: $viewCenter -- tolerance: $tolerance";
+    return super.toString() + " drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance";
   }
 }
 
@@ -66,6 +71,6 @@ class PointsAndDistanceActiveState extends PointsAndDistanceState {
 
   @override
   String toString() {
-    return super.toString() + " -- nullIndex: $nullIndices";
+    return super.toString() + " nullIndex: $nullIndices";
   }
 }

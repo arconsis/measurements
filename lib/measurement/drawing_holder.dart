@@ -1,10 +1,16 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
+import 'package:measurements/measurements.dart';
 
 class DrawingHolder extends Equatable {
   final List<Offset> points;
-  final List<double> distances;
+  final List<LengthUnit> distances;
 
   DrawingHolder(this.points, this.distances);
 

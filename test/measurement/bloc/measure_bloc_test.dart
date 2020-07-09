@@ -1,11 +1,18 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
+import 'package:measurements/input_bloc/input_bloc.dart';
+import 'package:measurements/input_bloc/input_state.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_event.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_state.dart';
 import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
@@ -18,65 +25,69 @@ void main() {
 
     MetadataRepository mockedMetadataRepository;
     MeasurementRepository mockedMeasurementRepository;
+    InputBloc mockedInputBloc;
 
     setUp(() {
       mockedMetadataRepository = MockedMetadataRepository();
       mockedMeasurementRepository = MockedMeasurementRepository();
+      mockedInputBloc = MockedInputBloc();
 
       when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
       when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);
       GetIt.I.registerSingleton(mockedMetadataRepository);
+
+      whenListen(mockedInputBloc, Stream.fromIterable(<InputState>[]));
     });
 
     tearDown(() {
       GetIt.I.unregister(instance: mockedMetadataRepository);
       GetIt.I.unregister(instance: mockedMeasurementRepository);
+      mockedInputBloc.close();
     });
 
-    blocTest("initial state",
-        skip: 0,
-        build: () async {
-          when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
-          when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
+    blocTest(
+      "initial state",
+      skip: 0,
+      build: () async {
+        when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
+        when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
 
-          return MeasureBloc();
-        },
-        expect: [MeasureInactiveState()]
+        return MagnificationBloc(mockedInputBloc);
+      },
+      expect: [MagnificationInactiveState()],
     );
 
     group("UI events", () {
-      blocTest("stroke events",
-          build: () async {
-            when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
-            when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
+      blocTest(
+        "stroke events",
+        build: () async {
+          when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
+          when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
-            return MeasureBloc();
-          },
-          act: (bloc) {
-            bloc.add(MeasureDownEvent(Offset(0, 0)));
-            bloc.add(MeasureMoveEvent(Offset(10, 10)));
-            bloc.add(MeasureUpEvent(Offset(10, 10)));
+          return MagnificationBloc(mockedInputBloc);
+        },
+        act: (bloc) async {
+          bloc.add(MagnificationShowEvent(Offset(0, 0)));
+          bloc.add(MagnificationShowEvent(Offset(10, 10)));
+          bloc.add(MagnificationHideEvent());
+        },
+        expect: [
+          MagnificationActiveState(Offset(0, 0), Offset(-10, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+          MagnificationActiveState(Offset(10, 10), Offset(0, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+          MagnificationInactiveState()
+        ],
+        verify: (_) async {
+          verifyInOrder([
+            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
+            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
+          ]);
 
-            return;
-          },
-          expect: [
-            MeasureActiveState(Offset(0, 0), Offset(-10, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
-            MeasureActiveState(Offset(10, 10), Offset(0, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
-            MeasureInactiveState()
-          ],
-          verify: (_) {
-            verifyInOrder([
-              mockedMeasurementRepository.registerDownEvent(Offset(0, 0)),
-              mockedMeasurementRepository.registerMoveEvent(Offset(10, 10)),
-              mockedMeasurementRepository.registerUpEvent(Offset(10, 10)),
-            ]);
-
-            verifyNoMoreInteractions(mockedMeasurementRepository);
-
-            return;
-          });
+          verifyNoMoreInteractions(mockedMeasurementRepository);
+        },
+      );
     });
   });
 }

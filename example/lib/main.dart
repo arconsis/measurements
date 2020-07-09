@@ -1,3 +1,9 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
@@ -19,20 +25,21 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = true;
+  bool measure = false;
   bool showDistanceOnLine = true;
+  bool showTolerance = false;
+  bool zoomed = false;
 
-  Function(List<double>) distanceCallback;
+  List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
+  int unitIndex = 0;
+
+  MeasurementController controller;
 
   @override
   void initState() {
     super.initState();
 
-    distanceCallback = (List<double> distance) {
-      setState(() {
-        this.title = "Measurement#: ${distance.length}";
-      });
-    };
+    controller = MeasurementController();
   }
 
   Color getButtonColor(bool selected) {
@@ -51,31 +58,61 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Color(0xff1280b3),
           title: Row(
             children: <Widget>[
-              IconButton(onPressed: () {
-                setState(() {
-                  measure = !measure;
-                  title = originalTitle;
-                });
-              },
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))
+              IconButton(
+                  onPressed: () => setState(() {
+                        measure = !measure;
+                        title = originalTitle;
+                      }),
+                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
+              IconButton(onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine), icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))),
+              SizedBox.fromSize(
+                child: MaterialButton(
+                  shape: CircleBorder(),
+                  onPressed: () => setState(() => showTolerance = !showTolerance),
+                  child: Text("±"),
+                  textColor: getButtonColor(showTolerance),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                size: Size(52, 52),
               ),
-              IconButton(onPressed: () {
-                setState(() {
-                  showDistanceOnLine = !showDistanceOnLine;
-                });
-              },
-                  icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))
+              SizedBox.fromSize(
+                child: MaterialButton(
+                  shape: CircleBorder(),
+                  onPressed: () => setState(() => unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
+                  child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
+                  textColor: unselectedColor,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                size: Size(64, 64),
               ),
-              Text(title),
+              IconButton(
+                  onPressed: () {
+                    if (zoomed) {
+                      controller.resetZoom();
+                    } else {
+                      controller.zoomToOriginalSize();
+                    }
+
+                    setState(() {
+                      zoomed = !zoomed;
+                    });
+                  },
+                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
             ],
           ),
         ),
         body: Center(
           child: Measurement(
-            child: Image.asset("assets/images/example_portrait.png",),
-            scale: 1 / 2.0,
-            distanceCallback: distanceCallback,
+            child: Image.asset("assets/images/floorplan448x449mm.png",),
+            measurementInformation: MeasurementInformation(
+              scale: 1 / 50.0,
+              documentWidthInLengthUnits: Millimeter(448),
+              documentHeightInLengthUnits: Millimeter(449),
+              targetLengthUnit: unitsOfMeasurement[unitIndex],
+            ),
+            controller: controller,
             showDistanceOnLine: showDistanceOnLine,
+            distanceStyle: DistanceStyle(numDecimalPlaces: 2, showTolerance: showTolerance),
             measure: measure,
             pointStyle: PointStyle(lineType: DashedLine()),
           ),

@@ -14,7 +14,7 @@ dependencies:
   flutter_bloc: 4.0.0
   get_it: 4.0.2
   image: 2.1.12
-  path_provider: 1.6.8
+  path_provider: 1.6.9
   rxdart: 0.24.1
 
 dev_dependencies:

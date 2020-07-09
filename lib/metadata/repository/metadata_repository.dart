@@ -1,113 +1,203 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'dart:ui';
 
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' as widget;
+import 'package:measurements/measurements.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/util/logger.dart';
 import 'package:rxdart/subjects.dart';
-
 
 class MetadataRepository {
   final _logger = Logger(LogDistricts.METADATA_REPOSITORY);
 
   final _enableMeasure = BehaviorSubject<bool>.seeded(false);
   final _showDistance = BehaviorSubject<bool>();
-  final _transformationFactor = BehaviorSubject<double>();
-  final _imageScaleFactor = BehaviorSubject<double>();
-  final _currentBackgroundImage = BehaviorSubject<Image>();
-  final _viewCenter = BehaviorSubject<Offset>();
-  final _distanceCallback = BehaviorSubject<Function(List<double>)>();
-  final _toleranceCallback = BehaviorSubject<Function(double)>();
-
-  final _documentSize = BehaviorSubject<Size>();
-  final _scale = BehaviorSubject<double>();
-  final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
-  final _viewSize = BehaviorSubject<Size>();
+  final _measurementInformation = BehaviorSubject<MeasurementInformation>();
+  final _unitOfMeasurement = BehaviorSubject<LengthUnit>();
   final _magnificationRadius = BehaviorSubject<double>();
+  final _controller = BehaviorSubject<MeasurementController>();
 
-  final _viewWidthChangeFactor = BehaviorSubject<double>();
+  final _imageScaleFactor = BehaviorSubject<double>();
+  final _imageToDocumentFactor = BehaviorSubject<double>();
+  final _currentBackgroundImage = BehaviorSubject<Image>();
+  final _screenSize = BehaviorSubject<Size>();
+  final _viewSize = BehaviorSubject<Size>();
+  final _viewCenter = BehaviorSubject<Offset>();
 
-  MetadataRepository() {
-    _logger.log("Created repository");
-  }
+  final _transformationFactor = BehaviorSubject<LengthUnit>();
+  final _tolerance = BehaviorSubject<double>();
+
+  final _zoomLevel = BehaviorSubject<double>.seeded(1.0);
+  final _contentPosition = BehaviorSubject<Offset>();
+
+  Rect _deleteRegion;
+
+  MetadataRepository();
 
   Stream<bool> get measurement => _enableMeasure.stream;
 
   Stream<bool> get showDistances => _showDistance.stream;
 
-  Stream<double> get transformationFactor => _transformationFactor.stream;
+  Stream<LengthUnit> get transformationFactor => _transformationFactor.stream;
+
+  Stream<MeasurementController> get controller => _controller.stream;
+
+  Stream<LengthUnit> get unitOfMeasurement => _unitOfMeasurement.stream;
+
+  Stream<double> get zoom => _zoomLevel.stream;
+
+  Stream<Offset> get backgroundPosition => _contentPosition.stream;
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
+
+  Stream<double> get imageToDocumentScaleFactor => _imageToDocumentFactor.stream;
 
   Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
 
   Stream<Offset> get viewCenter => _viewCenter.stream;
 
-  Stream<double> get tolerance => _transformationFactor.stream;
+  Stream<double> get tolerance => _tolerance.stream;
+
+  Stream<Size> get screenSize => _screenSize.stream;
 
   Stream<Size> get viewSize => _viewSize.stream;
 
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
 
-  Stream<double> get viewScaleFactor => _viewWidthChangeFactor.stream;
+  Future<double> get zoomFactorForOriginalSize async {
+    double pixelPerInch = await MethodChannel("measurements").invokeMethod("getPhysicalPixelsPerInch");
+    Size screenSize = _screenSize.value;
 
-  Stream<Function(List<double>)> get callback => _distanceCallback.stream;
+    if (screenSize == null) return 1;
 
+    MeasurementInformation information = _measurementInformation.value;
 
-  void registerStartupValuesChange(bool measure, bool showDistance, Function(List<double>) callback, Function(double) toleranceCallback, double scale, double zoom, Size documentSize,
-      MagnificationStyle magnificationStyle) {
+    if (isDocumentWidthAlignedWithScreenWidth(screenSize)) {
+      return information.documentWidthInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.width * information.scale * window.devicePixelRatio);
+    } else {
+      return information.documentHeightInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.height * information.scale * window.devicePixelRatio);
+    }
+  }
+
+  double get zoomFactorToFillScreen {
+    if (_screenSize.value == null) return 1.0;
+
+    if (isDocumentWidthAlignedWithScreenWidth(_screenSize.value)) {
+      return _screenSize.value.height / _screenSize.value.width;
+    } else {
+      return _screenSize.value.width / _screenSize.value.height;
+    }
+  }
+
+  void registerStartupValuesChange({
+    @widget.required MeasurementInformation measurementInformation,
+    @widget.required bool measure,
+    @widget.required bool showDistance,
+    @widget.required MagnificationStyle magnificationStyle,
+    @widget.required MeasurementController controller,
+  }) {
+    _measurementInformation.value = measurementInformation;
+    _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
-    _distanceCallback.value = callback;
-    _toleranceCallback.value = toleranceCallback;
-    _scale.value = scale;
-    _zoomLevel.value = zoom;
-    _documentSize.value = documentSize;
     _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
+    _controller.value = controller;
 
     _updateTransformationFactor();
   }
 
   void registerBackgroundChange(Image backgroundImage, Size size) {
     _currentBackgroundImage.value = backgroundImage;
+    _viewSize.value = size;
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
-    if (_viewSize.value == null) {
-      _viewSize.value = size;
-    } else if (_viewSize.value.width != size.width) {
-      _viewWidthChangeFactor.value = size.width / _viewSize.value.width;
-      _viewSize.value = size;
-    }
+    _logger.log("view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size $size");
 
+    _updateImageToDocumentFactor(size);
     _updateTransformationFactor();
   }
 
+  void registerResizing(Offset position, double zoom) {
+    _logger.log("Offset: $position, zoom: $zoom");
+    _contentPosition.value = position;
+    _zoomLevel.value = zoom;
+    _updateTransformationFactor();
+  }
+
+  void registerDeleteRegion(Offset position, Size size) => _deleteRegion = Rect.fromPoints(position, position + Offset(size.width, size.height));
+
+  void registerScreenSize(Size size) {
+    _screenSize.value = size;
+    _logger.log("_screenSize: ${_screenSize.value}");
+  }
+
+  void registerMeasurementFunction(MeasurementFunction function) {
+    _controller.value?.measurementFunction = function;
+  }
+
+  bool isInDeleteRegion(Offset position) => _deleteRegion.contains(position);
+
+  bool isDocumentWidthAlignedWithScreenWidth(Size screenSize) {
+    final documentAspectRatio = _getDocumentWidth() / _getDocumentHeight();
+    final backgroundAspectRatio = screenSize.width / screenSize.height;
+
+    return documentAspectRatio > backgroundAspectRatio;
+  }
+
   void dispose() {
-    _documentSize.close();
-    _distanceCallback.close();
-    _toleranceCallback.close();
-    _scale.close();
-    _zoomLevel.close();
-    _showDistance.close();
     _enableMeasure.close();
-    _currentBackgroundImage.close();
-    _viewSize.close();
+    _showDistance.close();
+    _measurementInformation.close();
+    _unitOfMeasurement.close();
     _magnificationRadius.close();
-    _viewCenter.close();
+    _controller.close();
+
+    _currentBackgroundImage.close();
     _imageScaleFactor.close();
+    _imageToDocumentFactor.close();
+    _screenSize.close();
+    _viewSize.close();
+    _viewCenter.close();
+
     _transformationFactor.close();
-    _viewWidthChangeFactor.close();
+    _tolerance.close();
+
+    _contentPosition.close();
+    _zoomLevel.close();
+  }
+
+  double _getDocumentWidth() => _measurementInformation.value.documentWidthInLengthUnits.value.toDouble();
+
+  double _getDocumentHeight() => _measurementInformation.value.documentHeightInLengthUnits.value.toDouble();
+
+  void _updateImageToDocumentFactor(Size viewSize) {
+    if (_screenSize.value == null) return;
+
+    if (isDocumentWidthAlignedWithScreenWidth(viewSize)) {
+      _imageToDocumentFactor.value = _getDocumentWidth() / viewSize.width;
+    } else {
+      _imageToDocumentFactor.value = _getDocumentHeight() / viewSize.height;
+    }
   }
 
   void _updateTransformationFactor() async {
-    if (_scale.hasValue && _zoomLevel.hasValue && _viewSize.hasValue && _documentSize.hasValue) {
-      double scale = _scale.value;
+    if (_zoomLevel.hasValue && _viewSize.hasValue && _measurementInformation.hasValue) {
       double zoomLevel = _zoomLevel.value;
       double viewWidth = _viewSize.value.width;
-      double documentWidth = _documentSize.value.width;
+      MeasurementInformation measurementInfo = _measurementInformation.value;
 
-      _transformationFactor.value = documentWidth / (scale * viewWidth * zoomLevel);
+      _transformationFactor.value = measurementInfo.documentToTargetFactor / measurementInfo.scale;
+      _tolerance.value = measurementInfo.documentWidthInUnitOfMeasurement.value / (measurementInfo.scale * viewWidth) / zoomLevel;
 
-      _logger.log("tolerance is: ${_transformationFactor.value}mm");
+      _controller.value?.tolerance = _tolerance.value;
+
+      _logger.log("tolerance is: ${_transformationFactor.value}");
       _logger.log("updated transformationFactor");
     }
   }

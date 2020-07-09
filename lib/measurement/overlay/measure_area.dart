@@ -1,10 +1,15 @@
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_bloc.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_event.dart';
-import 'package:measurements/measurement/bloc/measure_bloc/measure_state.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:measurements/measurement/bloc/magnification_bloc/magnification_state.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/measurement_information.dart';
 import 'package:measurements/style/distance_style.dart';
 import 'package:measurements/style/magnification_style.dart';
 import 'package:measurements/style/point_style.dart';
@@ -18,37 +23,47 @@ import 'painters/measure_painter.dart';
 class MeasureArea extends StatelessWidget {
   final _logger = Logger(LogDistricts.MEASURE_AREA);
 
-  final Widget child;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
+  final Paint dotPaint = Paint(), pathPaint = Paint();
 
-  MeasureArea({@required this.child, @required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle});
+  MeasureArea({@required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
+    LineType lineType = pointStyle.lineType;
+    double strokeWidth;
+    if (lineType is SolidLine) {
+      strokeWidth = lineType.lineWidth;
+    } else if (lineType is DashedLine) {
+      strokeWidth = lineType.dashWidth;
+    } else {
+      throw UnimplementedError("This line type is not supported! Type was: $lineType");
+    }
+
+    dotPaint.color = pointStyle.dotColor;
+
+    pathPaint
+      ..style = PaintingStyle.stroke
+      ..color = pointStyle.lineType.lineColor
+      ..strokeWidth = strokeWidth;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-        onPointerDown: (PointerDownEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureDownEvent(event.localPosition)),
-        onPointerMove: (PointerMoveEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureMoveEvent(event.localPosition)),
-        onPointerUp: (PointerUpEvent event) =>
-            BlocProvider.of<MeasureBloc>(context).add(MeasureUpEvent(event.localPosition)),
-        child: Stack(
-          children: <Widget>[
-            BlocBuilder<PointsBloc, PointsState>(
-              builder: (context, state) => _pointsOverlay(state, child),
-            ),
-            BlocBuilder<MeasureBloc, MeasureState>(
-              builder: (context, state) => _magnificationOverlay(state),
-            ),
-          ],
-        )
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        BlocBuilder<PointsBloc, PointsState>(
+          builder: (context, state) => _pointsOverlay(state),
+        ),
+        BlocBuilder<MagnificationBloc, MagnificationState>(
+          builder: (context, state) => _magnificationOverlay(state),
+        ),
+      ],
     );
   }
 
-  Stack _pointsOverlay(PointsState state, Widget child) {
-    List<Widget> widgets = List.of([child]);
+  Stack _pointsOverlay(PointsState state) {
+    List<Widget> widgets = List();
 
     if (state is PointsSingleState) {
       widgets.add(_pointPainter(state.point, state.point));
@@ -60,7 +75,9 @@ class MeasureArea extends StatelessWidget {
       widgets.addAll(_pointsAndDistances(state));
     }
 
-    return Stack(children: widgets,);
+    return Stack(
+      children: widgets,
+    );
   }
 
   List<Widget> _onlyPoints(PointsOnlyState state) {
@@ -101,11 +118,13 @@ class MeasureArea extends StatelessWidget {
         start: first,
         end: last,
         style: pointStyle,
+        dotPaint: dotPaint,
+        pathPaint: pathPaint,
       ),
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, double distance, double tolerance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance, double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,
@@ -118,11 +137,12 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  Widget _magnificationOverlay(MeasureState state) {
-    if (state is MeasureActiveState) {
+  Widget _magnificationOverlay(MagnificationState state) {
+    if (state is MagnificationActiveState) {
       return CustomPaint(
         foregroundPainter: MagnifyingPainter(
           fingerPosition: state.position,
+          absolutePosition: state.absolutePosition,
           image: state.backgroundImage,
           imageScaleFactor: state.imageScaleFactor,
           style: magnificationStyle,
@@ -131,6 +151,8 @@ class MeasureArea extends StatelessWidget {
       );
     }
 
-    return Opacity(opacity: 0.0,);
+    return Opacity(
+      opacity: 0.0,
+    );
   }
 }

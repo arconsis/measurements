@@ -1,3 +1,10 @@
+import 'dart:async';
+
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
@@ -8,49 +15,39 @@ import 'metadata_state.dart';
 
 class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
-  final _initialMeasure = false;
 
   MetadataRepository _repository;
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
-
-    _repository.measurement.listen((bool measure) {
-      add(MetadataUpdatedEvent(measure));
-    });
-
-    _logger.log("Created Bloc");
   }
 
   @override
-  MetadataState get initialState => MetadataState(_initialMeasure);
+  MetadataState get initialState => MetadataState();
 
   @override
-  void onEvent(MetadataEvent event) {
+  void onEvent(MetadataEvent event) async {
     _logger.log("received event: $event");
 
     if (event is MetadataStartedEvent) {
       _repository.registerStartupValuesChange(
-          event.measure,
-          event.showDistances,
-          event.callback,
-          event.toleranceCallback,
-          event.scale,
-          event.zoom,
-          event.documentSize,
-          event.magnificationStyle
+        measurementInformation: event.measurementInformation,
+        measure: event.measure,
+        showDistance: event.showDistances,
+        controller: event.controller,
+        magnificationStyle: event.magnificationStyle,
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
+    } else if (event is MetadataDeleteRegionEvent) {
+      _repository.registerDeleteRegion(event.position, event.deleteSize);
+    } else if (event is MetadataScreenSizeEvent) {
+      _repository.registerScreenSize(event.screenSize);
     }
 
     super.onEvent(event);
   }
 
   @override
-  Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
-    if (event is MetadataUpdatedEvent) {
-      yield MetadataState(event.measure);
-    }
-  }
+  Stream<MetadataState> mapEventToState(MetadataEvent event) async* {}
 }

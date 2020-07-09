@@ -1,3 +1,13 @@
+import 'dart:math';
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
+
+///
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+///
+
 import 'logger.dart';
 
 extension IterableExtension on Iterable {
@@ -5,8 +15,7 @@ extension IterableExtension on Iterable {
     Iterator iterator = this.iterator;
     iterator.moveNext();
 
-    T current = iterator.current,
-        next;
+    T current = iterator.current, next;
 
     while (iterator.moveNext()) {
       next = iterator.current;
@@ -18,8 +27,7 @@ extension IterableExtension on Iterable {
   }
 
   void zip<T, K>(Iterable<T> iterable, Function(K, T) function) {
-    Iterator thisIterator = this.iterator,
-        otherIterator = iterable.iterator;
+    Iterator thisIterator = this.iterator, otherIterator = iterable.iterator;
 
     while (thisIterator.moveNext() && otherIterator.moveNext()) {
       K thisCurrent = thisIterator.current;
@@ -27,6 +35,22 @@ extension IterableExtension on Iterable {
 
       function(thisCurrent, otherCurrent);
     }
+  }
+}
+
+extension NumberExtension on num {
+  bool isInBounds(num lower, num upper) => this > lower && this < upper;
+
+  num fit(num lower, num upper) => min(max(lower, this), upper);
+}
+
+extension OffsetExtension on Offset {
+  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target, double threshold, double scale) {
+    Offset currentOffset = this + offset;
+    double thresholdOffset = min(mySize.width, mySize.height) * threshold;
+
+    return Offset((currentOffset.dx + target.dx).fit(-mySize.width + thresholdOffset, bounds.width - thresholdOffset),
+        (currentOffset.dy + target.dy).fit(-mySize.height + thresholdOffset, bounds.height - thresholdOffset));
   }
 }
 
