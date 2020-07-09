@@ -8,9 +8,9 @@ import 'package:rxdart/rxdart.dart';
 
 
 abstract class MeasurementFunction {
-  void zoomToOriginal();
+  bool zoomToOriginal();
 
-  void resetZoom();
+  bool resetZoom();
 }
 
 class MeasurementValues extends Equatable {
@@ -53,9 +53,9 @@ class MeasurementController {
     _currentValues.value = MeasurementValues(distances, tolerance);
   }
 
-  void zoomToOriginalSize() => _function?.zoomToOriginal();
+  bool zoomToOriginalSize() => _function?.zoomToOriginal();
 
-  void resetZoom() => _function?.resetZoom();
+  bool resetZoom() => _function?.resetZoom();
 
   void close() {
     _currentValues.close();

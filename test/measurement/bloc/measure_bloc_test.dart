@@ -81,8 +81,8 @@ void main() {
         ],
         verify: (_) async {
           verifyInOrder([
-            mockedMeasurementRepository.convertIntoAbsoluteTopLeftPosition(Offset(0, 0)),
-            mockedMeasurementRepository.convertIntoAbsoluteTopLeftPosition(Offset(10, 10)),
+            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
+            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
           ]);
 
           verifyNoMoreInteractions(mockedMeasurementRepository);

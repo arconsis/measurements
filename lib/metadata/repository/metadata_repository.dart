@@ -132,7 +132,10 @@ class MetadataRepository {
 
   void registerDeleteRegion(Offset position, Size size) => _deleteRegion = Rect.fromPoints(position, position + Offset(size.width, size.height));
 
-  void registerScreenSize(Size size) => _screenSize.value = size;
+  void registerScreenSize(Size size) {
+    _screenSize.value = size;
+    _logger.log("_screenSize: ${_screenSize.value}");
+  }
 
   void registerMeasurementFunction(MeasurementFunction function) {
     _controller.value?.measurementFunction = function;

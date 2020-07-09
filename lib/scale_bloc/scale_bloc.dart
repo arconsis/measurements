@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:measurements/measurement_controller.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'package:measurements/util/logger.dart';
+import 'package:measurements/util/utils.dart';
 
 import 'scale_event.dart';
 import 'scale_state.dart';
@@ -21,8 +21,8 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   final logger = Logger(LogDistricts.SCALE_BLOC);
   final List<StreamSubscription> subscriptions = List();
 
-  final double minScale = 1.0;
-  final double maxScale = 10.0;
+  final double _minScale = 1.0;
+  final double _maxScale = 10.0;
 
   MetadataRepository _metadataRepository;
 
@@ -70,9 +70,11 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
     if (event is ScaleOriginalEvent && _originalScale != null) {
       _currentScale = _originalScale;
       _accumulatedScale = _currentScale;
+      _registerResizing();
     } else if (event is ScaleResetEvent) {
       _currentScale = 1.0;
       _accumulatedScale = _currentScale;
+      _registerResizing();
     }
 
     if (_measure) return;
@@ -86,10 +88,8 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       if (event.scale == 1.0) {
         _workingTranslate = _currentTranslate + (event.position - _translateStart);
       } else {
-        _accumulatedScale = min(max(minScale, _currentScale * event.scale), maxScale);
+        _accumulatedScale = (_currentScale * event.scale).fit(_minScale, _maxScale);
       }
-
-      _metadataRepository.registerResizing(_workingTranslate, _accumulatedScale);
     } else if (event is ScaleDoubleTapEvent) {
       if (_currentScale == 1.0) {
         _currentScale = _doubleTapScale;
@@ -103,6 +103,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       _workingTranslate = _currentTranslate;
     }
 
+    _registerResizing();
     super.onEvent(event);
   }
 
@@ -115,7 +116,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   @override
   Stream<ScaleState> mapEventToState(ScaleEvent event) async* {
-    final offset = defaultOffset + _workingTranslate;
+    final offset = _getTranslate();
 
     if (event is ScaleOriginalEvent) {
       yield ScaleState(
@@ -142,14 +143,22 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   }
 
   @override
-  void resetZoom() {
+  bool resetZoom() {
     add(ScaleResetEvent());
+    return true;
   }
 
   @override
-  void zoomToOriginal() {
+  bool zoomToOriginal() {
+    if (!_originalScale.isInBounds(_minScale, _maxScale)) return false;
+
     add(ScaleOriginalEvent());
+    return true;
   }
+
+  void _registerResizing() => _metadataRepository.registerResizing(_getTranslate(), _accumulatedScale);
+
+  Offset _getTranslate() => defaultOffset + _workingTranslate;
 
   void _updateDefaultOffset() {
     if (_screenSize == null || _viewSize == null) return;
@@ -161,5 +170,6 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
     }
 
     add(ScaleCenterUpdatedEvent());
+    _registerResizing();
   }
 }

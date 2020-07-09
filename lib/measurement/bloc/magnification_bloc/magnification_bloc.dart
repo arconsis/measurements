@@ -74,7 +74,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
             nextState: MagnificationActiveState(
               state.position,
               state.magnificationOffset,
-              absolutePosition: _measureRepository.convertIntoAbsoluteTopLeftPosition(state.position),
+              absolutePosition: _measureRepository.convertIntoDocumentLocalTopLeftPosition(state.position),
               backgroundImage: _backgroundImage,
               imageScaleFactor: _imageScaleFactor,
             ));

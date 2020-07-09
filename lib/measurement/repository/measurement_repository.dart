@@ -6,6 +6,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:measurements/measurement/drawing_holder.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements/metadata/repository/metadata_repository.dart';
@@ -45,8 +46,7 @@ class MeasurementRepository {
     _metadataRepository.viewCenter.listen((viewCenter) => _viewCenterPosition = viewCenter);
     _metadataRepository.imageToDocumentScaleFactor.listen((scaleFactor) {
       _imageToDocumentScaleFactor = scaleFactor;
-      _logger.log("imageToDocumentScaleFactor: $_imageToDocumentScaleFactor");
-      _updatePoints();
+      _publishPoints();
     });
     _metadataRepository.transformationFactor.listen((factor) {
       if (_transformationFactor != factor) {
@@ -56,7 +56,6 @@ class MeasurementRepository {
     });
     _metadataRepository.zoom.listen((zoom) {
       _zoomLevel = zoom;
-      _logger.log("zoomLevel: $_zoomLevel");
       _publishPoints();
     });
     _metadataRepository.backgroundPosition.listen((backgroundPosition) {
@@ -69,25 +68,25 @@ class MeasurementRepository {
 
   Stream<DrawingHolder> get drawingHolder => _drawingHolder.stream;
 
-  void registerDownEvent(Offset position) {
+  void registerDownEvent(Offset globalPosition) {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset absoluteCenteredPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition);
+    Offset documentLocalCenteredPosition = _convertIntoDocumentLocalCenteredPosition(globalPosition, _viewCenterPosition);
 
-    int closestIndex = _getClosestPointIndex(absoluteCenteredPosition);
+    int closestIndex = _getClosestPointIndex(documentLocalCenteredPosition);
 
     if (closestIndex >= 0) {
       Offset closestPoint = _absolutePoints[closestIndex];
 
-      if ((_convertIntoRelativePosition(closestPoint, _viewCenterPosition) - position).distance > 40.0) {
-        _currentIndex = _addNewPoint(absoluteCenteredPosition);
+      if ((_convertIntoGlobalPosition(closestPoint, _viewCenterPosition) - globalPosition).distance > 40.0) {
+        _currentIndex = _addNewPoint(documentLocalCenteredPosition);
       } else {
         _currentIndex = closestIndex;
-        _updatePoint(absoluteCenteredPosition);
+        _updatePoint(documentLocalCenteredPosition);
       }
     } else {
-      _currentIndex = _addNewPoint(absoluteCenteredPosition);
+      _currentIndex = _addNewPoint(documentLocalCenteredPosition);
     }
 
     _movementStarted(_currentIndex);
@@ -97,14 +96,14 @@ class MeasurementRepository {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.MOVE;
 
-    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
+    _updatePoint(_convertIntoDocumentLocalCenteredPosition(position, _viewCenterPosition));
   }
 
   void registerUpEvent(Offset position) {
     if (_currentState != TouchState.DOWN && _currentState != TouchState.MOVE) return;
     _currentState = TouchState.UP;
 
-    _updatePoint(_convertIntoAbsolutePosition(position, _viewCenterPosition));
+    _updatePoint(_convertIntoDocumentLocalCenteredPosition(position, _viewCenterPosition));
     _movementFinished();
   }
 
@@ -123,30 +122,35 @@ class MeasurementRepository {
     _drawingHolder.close();
   }
 
-  Offset convertIntoAbsoluteTopLeftPosition(Offset position) {
-    Offset absoluteCenterPosition = _convertIntoAbsolutePosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
+  Offset convertIntoDocumentLocalTopLeftPosition(Offset position) {
+    Offset documentLocalCenterPosition = _convertIntoDocumentLocalCenteredPosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
 
-    return Offset(absoluteCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - absoluteCenterPosition.dy);
+    return Offset(documentLocalCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - documentLocalCenterPosition.dy);
   }
 
-  Offset _convertIntoAbsolutePosition(Offset position, Offset viewCenter) {
+  Offset _convertIntoDocumentLocalCenteredPosition(Offset position, Offset viewCenter) {
     return (Offset(position.dx - viewCenter.dx, viewCenter.dy - position.dy) - _backgroundPosition) / _zoomLevel * _imageToDocumentScaleFactor;
   }
 
-  Offset _convertIntoRelativePosition(Offset position, Offset viewCenter) {
+  Offset _convertIntoGlobalPosition(Offset position, Offset viewCenter) {
     Offset scaledPosition = position / _imageToDocumentScaleFactor * _zoomLevel;
 
     return Offset(scaledPosition.dx + viewCenter.dx + _backgroundPosition.dx, viewCenter.dy - scaledPosition.dy - _backgroundPosition.dy);
   }
 
   List<Offset> _getRelativePoints() {
-    return _absolutePoints.map((point) => _convertIntoRelativePosition(point, _viewCenterPosition)).toList();
+    return _absolutePoints.map((point) => _convertIntoGlobalPosition(point, _viewCenterPosition)).toList();
   }
 
   void _publishPoints() {
     List<Offset> relativePoints = _getRelativePoints();
 
-    _logger.log("relative points: $relativePoints");
+    _logger.log("\nimageToDocumentScaleFactor: ${_imageToDocumentScaleFactor.toStringAsFixed(2)}, "
+        "zoomLevel: ${_zoomLevel.toStringAsFixed(2)}, "
+        "backgroundPosition: $_backgroundPosition, "
+        "viewCenter: $_viewCenterPosition\n"
+        "absolute points: $_absolutePoints\n"
+        "relative points: $relativePoints");
 
     _points.add(relativePoints);
     _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
@@ -210,11 +214,6 @@ class MeasurementRepository {
       _publishDistances([]);
       _controller?.distances = [];
     }
-  }
-
-  void _updatePoints() {
-    _logger.log("absolute position: $_absolutePoints new view center $_viewCenterPosition");
-    _publishPoints();
   }
 }
 
