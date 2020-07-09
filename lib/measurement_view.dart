@@ -32,6 +32,19 @@ import 'style/point_style.dart';
 import 'util/colors.dart';
 import 'util/logger.dart';
 
+class _DeleteChild extends StatelessWidget {
+  const _DeleteChild();
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      Icons.highlight_off,
+      size: 75,
+      color: Color.fromARGB(100, 50, 50, 50),
+    );
+  }
+}
+
 class Measurement extends StatelessWidget {
   final Widget child;
   final Widget deleteChild;
@@ -47,7 +60,7 @@ class Measurement extends StatelessWidget {
   Measurement({
     Key key,
     @required this.child,
-    this.deleteChild,
+    this.deleteChild = const _DeleteChild(),
     this.measure = false,
     this.showDistanceOnLine = false,
     this.measurementInformation = const MeasurementInformation.A4(),
@@ -210,13 +223,8 @@ class MeasurementView extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  width: 100,
-                  height: 100,
-                  child: Container(
-                    key: _deleteKey,
-                    color: Color.fromARGB(50, 100, 100, 255),
-                    child: deleteChild,
-                  ),
+                  key: _deleteKey,
+                  child: deleteChild,
                 ),
               ),
               GestureDetector(
