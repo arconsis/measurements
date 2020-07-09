@@ -6,23 +6,34 @@ import 'package:flutter/cupertino.dart';
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 ///
 
-abstract class GestureEvent extends Equatable {
+abstract class ScaleEvent {}
+
+class ScaleDoubleTapEvent extends ScaleEvent {}
+
+class ScaleOriginalEvent extends ScaleEvent {}
+
+class ScaleResetEvent extends ScaleEvent {}
+
+abstract class ScalePositionEvent extends ScaleEvent implements Equatable {
   final Offset position;
 
-  GestureEvent(this.position);
+  ScalePositionEvent(this.position);
+
+  @override
+  bool get stringify => false;
 }
 
-class GestureScaleStartEvent extends GestureEvent {
-  GestureScaleStartEvent(Offset position) : super(position);
+class ScaleStartEvent extends ScalePositionEvent {
+  ScaleStartEvent(Offset position) : super(position);
 
   @override
   List<Object> get props => [position];
 }
 
-class GestureScaleUpdateEvent extends GestureEvent {
+class ScaleUpdateEvent extends ScalePositionEvent {
   final double scale;
 
-  GestureScaleUpdateEvent(Offset position, this.scale) : super(position);
+  ScaleUpdateEvent(Offset position, this.scale) : super(position);
 
   @override
   List<Object> get props => [position, scale];

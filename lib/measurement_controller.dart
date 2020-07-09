@@ -53,9 +53,9 @@ class MeasurementController {
     _currentValues.value = MeasurementValues(distances, tolerance);
   }
 
-  void zoomToOriginalSize() => _function.zoomToOriginal();
+  void zoomToOriginalSize() => _function?.zoomToOriginal();
 
-  void resetZoom() => _function.resetZoom();
+  void resetZoom() => _function?.resetZoom();
 
   void close() {
     _currentValues.close();

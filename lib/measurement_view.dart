@@ -11,12 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
-import 'package:measurements/scale_bloc/scale_bloc.dart';
-import 'package:measurements/scale_bloc/scale_event.dart';
 
 import 'input_bloc/input_bloc.dart';
 import 'input_bloc/input_event.dart';
+import 'measurement/bloc/magnification_bloc/magnification_bloc.dart';
 import 'measurement/bloc/points_bloc/points_bloc.dart';
 import 'measurement/overlay/measure_area.dart';
 import 'measurement/repository/measurement_repository.dart';
@@ -24,8 +22,9 @@ import 'measurement_controller.dart';
 import 'measurement_information.dart';
 import 'metadata/bloc/metadata_bloc.dart';
 import 'metadata/bloc/metadata_event.dart';
-import 'metadata/bloc/metadata_state.dart';
 import 'metadata/repository/metadata_repository.dart';
+import 'scale_bloc/scale_bloc.dart';
+import 'scale_bloc/scale_event.dart';
 import 'scale_bloc/scale_state.dart';
 import 'style/distance_style.dart';
 import 'style/magnification_style.dart';
@@ -72,7 +71,7 @@ class Measurement extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => MetadataBloc()),
         BlocProvider(create: (context) => InputBloc()),
-        BlocProvider(create: (context) => GestureBloc()),
+        BlocProvider(create: (context) => ScaleBloc()),
       ],
       child: MeasurementView(
         child,
@@ -139,7 +138,7 @@ class MeasurementView extends StatelessWidget {
     });
   }
 
-  void _setDeleteChildInfoToBloc(BuildContext context) {
+  void _setScreenInfoToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_deleteKey.currentContext != null && _parentKey.currentContext != null) {
         RenderObject parentObject = _parentKey.currentContext.findRenderObject();
@@ -150,6 +149,7 @@ class MeasurementView extends StatelessWidget {
 
         _logger.log("Translation is: $translation size is $deleteSize");
 
+        BlocProvider.of<MetadataBloc>(context).add(MetadataScreenSizeEvent(_parentKey.currentContext.size));
         BlocProvider.of<MetadataBloc>(context).add(MetadataDeleteRegionEvent(Offset(translation.x, translation.y), deleteSize));
       }
     });
@@ -172,19 +172,16 @@ class MeasurementView extends StatelessWidget {
     return Container(
       key: _parentKey,
       color: drawColor,
-      child: BlocBuilder<MetadataBloc, MetadataState>(
-        builder: (context, metadataState) => BlocBuilder<GestureBloc, GestureState>(
-          builder: (context, scaleState) => _overlay(context, metadataState, scaleState),
-        ),
+      child: BlocBuilder<ScaleBloc, ScaleState>(
+        builder: (context, scaleState) => _overlay(context, scaleState),
       ),
     );
   }
 
-  Widget _overlay(BuildContext context, MetadataState metadataState, GestureState scaleState) {
+  Widget _overlay(BuildContext context, ScaleState scaleState) {
     return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
-      BlocProvider.of<MetadataBloc>(context).add(MetadataOrientationEvent(orientation));
       _setBackgroundImageToBloc(context, scaleState.scale);
-      _setDeleteChildInfoToBloc(context);
+      _setScreenInfoToBloc(context);
 
       return MultiBlocProvider(
         providers: [
@@ -193,26 +190,10 @@ class MeasurementView extends StatelessWidget {
         ],
         child: Listener(
           onPointerDown: (PointerDownEvent event) => BlocProvider.of<InputBloc>(context).add(InputDownEvent(event.localPosition)),
-          onPointerMove: (PointerMoveEvent event) {
-//            _logger.log("move event ${event.toStringFull()}");
-            BlocProvider.of<InputBloc>(context).add(InputMoveEvent(event.localPosition));
-          },
+          onPointerMove: (PointerMoveEvent event) => BlocProvider.of<InputBloc>(context).add(InputMoveEvent(event.localPosition)),
           onPointerUp: (PointerUpEvent event) => BlocProvider.of<InputBloc>(context).add(InputUpEvent(event.localPosition)),
           child: Stack(
             children: <Widget>[
-//              AbsorbPointer(
-//                absorbing: state.measure,
-//                child: PhotoView.customChild(
-//                  controller: state.controller,
-//                  initialScale: PhotoViewComputedScale.contained,
-//                  minScale: PhotoViewComputedScale.contained,
-//                  maxScale: PhotoViewComputedScale.contained * state.maxZoom,
-//                  child: RepaintBoundary(
-//                    key: _childKey,
-//                    child: child,
-//                  ),
-//                ),
-//              ),
               Transform(
                 transform: scaleState.transform,
                 alignment: Alignment.center,
@@ -239,16 +220,10 @@ class MeasurementView extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onScaleStart: (ScaleStartDetails details) {
-                  BlocProvider.of<GestureBloc>(context).add(GestureScaleStartEvent(details.localFocalPoint));
-                  _logger.log("Scale Start: $details");
-                },
-                onScaleUpdate: (ScaleUpdateDetails details) {
-                  BlocProvider.of<GestureBloc>(context).add(GestureScaleUpdateEvent(details.localFocalPoint, details.scale));
-                  _logger.log("Scale Update: $details");
-                },
-//              TODO  onDoubleTap: , zoom to 1 or to some zoom level
-              ),
+                onScaleStart: (ScaleStartDetails details) => BlocProvider.of<ScaleBloc>(context).add(ScaleStartEvent(details.localFocalPoint)),
+                onScaleUpdate: (ScaleUpdateDetails details) => BlocProvider.of<ScaleBloc>(context).add(ScaleUpdateEvent(details.localFocalPoint, details.scale)),
+                onDoubleTap: () => BlocProvider.of<ScaleBloc>(context).add(ScaleDoubleTapEvent()),
+              )
             ],
           ),
         ),

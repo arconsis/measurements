@@ -6,6 +6,7 @@
 enum LogDistricts {
   MEASUREMENT_VIEW,
   METADATA_BLOC,
+  SCALE_BLOC,
   METADATA_REPOSITORY,
   MEASURE_AREA,
   MEASURE_BLOC,
@@ -15,8 +16,9 @@ enum LogDistricts {
 
 class Logger {
   static final List<LogDistricts> _activeDistricts = [
-    LogDistricts.MEASUREMENT_VIEW,
+//    LogDistricts.MEASUREMENT_VIEW,
 //    LogDistricts.METADATA_BLOC,
+    LogDistricts.SCALE_BLOC,
 //    LogDistricts.METADATA_REPOSITORY,
 //
 //    LogDistricts.MEASURE_AREA,

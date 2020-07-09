@@ -15,33 +15,15 @@ import 'metadata_state.dart';
 
 class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
   final _logger = Logger(LogDistricts.METADATA_BLOC);
-  final List<StreamSubscription> _streamSubscriptions = List();
 
   MetadataRepository _repository;
-  bool _measure = false;
-  double _zoom = 1.0;
-  double _maxZoom = 5.0;
 
   MetadataBloc() {
     _repository = GetIt.I<MetadataRepository>();
-
-    _streamSubscriptions.add(_repository.measurement.listen((bool measure) {
-      _measure = measure;
-      _updateState();
-    }));
-    _streamSubscriptions.add(_repository.zoom.listen((zoom) {
-      _zoom = zoom;
-      _updateState();
-    }));
-    _streamSubscriptions.add(_repository.orientation.listen((orientation) => _updateState()));
-  }
-
-  void _updateState() {
-    add(MetadataUpdatedEvent(_measure, _zoom, _maxZoom));
   }
 
   @override
-  MetadataState get initialState => MetadataState(_measure, _zoom, _maxZoom);
+  MetadataState get initialState => MetadataState();
 
   @override
   void onEvent(MetadataEvent event) async {
@@ -57,19 +39,15 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
       );
     } else if (event is MetadataBackgroundEvent) {
       _repository.registerBackgroundChange(event.backgroundImage, event.size);
-
-      _maxZoom = await _repository.zoomFactorForOriginalSize;
     } else if (event is MetadataDeleteRegionEvent) {
       _repository.registerDeleteRegion(event.position, event.deleteSize);
+    } else if (event is MetadataScreenSizeEvent) {
+      _repository.registerScreenSize(event.screenSize);
     }
 
     super.onEvent(event);
   }
 
   @override
-  Stream<MetadataState> mapEventToState(MetadataEvent event) async* {
-    if (event is MetadataUpdatedEvent) {
-      yield MetadataState(event.measure, event.zoom, event.maxZoom);
-    }
-  }
+  Stream<MetadataState> mapEventToState(MetadataEvent event) async* {}
 }

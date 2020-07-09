@@ -6,17 +6,8 @@
 import 'package:equatable/equatable.dart';
 
 class MetadataState extends Equatable {
-  final bool measure;
-  final double zoom;
-  final double maxZoom;
-
-  MetadataState(this.measure, this.zoom, this.maxZoom);
+  MetadataState();
 
   @override
-  List<Object> get props => [measure, zoom, maxZoom];
-
-  @override
-  String toString() {
-    return super.toString() + " measure: $measure, zoom: $zoom, maxZoom: $maxZoom";
-  }
+  List<Object> get props => [];
 }

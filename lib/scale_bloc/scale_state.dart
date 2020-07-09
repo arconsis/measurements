@@ -8,13 +8,18 @@ import 'package:flutter/widgets.dart';
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 ///
 
-class GestureState extends Equatable {
+class ScaleState extends Equatable {
   final Offset offset;
   final double scale;
   final Matrix4 transform;
 
-  GestureState(this.offset, this.scale, this.transform);
+  ScaleState(this.offset, this.scale, this.transform);
 
   @override
   List<Object> get props => [offset, scale, transform];
+
+  @override
+  String toString() {
+    return super.toString() + " offset: $offset, scale: $scale, transform:\n$transform";
+  }
 }

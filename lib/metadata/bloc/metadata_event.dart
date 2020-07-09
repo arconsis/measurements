@@ -66,6 +66,20 @@ class MetadataOrientationEvent extends MetadataEvent {
   }
 }
 
+class MetadataScreenSizeEvent extends MetadataEvent {
+  final Size screenSize;
+
+  MetadataScreenSizeEvent(this.screenSize);
+
+  @override
+  List<Object> get props => [screenSize];
+
+  @override
+  String toString() {
+    return super.toString() + " screenSize: $screenSize";
+  }
+}
+
 class MetadataDeleteRegionEvent extends MetadataEvent {
   final Offset position;
   final Size deleteSize;
@@ -78,21 +92,5 @@ class MetadataDeleteRegionEvent extends MetadataEvent {
   @override
   String toString() {
     return super.toString() + " position: $position, deleteSize: $deleteSize";
-  }
-}
-
-class MetadataUpdatedEvent extends MetadataEvent {
-  final bool measure;
-  final double zoom;
-  final double maxZoom;
-
-  MetadataUpdatedEvent(this.measure, this.zoom, this.maxZoom);
-
-  @override
-  List<Object> get props => [measure, zoom, maxZoom];
-
-  @override
-  String toString() {
-    return super.toString() + " measure: $measure, zoom: $zoom, maxZoom: $maxZoom";
   }
 }
