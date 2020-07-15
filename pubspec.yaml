@@ -1,8 +1,8 @@
 name: measurements
-description: A new flutter plugin project.
+description: A widget that allows you to measure distances in documents.
 version: 0.0.1
 author: arconsis IT-Solutions GmbH
-homepage: "https://github.com/ChristianNavolskyi/measurements"
+homepage: "https://github.com/arconsis/measurements"
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -14,6 +14,7 @@ dependencies:
   flutter_bloc: 4.0.0
   get_it: 4.0.2
   image: 2.1.12
+  meta: 1.1.8
   path_provider: 1.6.9
   rxdart: 0.24.1
 
@@ -22,8 +23,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mockito: 4.1.1
-
-
 
 flutter:
   plugin:

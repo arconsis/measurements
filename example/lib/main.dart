@@ -103,7 +103,9 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Measurement(
-            child: Image.asset("assets/images/floorplan448x449mm.png",),
+            child: Image.asset(
+              "assets/images/floorplan448x449mm.png",
+            ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 50.0,
               documentWidthInLengthUnits: Millimeter(448),
