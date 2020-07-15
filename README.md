@@ -37,10 +37,10 @@ Widget build(BuildContext context) {
         "assets/images/your-document.png",
       ),
       measurementInformation: MeasurementInformation(
-        scale: 1 / 2.0,
-        documentWidthInLengthUnits: Inch(11),
-        documentHeightInLengthUnits: Inch(17),
-        targetLengthUnit: Foot.asUnit(),
+        scale: 1 / 50.0,
+        documentWidthInLengthUnits: Millimeter(448),
+        documentHeightInLengthUnits: Millimeter(449),
+        targetLengthUnit: Meter.asUnit(),
       ),
     ),
 }
