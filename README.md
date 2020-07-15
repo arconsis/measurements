@@ -8,11 +8,11 @@ This plugin provides a widget in which you can display for example a floor plan 
 To use this plugin simply include it in your `pubspec.yaml` with
 ```yaml
 dependencies:
-  measurement: 0.1
+  measurement: 0.0.1
 ```
 
 
-## Examples
+## Usages
 
 ### Using all defaults
 ``` Dart
@@ -154,8 +154,76 @@ Widget build(BuildContext context) {
 }
 ```
 
+### Customizing the magnification glass
+When you place your finger on the screen to set a point you hide the position with your finger, too bad, but that's why we have a magnification glass build in and you can even customize it.
+Change the magnification factor by setting `magnificationZoomFactor` and to change the appearance of the magnification glass set `magnificationStyle` with your style.
+``` Dart
+Widget build(BuildContext context) {
+  return ...
+    Measurement(
+      child: Image.asset(
+        "assets/images/your-document.png",
+      ),
+      magnificationZoomFactor: 2.0,
+      magnificationStyle: MagnificationStyle(
+        magnificationColor: Color.fromARGB(255, 200, 50, 80),
+        magnificationRadius: 100,
+        outerCircleThickness: 5,
+        crossHairThickness: 2,
+      ),
+    ),
+}
+```
 
+### Customize the shown distances
+You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which color the distance should the drawn in.
+``` Dart
+Widget build(BuildContext context) {
+  return ...
+    Measurement(
+      child: Image.asset(
+        "assets/images/your-document.png",
+      ),
+      distanceStyle: DistanceStyle(
+        textColor: Color.fromARGB(255, 200, 50, 80),
+        numDecimalPlaces: 4,
+        showTolerance: true,
+      ),
+    ),
+}
+```
 
+### Customize the points and lines for the set measurement points
+The size and color of the points and lines can be changed with the `pointStyle` parameter.
+You can choose between a solid line by using 
+```Dart
+SolidLine(double lineWidth, Color lineColor)
+```
+and a dashed line by using 
+```Dart
+DashedLine(double dashWidth, double dashLength, double dashDistance, Color lineColor)
+```
+
+``` Dart
+Widget build(BuildContext context) {
+  return ...
+    Measurement(
+      child: Image.asset(
+        "assets/images/your-document.png",
+      ),
+      pointStyle: PointStyle(
+        dotColor: Color.fromARGB(255, 200, 50, 80),
+        dotRadius: 10,
+        lineType: DashedLine(
+          dashWidth: 4,
+          dashLength: 10,
+          dashDistance: 2,
+          lineColor: Color.fromARGB(255, 50, 200, 80),
+        ),
+      ),
+    ),
+}
+```
 
 
 
