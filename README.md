@@ -2,7 +2,7 @@
 
 This plugin provides a widget in which you can display another widget, for example a floor plan of your flat in an image and measure distances between points in your flat.
 
-
+![Showcase of Features](assets/gifs/all_features.gif)
 
 ## Getting Started
 To use this plugin simply include it in your `pubspec.yaml` with
