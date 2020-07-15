@@ -22,15 +22,12 @@ class InputBloc extends Bloc<InputEvent, InputState> {
   bool _measure = false;
   bool _delete = false;
 
-  InputBloc() {
+  InputBloc() : super(InputEmptyState()) {
     _metadataRepository = GetIt.I<MetadataRepository>();
     _measurementRepository = GetIt.I<MeasurementRepository>();
 
     _streamSubscription.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
   }
-
-  @override
-  InputState get initialState => InputEmptyState();
 
   @override
   void onEvent(InputEvent event) {

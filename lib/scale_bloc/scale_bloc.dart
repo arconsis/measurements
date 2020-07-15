@@ -26,8 +26,6 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   MetadataRepository _metadataRepository;
 
-  Matrix4 _transformation = Matrix4.identity();
-
   Offset _translateStart;
   Offset _workingTranslate = Offset(0, 0);
   Offset _currentTranslate = Offset(0, 0);
@@ -43,7 +41,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   bool _measure;
 
-  ScaleBloc() {
+  ScaleBloc() : super(ScaleState(Offset(0, 0), 1.0, Matrix4.identity())) {
     _metadataRepository = GetIt.I<MetadataRepository>();
 
     subscriptions.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
@@ -56,14 +54,11 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       _updateDefaultOffset();
 
       _doubleTapScale = _metadataRepository.zoomFactorToFillScreen;
-      _originalScale = await _metadataRepository.zoomFactorForOriginalSize;
+      _originalScale = await _metadataRepository.zoomFactorForLifeSize;
     }));
 
     _metadataRepository.registerMeasurementFunction(this);
   }
-
-  @override
-  ScaleState get initialState => ScaleState(Offset(0, 0), 1.0, _transformation);
 
   @override
   void onEvent(ScaleEvent event) {
@@ -152,7 +147,7 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   }
 
   @override
-  bool zoomToOriginal() {
+  bool zoomToLifeSize() {
     if (!(_originalScale?.isInBounds(_minScale, _maxScale) ?? false)) return false;
 
     add(ScaleOriginalEvent());

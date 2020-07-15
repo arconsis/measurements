@@ -33,7 +33,7 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
   double _magnificationRadius;
   Offset _magnificationOffset;
 
-  MagnificationBloc(this.inputBloc) {
+  MagnificationBloc(this.inputBloc) : super(MagnificationInactiveState()) {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
@@ -59,9 +59,6 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
       }
     }));
   }
-
-  @override
-  MagnificationState get initialState => MagnificationInactiveState();
 
   @override
   Stream<Transition<MagnificationEvent, MagnificationState>> transformTransitions(Stream<Transition<MagnificationEvent, MagnificationState>> transitions) {

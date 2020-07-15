@@ -18,12 +18,9 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   MetadataRepository _repository;
 
-  MetadataBloc() {
+  MetadataBloc() : super(MetadataState()) {
     _repository = GetIt.I<MetadataRepository>();
   }
-
-  @override
-  MetadataState get initialState => MetadataState();
 
   @override
   void onEvent(MetadataEvent event) async {

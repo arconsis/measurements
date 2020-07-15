@@ -69,7 +69,7 @@ class MetadataRepository {
 
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
 
-  Future<double> get zoomFactorForOriginalSize async {
+  Future<double> get zoomFactorForLifeSize async {
     double pixelPerInch = await MethodChannel("measurements").invokeMethod("getPhysicalPixelsPerInch");
     Size screenSize = _screenSize.value;
 

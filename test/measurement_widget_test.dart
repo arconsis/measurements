@@ -231,7 +231,7 @@ void main() {
 
         await tester.pump();
 
-        controller.zoomToOriginalSize();
+        controller.zoomToLifeSize();
         await tester.pump();
 
         controller.resetZoom();

@@ -119,7 +119,7 @@ void main() {
           controller: expectedController,
         );
 
-        expect(await metadataRepository.zoomFactorForOriginalSize, equals(1.0));
+        expect(await metadataRepository.zoomFactorForLifeSize, equals(1.0));
       });
 
       test("started and retrieve zoom factor for original size", () async {
@@ -136,7 +136,7 @@ void main() {
         metadataRepository.registerBackgroundChange(expectedImage, viewSize);
         metadataRepository.registerScreenSize(Size(200, 300));
 
-        expect(await metadataRepository.zoomFactorForOriginalSize, equals(expectedZoomFactor));
+        expect(await metadataRepository.zoomFactorForLifeSize, equals(expectedZoomFactor));
       });
     });
   });

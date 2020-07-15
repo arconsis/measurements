@@ -5,15 +5,12 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
 
 class MetadataRepository {}
 
 void main() {
-  GetIt.I.registerSingleton(MetadataRepository());
-
   runApp(MyApp());
 }
 
@@ -25,7 +22,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = false;
+  bool measure = true;
   bool showDistanceOnLine = true;
   bool showTolerance = false;
   bool zoomed = false;
@@ -59,12 +56,24 @@ class _MyAppState extends State<MyApp> {
           title: Row(
             children: <Widget>[
               IconButton(
-                  onPressed: () => setState(() {
-                        measure = !measure;
-                        title = originalTitle;
-                      }),
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
-              IconButton(onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine), icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))),
+                onPressed: () => setState(() {
+                  measure = !measure;
+                  title = originalTitle;
+                }),
+                icon: Icon(
+                  Icons.straighten,
+                  color: getButtonColor(
+                    measure,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine),
+                icon: Icon(
+                  Icons.vertical_align_bottom,
+                  color: getButtonColor(showDistanceOnLine),
+                ),
+              ),
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
@@ -90,7 +99,7 @@ class _MyAppState extends State<MyApp> {
                     if (zoomed) {
                       controller.resetZoom();
                     } else {
-                      controller.zoomToOriginalSize();
+                      controller.zoomToLifeSize();
                     }
 
                     setState(() {
@@ -107,48 +116,48 @@ class _MyAppState extends State<MyApp> {
               "assets/images/floorplan448x449mm.png",
             ),
             measurementInformation: MeasurementInformation(
-              scale: 1 / 2.0,
-              documentWidthInLengthUnits: Inch(11),
-              documentHeightInLengthUnits: Inch(17),
-              targetLengthUnit: Foot.asUnit(),
+              scale: 1 / 50.0,
+              documentWidthInLengthUnits: Millimeter(448),
+              documentHeightInLengthUnits: Millimeter(449),
+              targetLengthUnit: unitsOfMeasurement[unitIndex],
             ),
 //            measurementInformation: MeasurementInformation(
-//              scale: 1 / 50.0,
-//              documentWidthInLengthUnits: Millimeter(448),
-//              documentHeightInLengthUnits: Millimeter(449),
-//              targetLengthUnit: unitsOfMeasurement[unitIndex],
+//              scale: 1 / 2.0,
+//              documentWidthInLengthUnits: Inch(11),
+//              documentHeightInLengthUnits: Inch(17),
+//              targetLengthUnit: Foot.asUnit(),
 //            ),
             controller: controller,
             showDistanceOnLine: showDistanceOnLine,
             distanceStyle: DistanceStyle(
-              textColor: Color.fromARGB(255, 200, 50, 80),
-              numDecimalPlaces: 4,
-              showTolerance: true,
+//              textColor: Color.fromARGB(255, 200, 50, 80),
+//              numDecimalPlaces: 4,
+              showTolerance: showTolerance,
             ),
-            deleteChild: Container(
-              width: 100,
-              height: 150,
-              color: Color.fromARGB(100, 200, 0, 0),
-            ),
-            deleteChildAlignment: Alignment.topCenter,
+//            deleteChild: Container(
+//              width: 100,
+//              height: 150,
+//              color: Color.fromARGB(100, 200, 0, 0),
+//            ),
+//            deleteChildAlignment: Alignment.topCenter,
             measure: measure,
-            magnificationZoomFactor: 5.0,
-            magnificationStyle: MagnificationStyle(
-              magnificationColor: Color.fromARGB(255, 200, 50, 80),
-              magnificationRadius: 100,
-              outerCircleThickness: 5,
-              crossHairThickness: 2,
-            ),
-            pointStyle: PointStyle(
-              dotColor: Color.fromARGB(255, 200, 50, 80),
-              dotRadius: 10,
-              lineType: DashedLine(
-                dashWidth: 4,
-                dashLength: 10,
-                dashDistance: 2,
-                lineColor: Color.fromARGB(255, 50, 200, 80),
-              ),
-            ),
+//            magnificationZoomFactor: 5.0,
+//            magnificationStyle: MagnificationStyle(
+//              magnificationColor: Color.fromARGB(255, 200, 50, 80),
+//              magnificationRadius: 100,
+//              outerCircleThickness: 5,
+//              crossHairThickness: 2,
+//            ),
+//            pointStyle: PointStyle(
+//              dotColor: Color.fromARGB(255, 200, 50, 80),
+//              dotRadius: 10,
+//              lineType: DashedLine(
+//                dashWidth: 4,
+//                dashLength: 10,
+//                dashDistance: 2,
+//                lineColor: Color.fromARGB(255, 50, 200, 80),
+//              ),
+//            ),
           ),
         ),
       ),

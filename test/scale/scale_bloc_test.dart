@@ -26,7 +26,7 @@ void main() {
       when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
       when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(50, 100)]));
       when(mockedMetadataRepository.screenSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
-      when(mockedMetadataRepository.zoomFactorForOriginalSize).thenAnswer((_) async => 2.0);
+      when(mockedMetadataRepository.zoomFactorForLifeSize).thenAnswer((_) async => 2.0);
       when(mockedMetadataRepository.zoomFactorToFillScreen).thenReturn(5.0);
       when(mockedMetadataRepository.isDocumentWidthAlignedWithScreenWidth(any)).thenReturn(true);
 

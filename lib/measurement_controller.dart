@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart';
 ///
 
 abstract class MeasurementFunction {
-  bool zoomToOriginal();
+  bool zoomToLifeSize();
 
   bool resetZoom();
 }
@@ -56,7 +56,7 @@ class MeasurementController {
     _currentValues.value = MeasurementValues(distances, tolerance);
   }
 
-  bool zoomToOriginalSize() => _function?.zoomToOriginal();
+  bool zoomToLifeSize() => _function?.zoomToLifeSize();
 
   bool resetZoom() => _function?.resetZoom();
 

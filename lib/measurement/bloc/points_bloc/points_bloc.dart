@@ -34,7 +34,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   Offset _viewCenter;
   double _tolerance;
 
-  PointsBloc() {
+  PointsBloc() : super(PointsEmptyState()) {
     _pointsListener = (points) => add(PointsOnlyEvent(points));
     _pointsAndDistanceListener = (holder) => add(PointsAndDistancesEvent(holder.points, holder.distances));
 
@@ -62,9 +62,6 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     _streamSubscriptions.add(_metadataRepository.viewCenter.listen((center) => _viewCenter = center));
     _streamSubscriptions.add(_metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance));
   }
-
-  @override
-  PointsState get initialState => PointsEmptyState();
 
   @override
   void onEvent(PointsEvent event) {
