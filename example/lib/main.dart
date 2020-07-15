@@ -103,18 +103,52 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Measurement(
-            child: Image.asset("assets/images/floorplan448x449mm.png",),
-            measurementInformation: MeasurementInformation(
-              scale: 1 / 50.0,
-              documentWidthInLengthUnits: Millimeter(448),
-              documentHeightInLengthUnits: Millimeter(449),
-              targetLengthUnit: unitsOfMeasurement[unitIndex],
+            child: Image.asset(
+              "assets/images/floorplan448x449mm.png",
             ),
+            measurementInformation: MeasurementInformation(
+              scale: 1 / 2.0,
+              documentWidthInLengthUnits: Inch(11),
+              documentHeightInLengthUnits: Inch(17),
+              targetLengthUnit: Foot.asUnit(),
+            ),
+//            measurementInformation: MeasurementInformation(
+//              scale: 1 / 50.0,
+//              documentWidthInLengthUnits: Millimeter(448),
+//              documentHeightInLengthUnits: Millimeter(449),
+//              targetLengthUnit: unitsOfMeasurement[unitIndex],
+//            ),
             controller: controller,
             showDistanceOnLine: showDistanceOnLine,
-            distanceStyle: DistanceStyle(numDecimalPlaces: 2, showTolerance: showTolerance),
+            distanceStyle: DistanceStyle(
+              textColor: Color.fromARGB(255, 200, 50, 80),
+              numDecimalPlaces: 4,
+              showTolerance: true,
+            ),
+            deleteChild: Container(
+              width: 100,
+              height: 150,
+              color: Color.fromARGB(100, 200, 0, 0),
+            ),
+            deleteChildAlignment: Alignment.topCenter,
             measure: measure,
-            pointStyle: PointStyle(lineType: DashedLine()),
+            magnificationZoomFactor: 5.0,
+            magnificationStyle: MagnificationStyle(
+              magnificationColor: Color.fromARGB(255, 200, 50, 80),
+              magnificationRadius: 100,
+              outerCircleThickness: 5,
+              crossHairThickness: 2,
+            ),
+            pointStyle: PointStyle(
+              dotColor: Color.fromARGB(255, 200, 50, 80),
+              dotRadius: 10,
+              lineType: DashedLine(
+                dashWidth: 4,
+                dashLength: 10,
+                dashDistance: 2,
+                lineColor: Color.fromARGB(255, 50, 200, 80),
+              ),
+            ),
           ),
         ),
       ),
