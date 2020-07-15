@@ -5,11 +5,12 @@ This plugin provides a widget in which you can display another widget, for examp
 ![Showcase of Features](assets/gifs/all_features.gif)
 
 ## Getting Started
-To use this plugin simply include it in your `pubspec.yaml` with
+~~To use this plugin simply include it in your `pubspec.yaml` with~~
 ```yaml
 dependencies:
   measurements: 0.0.1 // not published yet
 ```
+
 You need to download this repo and then reference it as
 ```yaml
 dependencies:
