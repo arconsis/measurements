@@ -133,6 +133,31 @@ Widget build(BuildContext context) {
 }
 ```
 
+### Display your drawing in life-size
+For smaller parts you can use the `MeasurementController` to zoom your document to life-size. (The maximal magnification is 10, which might not be sufficient for larger documents or bigger scales)
+Simply call `MeasurementController::zoomToLifeSize` to set the magnification accordingly and `MeasurementController::resetZoom` to reset the magnification to `1`.
+``` Dart
+MeasurementController controller = MeasurementController();
+
+void zoomToLifeSize() {
+  controller.zoomToLifeSize();
+}
+
+void resetZoom() {
+  controller.resetZoom();
+}
+
+Widget build(BuildContext context) {
+  return ...
+    Measurement(
+      child: Image.asset(
+        "assets/images/your-document.png",
+      ),
+      controller: controller,
+    ),
+}
+```
+
 ## Customizability
 
 ### Deleting points
