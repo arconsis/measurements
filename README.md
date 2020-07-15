@@ -1,6 +1,6 @@
-# measurement 
+# measurements 
 
-This plugin provides a widget in which you can display for example a floor plan of your flat and measure distances between points in your flat.
+This plugin provides a widget in which you can display another widget, for example a floor plan of your flat in an image and measure distances between points in your flat.
 
 
 
@@ -8,11 +8,10 @@ This plugin provides a widget in which you can display for example a floor plan 
 To use this plugin simply include it in your `pubspec.yaml` with
 ```yaml
 dependencies:
-  measurement: 0.0.1
+  measurements: 0.0.1
 ```
 
-
-## Usages
+## Functional Usage
 
 ### Using all defaults
 ``` Dart
@@ -134,6 +133,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+## Customizability
+
 ### Deleting points
 By default an icon will be displayed at the bottom center which will remove a points when it is beeing draged into the icon and released there.
 But you can also set your own custom widget there by passing a widget to the `deleteChild` parameter and align it by setting `deleteChildAlignment` accordingly.
@@ -164,7 +165,7 @@ Widget build(BuildContext context) {
       child: Image.asset(
         "assets/images/your-document.png",
       ),
-      magnificationZoomFactor: 2.0,
+      magnificationZoomFactor: 5.0,
       magnificationStyle: MagnificationStyle(
         magnificationColor: Color.fromARGB(255, 200, 50, 80),
         magnificationRadius: 100,
@@ -193,7 +194,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Customize the points and lines for the set measurement points
+### Customize the points and lines
 The size and color of the points and lines can be changed with the `pointStyle` parameter.
 You can choose between a solid line by using 
 ```Dart
@@ -225,6 +226,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+# License
+This project is licensed under the [MIT-License](https://github.com/arconsis/measurements/blob/master/LICENSE).
 
 
 
