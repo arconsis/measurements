@@ -8,8 +8,15 @@ This plugin provides a widget in which you can display another widget, for examp
 To use this plugin simply include it in your `pubspec.yaml` with
 ```yaml
 dependencies:
-  measurements: 0.0.1
+  measurements: 0.0.1 // not published yet
 ```
+You need to download this repo and then reference it as
+```yaml
+dependencies:
+  measurements: 
+    path: path/to/measurement-repo
+```
+
 
 ## Functional Usage
 
