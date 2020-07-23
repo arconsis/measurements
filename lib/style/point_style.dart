@@ -21,6 +21,11 @@ class SolidLine extends LineType {
   List<Object> get props => [lineWidth, lineColor];
 }
 
+/// [LineType] to render a dashed line, like - - - -
+///
+/// [dashLength] is the length of one dash 1: - - 2: -- --
+///
+/// [dashDistance] is distance between two dashes 1: - - 2: -  -
 class DashedLine extends LineType {
   final double dashWidth;
   final double dashLength;
@@ -32,7 +37,9 @@ class DashedLine extends LineType {
   List<Object> get props => [dashWidth, dashLength, dashDistance, lineColor];
 }
 
-
+/// Style class to customize the appearance of the placed points and lines between them.
+///
+/// The lines can by styles in their respective constructors ([SolidLine], [DashedLine]).
 class PointStyle extends Equatable {
   final Color dotColor;
   final double dotRadius;
