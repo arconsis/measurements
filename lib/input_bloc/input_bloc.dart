@@ -8,10 +8,8 @@ import 'package:measurements/metadata/repository/metadata_repository.dart';
 import 'input_event.dart';
 import 'input_state.dart';
 
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 class InputBloc extends Bloc<InputEvent, InputState> {
   final List<StreamSubscription> _streamSubscription = List();

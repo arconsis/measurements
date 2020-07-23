@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 
-public class SwiftMeasurementsPlugin: NSObject, FlutterPlugin {
+public class MeasurementsPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "measurements", binaryMessenger: registrar.messenger())
     let instance = SwiftMeasurementsPlugin()
@@ -9,6 +9,10 @@ public class SwiftMeasurementsPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+    if (call.method == "getPhysicalPixelsPerInch") {
+        result(UIScreen.main.nativeScale)
+    } else {
+      result(nil)
+    }
   }
 }

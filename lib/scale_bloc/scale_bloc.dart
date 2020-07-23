@@ -12,10 +12,8 @@ import 'package:measurements/util/utils.dart';
 import 'scale_event.dart';
 import 'scale_state.dart';
 
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunction {
   final logger = Logger(LogDistricts.SCALE_BLOC);

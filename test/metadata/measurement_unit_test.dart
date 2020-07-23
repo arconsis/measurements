@@ -1,7 +1,5 @@
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/measurement_information.dart';
