@@ -7,11 +7,10 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/bloc/metadata_bloc.dart';
-import 'package:measurements/metadata/bloc/metadata_event.dart';
-import 'package:measurements/metadata/bloc/metadata_state.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
-import 'package:measurements/style/magnification_style.dart';
+import 'package:measurements/src/metadata/bloc/metadata_bloc.dart';
+import 'package:measurements/src/metadata/bloc/metadata_event.dart';
+import 'package:measurements/src/metadata/bloc/metadata_state.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 

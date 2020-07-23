@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/drawing_holder.dart';
-import 'package:measurements/measurement/overlay/measure_area.dart';
-import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/src/measurement/drawing_holder.dart';
+import 'package:measurements/src/measurement/overlay/measure_area.dart';
+import 'package:measurements/src/measurement/repository/measurement_repository.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 
 Type typeOf<T>() => T;
 
