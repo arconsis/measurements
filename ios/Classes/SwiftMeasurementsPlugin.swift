@@ -9,6 +9,10 @@ public class SwiftMeasurementsPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+    if (call.method == "getPhysicalPixelsPerInch") {
+        result(UIScreen.main.nativeScale)
+    } else {
+      result(nil)
+    }
   }
 }

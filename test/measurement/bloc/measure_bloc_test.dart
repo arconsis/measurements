@@ -1,20 +1,18 @@
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/input_bloc/input_bloc.dart';
-import 'package:measurements/input_bloc/input_state.dart';
-import 'package:measurements/measurement/bloc/magnification_bloc/magnification_bloc.dart';
-import 'package:measurements/measurement/bloc/magnification_bloc/magnification_event.dart';
-import 'package:measurements/measurement/bloc/magnification_bloc/magnification_state.dart';
-import 'package:measurements/measurement/repository/measurement_repository.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/src/input_bloc/input_bloc.dart';
+import 'package:measurements/src/input_bloc/input_state.dart';
+import 'package:measurements/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:measurements/src/measurement/bloc/magnification_bloc/magnification_event.dart';
+import 'package:measurements/src/measurement/bloc/magnification_bloc/magnification_state.dart';
+import 'package:measurements/src/measurement/repository/measurement_repository.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';

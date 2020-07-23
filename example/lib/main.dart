@@ -1,19 +1,14 @@
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:measurements/measurements.dart';
 import 'package:measurements_example/colors.dart';
 
 class MetadataRepository {}
 
 void main() {
-  GetIt.I.registerSingleton(MetadataRepository());
-
   runApp(MyApp());
 }
 
@@ -25,7 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static String originalTitle = 'Measurement app';
   String title = originalTitle;
-  bool measure = false;
+  bool measure = true;
   bool showDistanceOnLine = true;
   bool showTolerance = false;
   bool zoomed = false;
@@ -59,12 +54,24 @@ class _MyAppState extends State<MyApp> {
           title: Row(
             children: <Widget>[
               IconButton(
-                  onPressed: () => setState(() {
-                        measure = !measure;
-                        title = originalTitle;
-                      }),
-                  icon: Icon(Icons.straighten, color: getButtonColor(measure))),
-              IconButton(onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine), icon: Icon(Icons.vertical_align_bottom, color: getButtonColor(showDistanceOnLine))),
+                onPressed: () => setState(() {
+                  measure = !measure;
+                  title = originalTitle;
+                }),
+                icon: Icon(
+                  Icons.straighten,
+                  color: getButtonColor(
+                    measure,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine),
+                icon: Icon(
+                  Icons.vertical_align_bottom,
+                  color: getButtonColor(showDistanceOnLine),
+                ),
+              ),
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
@@ -90,7 +97,7 @@ class _MyAppState extends State<MyApp> {
                     if (zoomed) {
                       controller.resetZoom();
                     } else {
-                      controller.zoomToOriginalSize();
+                      controller.zoomToLifeSize();
                     }
 
                     setState(() {
@@ -102,8 +109,10 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         body: Center(
-          child: Measurement(
-            child: Image.asset("assets/images/floorplan448x449mm.png",),
+          child: Measurements(
+            child: Image.asset(
+              "assets/images/floorplan448x449mm.png",
+            ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 50.0,
               documentWidthInLengthUnits: Millimeter(448),
@@ -112,9 +121,10 @@ class _MyAppState extends State<MyApp> {
             ),
             controller: controller,
             showDistanceOnLine: showDistanceOnLine,
-            distanceStyle: DistanceStyle(numDecimalPlaces: 2, showTolerance: showTolerance),
+            distanceStyle: DistanceStyle(
+              showTolerance: showTolerance,
+            ),
             measure: measure,
-            pointStyle: PointStyle(lineType: DashedLine()),
           ),
         ),
       ),
