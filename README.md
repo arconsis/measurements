@@ -2,7 +2,7 @@
 
 This plugin provides a widget in which you can display another widget, for example a floor plan of your flat in an image and measure distances between points in your flat.
 
-![Showcase of Features](assets/gifs/all_features.gif)
+![Showcase of Features](assets/gifs/0_all_features.gif)
 
 ## Getting Started
 ~~To use this plugin simply include it in your `pubspec.yaml` with~~
@@ -35,6 +35,8 @@ Widget build(BuildContext context) {
 This will assume that the paper size of `your-document.png` is A4 (210mm x 297mm) and the content is in a scale of 1:1.
 You can place points, move them and see the distance between them in the view.
 
+![Example with defaults](assets/gifs/1_defaults.gif)
+
 
 ### Setting custom paper size, scale and unit of measurement
 ``` Dart
@@ -66,6 +68,8 @@ The document size can also be described with the above units by using the defaul
 `Inch(x.y)` for inches\
 `Foot(x.y)` for foot
 
+![Example with custom size](assets/gifs/2_measurement_information.gif)
+
 ### Toggle between measuring and movement
 You can switch between setting points for measuring and zooming/moving by changing the `measure` parameter.
 ``` Dart
@@ -88,6 +92,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+![Example with panning and zooming](assets/gifs/3_toggle_measure.gif)
+
 ### Show and hide distances in the widget
 As with the measure parameter you can also toggle the distances on the lines between the points on and off.
 ``` Dart
@@ -109,6 +115,8 @@ Widget build(BuildContext context) {
     ),
 }
 ```
+
+![Example with and without distances](assets/gifs/4_toggle_distance.gif)
 
 ### Getting the distances in code
 Since not seeing the distances defeates the purpose of the widget you can still access them by passing a `MeasurementController` which lets you access the distances between the points and the tolerance of the measurement.
@@ -166,6 +174,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+![Example with life-size](assets/gifs/5_life_size.gif)
+
 ## Customizability
 
 ### Deleting points
@@ -188,6 +198,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+![Example with custom delete region](assets/gifs/6_custom_delete.gif)
+
 ### Customizing the magnification glass
 When you place your finger on the screen to set a point you hide the position with your finger, too bad, but that's why we have a magnification glass build in and you can even customize it.
 Change the magnification factor by setting `magnificationZoomFactor` and to change the appearance of the magnification glass set `magnificationStyle` with your style.
@@ -209,6 +221,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+![Example with custom magnification glass](assets/gifs/7_custom_magnification_glass.gif)
+
 ### Customize the shown distances
 You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which color the distance should the drawn in.
 ``` Dart
@@ -226,6 +240,8 @@ Widget build(BuildContext context) {
     ),
 }
 ```
+
+![Example with custom distances](assets/gifs/8_custom_distances.gif)
 
 ### Customize the points and lines
 The size and color of the points and lines can be changed with the `pointStyle` parameter.
@@ -258,6 +274,8 @@ Widget build(BuildContext context) {
     ),
 }
 ```
+
+![Example with custoam lines](assets/gifs/9_custom_lines.gif)
 
 # License
 This project is licensed under the [MIT-License](https://github.com/arconsis/measurements/blob/master/LICENSE).
