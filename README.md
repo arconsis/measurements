@@ -20,7 +20,7 @@ dependencies:
 
 ## Overview
 * [Functional Usage](#functional-usage)
-  * [Using all defaults](#using all defaults)
+  * [Using all defaults](#using-all-defaults)
   * [Setting custom paper size, scale and unit of measurement](#setting-custom-paper-size-scale-and-unit-of-measurement)
   * [Toggle between measuring and movement](#toggle-between-measuring-and-movement)
   * [Show and hide distances in the widget](#show-and-hide-distances-in-the-widget)
