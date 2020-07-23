@@ -18,7 +18,7 @@ dependencies:
     path: path/to/measurement-repo
 ```
 
-## Overview
+## Usage Overview
 * [Functional Usage](#functional-usage)
   * [Using all defaults](#using-all-defaults)
   * [Setting custom paper size, scale and unit of measurement](#setting-custom-paper-size-scale-and-unit-of-measurement)
