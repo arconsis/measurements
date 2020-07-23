@@ -1,10 +1,12 @@
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart' as meta;
 
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
+/// The [LengthUnits] allow us to offer different units for measurement and changing between them.
 abstract class LengthUnit extends Equatable {
   final double value;
 
@@ -24,6 +26,12 @@ abstract class LengthUnit extends Equatable {
 
   Foot convertToFoot() => Foot(value * footFactor());
 
+  /// Returns the conversion factor of the current length unit to the target length [unit].
+  ///
+  /// The individual lengths are ignored, only the types matter.
+  /// ```dart
+  /// Meter(10).factorTo(Millimeter(20)); // 1000 (millimeter per meter)
+  /// ```
   LengthUnit factorTo(LengthUnit unit) {
     switch (unit.runtimeType) {
       case Meter:
@@ -39,6 +47,12 @@ abstract class LengthUnit extends Equatable {
     }
   }
 
+  /// Returns the current length expressed in the unit of the target length [unit].
+  ///
+  /// The length of the target unit is ignored, only its type matters.
+  /// ```dart
+  /// Meter(10).convertTo(Millimeter(5)); // 10.000 (millimeter)
+  /// ```
   LengthUnit convertTo(LengthUnit unit) {
     switch (unit.runtimeType) {
       case Meter:
@@ -121,7 +135,6 @@ class Millimeter extends LengthUnit {
 
   @override
   Millimeter operator /(double value) => Millimeter(this.value / value);
-
 }
 
 class Inch extends LengthUnit {
@@ -178,11 +191,18 @@ class Foot extends LengthUnit {
   Foot operator /(double value) => Foot(this.value / value);
 }
 
+/// This contains the information about the document that is being displayed.
+///
+/// To change the result measurement unit change [targetLengthUnit].
 class MeasurementInformation extends Equatable {
+  /// The scale of the content in the displayed document.
   final double scale;
+
+  /// The unit of measurement for the measurements of the user.
+  final LengthUnit targetLengthUnit;
+
   final LengthUnit documentWidthInLengthUnits;
   final LengthUnit documentHeightInLengthUnits;
-  final LengthUnit targetLengthUnit;
 
   const MeasurementInformation({
     @required this.documentWidthInLengthUnits,
@@ -191,6 +211,7 @@ class MeasurementInformation extends Equatable {
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
+  /// Default constructor for a DIN A4 document with a scale of 1 and Millimeters as the target unit.
   const MeasurementInformation.A4({
     this.scale = 1.0,
     this.documentWidthInLengthUnits = const Millimeter(210.0),
@@ -198,8 +219,10 @@ class MeasurementInformation extends Equatable {
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
+  @meta.protected
   LengthUnit get documentToTargetFactor => documentWidthInLengthUnits.factorTo(targetLengthUnit);
 
+  @meta.protected
   LengthUnit get documentWidthInUnitOfMeasurement => documentWidthInLengthUnits.convertTo(targetLengthUnit);
 
   @override

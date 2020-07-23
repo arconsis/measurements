@@ -43,7 +43,25 @@ class _DeleteChild extends StatelessWidget {
   }
 }
 
-class Measurement extends StatelessWidget {
+/// This widget displays its child and allows you to measure distances on its content.
+///
+/// [child] should be without any padding or margins, because the dimensions passed in [measurementInformation] will be assumed over the full width and height of the child.
+///
+/// [deleteChild] can be any widget but should not cover the whole widget as points are only removed when they are dragged from outside of the bounds of the [deleteChild] into its bounds.
+/// To position the [deleteChild] use [deleteChildAlignment].
+///
+/// When disabling [measure] the user can pan and zoom the document for more precise placement of points or focusing on one specific region.
+///
+/// When the distances are only needed programmatically, the displaying of the distances can be disabled with [showDistanceOnLine].
+///
+/// To change which unit of measurement you want the distances to be use [measurementInformation].
+/// The dimensions and scale of the document also have to be set in the [measurementInformation].
+///
+/// When you need the distances and tolerance in code or want to reset the zoom or zoom the document to life-size set a [MeasurementController] to [controller].
+///
+/// Changing how much the magnification glass zooms in set [magnificationZoomFactor] accordingly, but don't go too wild as that might break it.
+/// To style the appearance of the UI elements you can use [PointStyle], [MagnificationStyle] and [DistanceStyle] in [pointStyle], [magnificationStyle] and [distanceStyle] respectively.
+class Measurements extends StatelessWidget {
   final Widget child;
   final Widget deleteChild;
   final Alignment deleteChildAlignment;
@@ -56,7 +74,7 @@ class Measurement extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  Measurement({
+  Measurements({
     Key key,
     @required this.child,
     this.deleteChild = const _DeleteChild(),
@@ -86,7 +104,7 @@ class Measurement extends StatelessWidget {
         BlocProvider(create: (context) => InputBloc()),
         BlocProvider(create: (context) => ScaleBloc()),
       ],
-      child: MeasurementView(
+      child: _MeasurementView(
         child,
         deleteChild,
         deleteChildAlignment,
@@ -103,7 +121,7 @@ class Measurement extends StatelessWidget {
   }
 }
 
-class MeasurementView extends StatelessWidget {
+class _MeasurementView extends StatelessWidget {
   final Logger _logger = Logger(LogDistricts.MEASUREMENT_VIEW);
   final GlobalKey _childKey = GlobalKey();
   final GlobalKey _parentKey = GlobalKey();
@@ -121,7 +139,7 @@ class MeasurementView extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  MeasurementView(
+  _MeasurementView(
     this.child,
     this.deleteChild,
     this.deleteChildAlignment,

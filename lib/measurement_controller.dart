@@ -29,8 +29,13 @@ class MeasurementValues extends Equatable {
   List<Object> get props => [distances, tolerance];
 }
 
-/// This controller offers the interaction with the displayed content for zooming in and out.
-/// You can get the latest distances and tolerance directly
+/// A controller that offers interaction with the displayed content for zooming in or out and retrieving the measured distances.
+///
+/// You can get the latest distances and tolerance directly by calling [distances] and [tolerance] respectively
+/// or listen to the [MeasurementValues] stream via
+/// ```dart
+/// measurementController.measurements.listen((value) => ...);
+/// ```
 class MeasurementController {
   final BehaviorSubject<MeasurementValues> _currentValues = BehaviorSubject();
   MeasurementFunction _function;
@@ -40,8 +45,11 @@ class MeasurementController {
   @protected
   set measurementFunction(MeasurementFunction function) => _function = function;
 
+  /// The stream of measurements the user takes.
+  /// They will be in the selected unit of measurement in [MeasurementView].
   Stream<MeasurementValues> get measurements => _currentValues.stream;
 
+  /// Returns the latest distances.
   List<double> get distances => _currentValues.value?.distances;
 
   @protected
@@ -53,6 +61,8 @@ class MeasurementController {
     _currentValues.value = MeasurementValues(distances, tolerance);
   }
 
+  /// Return the current tolerance.
+  /// This might change as the user zooms in and out.
   double get tolerance => _currentValues.value?.tolerance;
 
   @protected
@@ -64,8 +74,11 @@ class MeasurementController {
     _currentValues.value = MeasurementValues(distances, tolerance);
   }
 
+  /// Zoom the content to life-size if possible.
+  /// When the resulting zoom would be too large the call will be ignored to avoid performance issues and other problems.
   bool zoomToLifeSize() => _function?.zoomToLifeSize();
 
+  /// Reset the zoom back to 1, which will fit the content into the view.
   bool resetZoom() => _function?.resetZoom();
 
   void close() {

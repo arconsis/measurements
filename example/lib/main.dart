@@ -109,7 +109,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         body: Center(
-          child: Measurement(
+          child: Measurements(
             child: Image.asset(
               "assets/images/floorplan448x449mm.png",
             ),
