@@ -1,17 +1,15 @@
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/drawing_holder.dart';
-import 'package:measurements/measurement/overlay/measure_area.dart';
-import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/src/measurement/drawing_holder.dart';
+import 'package:measurements/src/measurement/overlay/measure_area.dart';
+import 'package:measurements/src/measurement/repository/measurement_repository.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 
 Type typeOf<T>() => T;
 
@@ -57,7 +55,7 @@ void main() {
 
     group("widget setup", () {
       testWidgets("measurement should show child also when measure is false", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
         )));
 
@@ -66,7 +64,7 @@ void main() {
       });
 
       testWidgets("measurement should show child under measure area when measuring", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
         )));
@@ -80,7 +78,7 @@ void main() {
 
     group("setting points", () {
       testWidgets("adding single point", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
         )));
@@ -96,7 +94,7 @@ void main() {
       });
 
       testWidgets("adding multiple points and getting distances", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
@@ -128,7 +126,7 @@ void main() {
       });
 
       testWidgets("add points without distances and then turn on distances", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: false,
@@ -156,7 +154,7 @@ void main() {
         expect(controller.distances, equals([400, 400, 400]));
         expect(controller.tolerance, equals(2));
 
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
@@ -173,7 +171,7 @@ void main() {
       });
 
       testWidgets("adding multiple points and getting distances with set scale", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
@@ -221,7 +219,7 @@ void main() {
       });
 
       testWidgets("set zoom to original size and reset zoom level", (WidgetTester tester) async {
-        await tester.pumpWidget(fillTemplate(Measurement(
+        await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
@@ -231,7 +229,7 @@ void main() {
 
         await tester.pump();
 
-        controller.zoomToOriginalSize();
+        controller.zoomToLifeSize();
         await tester.pump();
 
         controller.resetZoom();

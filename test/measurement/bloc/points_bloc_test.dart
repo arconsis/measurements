@@ -1,20 +1,18 @@
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'dart:math';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurement/bloc/points_bloc/points_bloc.dart';
-import 'package:measurements/measurement/bloc/points_bloc/points_state.dart';
-import 'package:measurements/measurement/drawing_holder.dart';
-import 'package:measurements/measurement/overlay/holder.dart';
-import 'package:measurements/measurement/repository/measurement_repository.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
+import 'package:measurements/src/measurement/bloc/points_bloc/points_bloc.dart';
+import 'package:measurements/src/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measurements/src/measurement/drawing_holder.dart';
+import 'package:measurements/src/measurement/overlay/holder.dart';
+import 'package:measurements/src/measurement/repository/measurement_repository.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';

@@ -1,16 +1,13 @@
 import 'dart:async';
-///
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-///
 
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:measurements/measurements.dart';
-import 'package:measurements/metadata/repository/metadata_repository.dart';
-import 'package:measurements/style/magnification_style.dart';
+import 'package:measurements/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
@@ -119,7 +116,7 @@ void main() {
           controller: expectedController,
         );
 
-        expect(await metadataRepository.zoomFactorForOriginalSize, equals(1.0));
+        expect(await metadataRepository.zoomFactorForLifeSize, equals(1.0));
       });
 
       test("started and retrieve zoom factor for original size", () async {
@@ -136,7 +133,7 @@ void main() {
         metadataRepository.registerBackgroundChange(expectedImage, viewSize);
         metadataRepository.registerScreenSize(Size(200, 300));
 
-        expect(await metadataRepository.zoomFactorForOriginalSize, equals(expectedZoomFactor));
+        expect(await metadataRepository.zoomFactorForLifeSize, equals(expectedZoomFactor));
       });
     });
   });
