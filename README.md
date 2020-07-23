@@ -11,12 +11,19 @@ dependencies:
   measurements: 0.0.1 // not published yet
 ```
 
-You need to download this repo and then reference it as
+You can either download this repo and then reference it as
 ```yaml
 dependencies:
   measurements: 
     path: path/to/measurement-repo
 ```
+or use it over GitHub directly with
+```yaml
+dependencies:
+  measurements: 
+    git: git://github.com/arconsis/measurements.git
+```
+and make sure to run `flutter packages upgrade`.
 
 # Usage Overview
 * [Functional Usage](#functional-usage)
