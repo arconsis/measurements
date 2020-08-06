@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> {
                 child: MaterialButton(
                   shape: CircleBorder(),
                   onPressed: () => setState(() => showTolerance = !showTolerance),
-                  child: Text("±"),
+                  child: Text('±'),
                   textColor: getButtonColor(showTolerance),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Measurements(
             child: Image.asset(
-              "assets/images/floorplan448x449mm.png",
+              'assets/images/floorplan448x449mm.png',
             ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 50.0,

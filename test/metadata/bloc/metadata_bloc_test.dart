@@ -4,25 +4,25 @@
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/metadata/bloc/metadata_bloc.dart';
 import 'package:document_measure/src/metadata/bloc/metadata_event.dart';
 import 'package:document_measure/src/metadata/bloc/metadata_state.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Metadata Bloc Unit Test", () {
+  group('Metadata Bloc Unit Test', () {
     MetadataRepository mockedRepository;
     BehaviorSubject<bool> measurement;
     Image mockedImage;
 
-    final measurementInformation = MeasurementInformation.A4(scale: 1.0);
+    final measurementInformation = MeasurementInformation.dinA4(scale: 1.0);
     final measure = true;
     final showDistance = true;
     final magnificationStyle = MagnificationStyle();
@@ -49,15 +49,15 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       skip: 0,
       build: () async => MetadataBloc(),
       expect: [MetadataState()],
     );
 
-    group("metadata events", () {
+    group('metadata events', () {
       blocTest(
-        "started event",
+        'started event',
         build: () async => MetadataBloc(),
         act: (bloc) => bloc.add(startedEvent),
         verify: (MetadataBloc bloc) async {
@@ -72,7 +72,7 @@ void main() {
       );
 
       blocTest(
-        "background event",
+        'background event',
         skip: 0,
         build: () async => MetadataBloc(),
         act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
@@ -85,7 +85,7 @@ void main() {
       );
 
       blocTest(
-        "delete region event",
+        'delete region event',
         build: () async => MetadataBloc(),
         act: (bloc) => bloc.add(MetadataDeleteRegionEvent(Offset(10, 10), Size(10, 10))),
         verify: (MetadataBloc bloc) async {
@@ -94,7 +94,7 @@ void main() {
       );
 
       blocTest(
-        "started, background and delete event",
+        'started, background and delete event',
         build: () async {
           when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
 

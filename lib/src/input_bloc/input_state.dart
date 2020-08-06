@@ -19,7 +19,7 @@ abstract class InputPositionalState extends InputState {
   List<Object> get props => [position];
 
   @override
-  String toString() => super.toString() + " position: $position";
+  String toString() => super.toString() + ' position: $position';
 }
 
 class InputStandardState extends InputPositionalState {

@@ -20,7 +20,7 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " size: $size, backgroundImage: $backgroundImage";
+    return super.toString() + ' size: $size, backgroundImage: $backgroundImage';
   }
 }
 
@@ -44,7 +44,7 @@ class MetadataStartedEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle";
+    return super.toString() + ' MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
   }
 }
 
@@ -58,7 +58,7 @@ class MetadataOrientationEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " orientation: $orientation";
+    return super.toString() + ' orientation: $orientation';
   }
 }
 
@@ -72,7 +72,7 @@ class MetadataScreenSizeEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " screenSize: $screenSize";
+    return super.toString() + ' screenSize: $screenSize';
   }
 }
 
@@ -87,6 +87,6 @@ class MetadataDeleteRegionEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " position: $position, deleteSize: $deleteSize";
+    return super.toString() + ' position: $position, deleteSize: $deleteSize';
   }
 }

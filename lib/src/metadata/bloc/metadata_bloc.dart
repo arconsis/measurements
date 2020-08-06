@@ -22,7 +22,7 @@ class MetadataBloc extends Bloc<MetadataEvent, MetadataState> {
 
   @override
   void onEvent(MetadataEvent event) async {
-    _logger.log("received event: $event");
+    _logger.log('received event: $event');
 
     if (event is MetadataStartedEvent) {
       _repository.registerStartupValuesChange(

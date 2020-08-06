@@ -18,7 +18,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Measure Bloc Unit Test", () {
+  group('Measure Bloc Unit Test', () {
     final imageScaleFactor = 3.0;
 
     MetadataRepository mockedMetadataRepository;
@@ -47,7 +47,7 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       skip: 0,
       build: () async {
         when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
@@ -58,9 +58,9 @@ void main() {
       expect: [MagnificationInactiveState()],
     );
 
-    group("UI events", () {
+    group('UI events', () {
       blocTest(
-        "stroke events",
+        'stroke events',
         build: () async {
           when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
           when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));

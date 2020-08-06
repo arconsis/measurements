@@ -14,7 +14,7 @@ class DrawingHolder extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " points: $points, distances: $distances";
+    return super.toString() + ' points: $points, distances: $distances';
   }
 
   @override

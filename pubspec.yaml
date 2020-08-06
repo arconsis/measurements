@@ -1,6 +1,6 @@
 name: document_measure
-description: A widget that allows you to measure distances in documents.
-version: 0.0.1+0
+description: This package lets you measure distances in documents. The main use will probabily be technical documents and floorplans, but you are welcome to experiment with it.
+version: 0.0.1+1
 repository: "https://github.com/arconsis/measurements"
 issue_tracker: "https://github.com/arconsis/measurements/issues"
 
@@ -14,7 +14,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^5.0.1
   get_it: ^4.0.4
-  meta: ^1.1.8
   path_provider: ^1.6.11
   rxdart: ^0.24.1
 
@@ -23,6 +22,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mockito: 4.1.1
+  pedantic: 1.9.0
 
 flutter:
   assets:

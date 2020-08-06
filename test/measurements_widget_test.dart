@@ -1,23 +1,23 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/measurement/drawing_holder.dart';
 import 'package:document_measure/src/measurement/overlay/measure_area.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 
 Type typeOf<T>() => T;
 
 final imageWidth = 800.0;
 final imageHeight = 600.0;
 final imageWidget = Image.asset(
-  "assets/images/example_portrait.png",
-  package: "document_measure",
+  'assets/images/example_portrait.png',
+  package: 'document_measure',
   width: imageWidth,
   height: imageHeight,
 );
@@ -36,7 +36,7 @@ void main() {
   final controller = MeasurementController();
   final measurementInformation = MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), documentHeightInLengthUnits: Millimeter(imageHeight * 2));
 
-  group("Measurement Widget Integration Test", () {
+  group('Measurement Widget Integration Test', () {
     MetadataRepository metadataRepository;
     MeasurementRepository measurementRepository;
 
@@ -53,8 +53,8 @@ void main() {
       GetIt.I.unregister(instance: measurementRepository);
     });
 
-    group("widget setup", () {
-      testWidgets("measurement should show child also when measure is false", (WidgetTester tester) async {
+    group('widget setup', () {
+      testWidgets('measurement should show child also when measure is false', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
         )));
@@ -63,7 +63,7 @@ void main() {
         expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
       });
 
-      testWidgets("measurement should show child under measure area when measuring", (WidgetTester tester) async {
+      testWidgets('measurement should show child under measure area when measuring', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -76,8 +76,8 @@ void main() {
       });
     });
 
-    group("setting points", () {
-      testWidgets("adding single point", (WidgetTester tester) async {
+    group('setting points', () {
+      testWidgets('adding single point', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -93,7 +93,7 @@ void main() {
         measurementRepository.points.listen((actual) => expect(actual, [Offset(100, 100)]));
       });
 
-      testWidgets("adding multiple points and getting distances", (WidgetTester tester) async {
+      testWidgets('adding multiple points and getting distances', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -125,7 +125,7 @@ void main() {
         expect(controller.tolerance, equals(2));
       });
 
-      testWidgets("add points without distances and then turn on distances", (WidgetTester tester) async {
+      testWidgets('add points without distances and then turn on distances', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -170,7 +170,7 @@ void main() {
         expect(controller.tolerance, equals(2));
       });
 
-      testWidgets("adding multiple points and getting distances with set scale", (WidgetTester tester) async {
+      testWidgets('adding multiple points and getting distances with set scale', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -206,11 +206,11 @@ void main() {
       });
     });
 
-    group("controller interaction", () {
-      final channel = MethodChannel("measurements");
+    group('controller interaction', () {
+      final channel = MethodChannel('measurements');
       setUp(() {
         channel.setMockMethodCallHandler((call) async {
-          if (call.method == "getPhysicalPixelsPerInch") {
+          if (call.method == 'getPhysicalPixelsPerInch') {
             return 4.0;
           } else {
             return -1.0;
@@ -218,7 +218,7 @@ void main() {
         });
       });
 
-      testWidgets("set zoom to original size and reset zoom level", (WidgetTester tester) async {
+      testWidgets('set zoom to original size and reset zoom level', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,

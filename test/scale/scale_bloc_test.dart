@@ -14,7 +14,7 @@ import '../mocks/test_mocks.dart';
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 void main() {
-  group("Scale Bloc Test", () {
+  group('Scale Bloc Test', () {
     MetadataRepository mockedMetadataRepository;
     final defaultOffset = Offset(25, 50);
 
@@ -36,7 +36,7 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       build: () async => ScaleBloc(),
       skip: 0,
       expect: [
@@ -45,9 +45,9 @@ void main() {
       ],
     );
 
-    group("single touch events", () {
+    group('single touch events', () {
       blocTest(
-        "panning",
+        'panning',
         build: () async => ScaleBloc(),
         act: (bloc) async {
           bloc.add(ScaleStartEvent(Offset(0, 0)));
@@ -59,7 +59,7 @@ void main() {
       );
 
       blocTest(
-        "zooming",
+        'zooming',
         build: () async => ScaleBloc(),
         act: (bloc) async {
           bloc.add(ScaleStartEvent(Offset(0, 0)));
@@ -76,7 +76,7 @@ void main() {
       );
 
       blocTest(
-        "zooming out should clamp at 1.0",
+        'zooming out should clamp at 1.0',
         build: () async => ScaleBloc(),
         act: (bloc) async {
           bloc.add(ScaleStartEvent(Offset(0, 0)));
@@ -93,7 +93,7 @@ void main() {
       );
 
       blocTest(
-        "zoom and then pan",
+        'zoom and then pan',
         build: () async => ScaleBloc(),
         act: (bloc) async {
           bloc.add(ScaleStartEvent(Offset(0, 0)));
@@ -113,7 +113,7 @@ void main() {
       );
 
       blocTest(
-        "zoom twice",
+        'zoom twice',
         build: () async => ScaleBloc(),
         act: (bloc) async {
           bloc.add(ScaleStartEvent(Offset(0, 0)));
@@ -133,9 +133,9 @@ void main() {
       );
     });
 
-    group("double tap", () {
+    group('double tap', () {
       blocTest(
-        "single double tap event",
+        'single double tap event',
         build: () async => ScaleBloc(),
         act: (bloc) async => bloc.add(ScaleDoubleTapEvent()),
         expect: [

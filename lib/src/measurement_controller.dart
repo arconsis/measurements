@@ -2,7 +2,6 @@
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Interface to offer zoom functionality.
@@ -42,7 +41,7 @@ class MeasurementController {
 
   MeasurementController();
 
-  @protected
+  /// Only for internal use. Don't use it, as that will break the update of distances.
   set measurementFunction(MeasurementFunction function) => _function = function;
 
   /// The stream of measurements the user takes.
@@ -52,7 +51,7 @@ class MeasurementController {
   /// Returns the latest distances.
   List<double> get distances => _currentValues.value?.distances;
 
-  @protected
+  /// Only for internal use. Using it will return [distances] back to you in the [measurements] [Stream].
   set distances(List<double> distances) {
     if (_currentValues.value?.distances == distances) {
       return;
@@ -65,7 +64,7 @@ class MeasurementController {
   /// This might change as the user zooms in and out.
   double get tolerance => _currentValues.value?.tolerance;
 
-  @protected
+  /// Only for internal use. Using it will return [tolerance] back to you in the [measurements] [Stream].
   set tolerance(double tolerance) {
     if (_currentValues.value?.tolerance == tolerance) {
       return;

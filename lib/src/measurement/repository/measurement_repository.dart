@@ -4,11 +4,11 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:document_measure/src/util/logger.dart';
 import 'package:document_measure/src/util/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../drawing_holder.dart';
@@ -23,8 +23,8 @@ enum TouchState {
 class MeasurementRepository {
   final _logger = Logger(LogDistricts.MEASUREMENT_REPOSITORY);
 
-  final _points = BehaviorSubject<List<Offset>>.seeded(List());
-  final _distances = BehaviorSubject<List<LengthUnit>>.seeded(List());
+  final _points = BehaviorSubject<List<Offset>>.seeded([]);
+  final _distances = BehaviorSubject<List<LengthUnit>>.seeded([]);
   final _drawingHolder = BehaviorSubject<DrawingHolder>();
   final MetadataRepository _metadataRepository;
 
@@ -35,7 +35,7 @@ class MeasurementRepository {
   int _currentIndex = -1;
   TouchState _currentState = TouchState.FREE;
 
-  List<Offset> _absolutePoints = List();
+  final List<Offset> _absolutePoints = [];
   double _zoomLevel = 1.0;
   Offset _backgroundPosition = Offset(0, 0);
   Offset _viewCenterPosition = Offset(0, 0);
@@ -71,12 +71,12 @@ class MeasurementRepository {
     if (_currentState != TouchState.FREE) return;
     _currentState = TouchState.DOWN;
 
-    Offset documentLocalCenteredPosition = _convertIntoDocumentLocalCenteredPosition(globalPosition, _viewCenterPosition);
+    var documentLocalCenteredPosition = _convertIntoDocumentLocalCenteredPosition(globalPosition, _viewCenterPosition);
 
-    int closestIndex = _getClosestPointIndex(documentLocalCenteredPosition);
+    var closestIndex = _getClosestPointIndex(documentLocalCenteredPosition);
 
     if (closestIndex >= 0) {
-      Offset closestPoint = _absolutePoints[closestIndex];
+      var closestPoint = _absolutePoints[closestIndex];
 
       if ((_convertIntoGlobalPosition(closestPoint, _viewCenterPosition) - globalPosition).distance > 40.0) {
         _currentIndex = _addNewPoint(documentLocalCenteredPosition);
@@ -122,7 +122,7 @@ class MeasurementRepository {
   }
 
   Offset convertIntoDocumentLocalTopLeftPosition(Offset position) {
-    Offset documentLocalCenterPosition = _convertIntoDocumentLocalCenteredPosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
+    var documentLocalCenterPosition = _convertIntoDocumentLocalCenteredPosition(position, _viewCenterPosition) / _imageToDocumentScaleFactor;
 
     return Offset(documentLocalCenterPosition.dx + _viewCenterPosition.dx, _viewCenterPosition.dy - documentLocalCenterPosition.dy);
   }
@@ -132,7 +132,7 @@ class MeasurementRepository {
   }
 
   Offset _convertIntoGlobalPosition(Offset position, Offset viewCenter) {
-    Offset scaledPosition = position / _imageToDocumentScaleFactor * _zoomLevel;
+    var scaledPosition = position / _imageToDocumentScaleFactor * _zoomLevel;
 
     return Offset(scaledPosition.dx + viewCenter.dx + _backgroundPosition.dx, viewCenter.dy - scaledPosition.dy - _backgroundPosition.dy);
   }
@@ -142,14 +142,14 @@ class MeasurementRepository {
   }
 
   void _publishPoints() {
-    List<Offset> relativePoints = _getRelativePoints();
+    var relativePoints = _getRelativePoints();
 
-    _logger.log("\nimageToDocumentScaleFactor: ${_imageToDocumentScaleFactor.toStringAsFixed(2)}, "
-        "zoomLevel: ${_zoomLevel.toStringAsFixed(2)}, "
-        "backgroundPosition: $_backgroundPosition, "
-        "viewCenter: $_viewCenterPosition\n"
-        "absolute points: $_absolutePoints\n"
-        "relative points: $relativePoints");
+    _logger.log('\nimageToDocumentScaleFactor: ${_imageToDocumentScaleFactor.toStringAsFixed(2)}, '
+        'zoomLevel: ${_zoomLevel.toStringAsFixed(2)}, '
+        'backgroundPosition: $_backgroundPosition, '
+        'viewCenter: $_viewCenterPosition\n'
+        'absolute points: $_absolutePoints\n'
+        'relative points: $relativePoints');
 
     _points.add(relativePoints);
     _drawingHolder.add(DrawingHolder(relativePoints, _distances.value));
@@ -159,7 +159,7 @@ class MeasurementRepository {
     _absolutePoints.add(point);
     _publishPoints();
 
-    _logger.log("added point: $_absolutePoints");
+    _logger.log('added point: $_absolutePoints');
     return _absolutePoints.length - 1;
   }
 
@@ -168,18 +168,18 @@ class MeasurementRepository {
       _absolutePoints.setRange(_currentIndex, _currentIndex + 1, [point]);
       _publishPoints();
 
-      _logger.log("updated point $_currentIndex: $_absolutePoints");
+      _logger.log('updated point $_currentIndex: $_absolutePoints');
     }
   }
 
   int _getClosestPointIndex(Offset reference) {
-    int index = 0;
+    var index = 0;
 
-    List<_CompareHolder> sortedPoints = _absolutePoints.map((Offset point) => _CompareHolder(index++, (reference - point).distance)).toList();
+    var sortedPoints = _absolutePoints.map((Offset point) => _CompareHolder(index++, (reference - point).distance)).toList();
 
     sortedPoints.sort((_CompareHolder a, _CompareHolder b) => a.distance.compareTo(b.distance));
 
-    return sortedPoints.length > 0 ? sortedPoints[0].index : -1;
+    return sortedPoints.isNotEmpty ? sortedPoints[0].index : -1;
   }
 
   void _publishDistances(List<LengthUnit> distances) {
@@ -188,12 +188,12 @@ class MeasurementRepository {
   }
 
   void _movementStarted(int index) {
-    List<LengthUnit> distances = List()..addAll(_distances.value);
+    var distances = [..._distances.value];
 
     distances.setRange(max(0, index - 1), min(distances.length, index + 1), [null, null]);
     _publishDistances(distances);
 
-    _logger.log("started moving point with index: $index");
+    _logger.log('started moving point with index: $index');
   }
 
   void _movementFinished() {
@@ -204,7 +204,7 @@ class MeasurementRepository {
 
   void _synchronizeDistances() {
     if (_transformationFactor != null && _absolutePoints.length >= 2) {
-      List<LengthUnit> distances = List();
+      var distances = <LengthUnit>[];
       _absolutePoints.doInBetween((start, end) => distances.add(_transformationFactor * (start - end).distance));
       _publishDistances(distances);
 
