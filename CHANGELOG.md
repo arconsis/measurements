@@ -1,3 +1,6 @@
+## 0.0.1+0
+* Updated installation method in README
+
 ## 0.0.1
 ### Added Features
 * Measuring in Meter, Millimeter, Inch and Foot

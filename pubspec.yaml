@@ -1,6 +1,6 @@
 name: document_measure
 description: A widget that allows you to measure distances in documents.
-version: 0.0.1
+version: 0.0.1+0
 repository: "https://github.com/arconsis/measurements"
 issue_tracker: "https://github.com/arconsis/measurements/issues"
 
