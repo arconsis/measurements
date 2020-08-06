@@ -6,14 +6,14 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurements.dart';
-import 'package:measurements/src/measurement/bloc/points_bloc/points_event.dart';
-import 'package:measurements/src/measurement/bloc/points_bloc/points_state.dart';
-import 'package:measurements/src/measurement/overlay/holder.dart';
-import 'package:measurements/src/measurement/repository/measurement_repository.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
-import 'package:measurements/src/util/logger.dart';
-import 'package:measurements/src/util/utils.dart';
+import 'package:measure/measure.dart';
+import 'package:measure/src/measurement/bloc/points_bloc/points_event.dart';
+import 'package:measure/src/measurement/bloc/points_bloc/points_state.dart';
+import 'package:measure/src/measurement/overlay/holder.dart';
+import 'package:measure/src/measurement/repository/measurement_repository.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/util/logger.dart';
+import 'package:measure/src/util/utils.dart';
 
 import '../../drawing_holder.dart';
 

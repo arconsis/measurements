@@ -1,4 +1,4 @@
-# measurements 
+# measure
 
 This plugin provides a widget in which you can display another widget, for example, a floor plan of your flat in an image and measure distances between points in your flat.
 
@@ -8,19 +8,19 @@ This plugin provides a widget in which you can display another widget, for examp
 ~~To use this plugin simply include it in your `pubspec.yaml` with~~
 ```yaml
 dependencies:
-  measurements: 0.0.1 // not published yet
+  measure: 0.0.1 // not published yet
 ```
 
 You can either download this repo and then reference it as
 ```yaml
 dependencies:
-  measurements: 
+  measure: 
     path: path/to/measurement-repo
 ```
 or use it over GitHub directly with
 ```yaml
 dependencies:
-  measurements: 
+  measure: 
     git: git://github.com/arconsis/measurements.git
 ```
 and make sure to run `flutter packages upgrade`.
@@ -45,7 +45,7 @@ and make sure to run `flutter packages upgrade`.
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -62,7 +62,7 @@ You can place points, move them and see the distance between them in the view.
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -103,7 +103,7 @@ void toggle() {
 
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -127,7 +127,7 @@ void toggle() {
 
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -160,7 +160,7 @@ void accessValues() {
 
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -185,7 +185,7 @@ void resetZoom() {
 
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -204,7 +204,7 @@ But you can also set your own custom widget by passing a widget to the `deleteCh
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -226,7 +226,7 @@ Change the magnification factor by setting `magnificationZoomFactor` and to chan
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -248,7 +248,7 @@ You can change how many decimal places you want to be displayed on the lines, wh
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),
@@ -277,7 +277,7 @@ DashedLine(double dashWidth, double dashLength, double dashDistance, Color lineC
 ``` Dart
 Widget build(BuildContext context) {
   return ...
-    Measurement(
+    Measurements(
       child: Image.asset(
         "assets/images/your-document.png",
       ),

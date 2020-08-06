@@ -3,8 +3,9 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:measurements/measurements.dart';
-import 'package:measurements_example/colors.dart';
+import 'package:measure/measure.dart';
+
+import 'colors.dart';
 
 class MetadataRepository {}
 

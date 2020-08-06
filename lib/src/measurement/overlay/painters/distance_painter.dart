@@ -5,7 +5,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measurements/measurements.dart';
+import 'package:measure/measure.dart';
 
 class DistancePainter extends material.CustomPainter {
   static final double _log10 = log(10);

@@ -5,10 +5,10 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:measurements/measurements.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
-import 'package:measurements/src/util/logger.dart';
-import 'package:measurements/src/util/utils.dart';
+import 'package:measure/measure.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/util/logger.dart';
+import 'package:measure/src/util/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../drawing_holder.dart';

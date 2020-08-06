@@ -4,7 +4,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:measurements/src/util/colors.dart';
+import 'package:measure/src/util/colors.dart';
 
 abstract class LineType extends Equatable {
   final Color lineColor;

@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:measurements/src/input_bloc/input_bloc.dart';
-import 'package:measurements/src/input_bloc/input_event.dart';
-import 'package:measurements/src/input_bloc/input_state.dart';
-import 'package:measurements/src/measurement/repository/measurement_repository.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/input_bloc/input_bloc.dart';
+import 'package:measure/src/input_bloc/input_event.dart';
+import 'package:measure/src/input_bloc/input_state.dart';
+import 'package:measure/src/measurement/repository/measurement_repository.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 class MockedMetadataRepository extends Mock implements MetadataRepository {}

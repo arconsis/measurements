@@ -104,7 +104,7 @@ class Measurements extends StatelessWidget {
         BlocProvider(create: (context) => InputBloc()),
         BlocProvider(create: (context) => ScaleBloc()),
       ],
-      child: _MeasurementView(
+      child: _Measurements(
         child,
         deleteChild,
         deleteChildAlignment,
@@ -121,7 +121,7 @@ class Measurements extends StatelessWidget {
   }
 }
 
-class _MeasurementView extends StatelessWidget {
+class _Measurements extends StatelessWidget {
   final Logger _logger = Logger(LogDistricts.MEASUREMENT_VIEW);
   final GlobalKey _childKey = GlobalKey();
   final GlobalKey _parentKey = GlobalKey();
@@ -139,7 +139,7 @@ class _MeasurementView extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  _MeasurementView(
+  _Measurements(
     this.child,
     this.deleteChild,
     this.deleteChildAlignment,

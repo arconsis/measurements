@@ -7,11 +7,11 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/src/input_bloc/input_bloc.dart';
-import 'package:measurements/src/input_bloc/input_state.dart';
-import 'package:measurements/src/measurement/repository/measurement_repository.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
-import 'package:measurements/src/util/logger.dart';
+import 'package:measure/src/input_bloc/input_bloc.dart';
+import 'package:measure/src/input_bloc/input_state.dart';
+import 'package:measure/src/measurement/repository/measurement_repository.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/util/logger.dart';
 
 import 'magnification_event.dart';
 import 'magnification_state.dart';

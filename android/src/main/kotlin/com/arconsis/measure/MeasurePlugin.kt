@@ -1,4 +1,4 @@
-package com.arconsis.measurements
+package com.arconsis.measure
 
 import android.content.res.Resources
 import androidx.annotation.NonNull
@@ -8,11 +8,11 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-/** MeasurementsPlugin */
-class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
+/** MeasurePlugin */
+class MeasurePlugin : FlutterPlugin, MethodCallHandler {
 	override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-		val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "measurements")
-		channel.setMethodCallHandler(MeasurementsPlugin())
+		val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "measure")
+		channel.setMethodCallHandler(MeasurePlugin())
 	}
 
 	// This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -27,8 +27,8 @@ class MeasurementsPlugin : FlutterPlugin, MethodCallHandler {
 	companion object {
 		@JvmStatic
 		fun registerWith(registrar: Registrar) {
-			val channel = MethodChannel(registrar.messenger(), "measurements")
-			channel.setMethodCallHandler(MeasurementsPlugin())
+			val channel = MethodChannel(registrar.messenger(), "measure")
+			channel.setMethodCallHandler(MeasurePlugin())
 		}
 	}
 

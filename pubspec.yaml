@@ -1,4 +1,4 @@
-name: measurements
+name: measure
 description: A widget that allows you to measure distances in documents.
 version: 0.0.1
 repository: "https://github.com/arconsis/measurements"
@@ -28,8 +28,8 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.arconsis.measurements
-        pluginClass: MeasurementsPlugin
+        package: com.arconsis.measure
+        pluginClass: MeasurePlugin
       ios:
-        pluginClass: MeasurementsPlugin
+        pluginClass: MeasurePlugin
 

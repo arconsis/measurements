@@ -5,7 +5,7 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/gestures.dart';
-import 'package:measurements/src/measurement/overlay/holder.dart';
+import 'package:measure/src/measurement/overlay/holder.dart';
 
 abstract class PointsState extends Equatable {
 }
