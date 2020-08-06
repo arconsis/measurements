@@ -1,6 +1,6 @@
 # measurements 
 
-This plugin provides a widget in which you can display another widget, for example a floor plan of your flat in an image and measure distances between points in your flat.
+This plugin provides a widget in which you can display another widget, for example, a floor plan of your flat in an image and measure distances between points in your flat.
 
 ![Showcase of Features](assets/gifs/0_all_features.gif)
 
@@ -52,7 +52,7 @@ Widget build(BuildContext context) {
     ),
 }
 ```
-This will assume that the paper size of `your-document.png` is A4 (210mm x 297mm) and the content is in a scale of 1:1.
+This will assume that the paper size of `your-document.png` is A4 (210mm x 297mm) and the content is on a scale of 1:1.
 You can place points, move them and see the distance between them in the view.
 
 ![Example with defaults](assets/gifs/1_defaults.gif)
@@ -75,7 +75,7 @@ Widget build(BuildContext context) {
     ),
 }
 ```
-`your-document.png` should now contain as document that is 11in x 17in and has a scale of 1:2. The distances will be displayed in foot.
+`your-document.png` should now contain a document that is 11in x 17in and has a scale of 1:2. The distances will be displayed in foot.
 You can pick a measurement unit by setting `targetLengthUnit` to\
 `Meter.asUnit()` for meters,\
 `Millimeter.asUnit()` for millimeters,\
@@ -115,7 +115,7 @@ Widget build(BuildContext context) {
 ![Example with panning and zooming](assets/gifs/3_toggle_measure.gif)
 
 ### Show and hide distances in the widget
-As with the measure parameter you can also toggle the distances on the lines between the points on and off.
+As with the measure parameter, you can also toggle the distances on the lines between the points on and off.
 ``` Dart
 bool showDistances = true;
 
@@ -139,7 +139,7 @@ Widget build(BuildContext context) {
 ![Example with and without distances](assets/gifs/4_toggle_distance.gif)
 
 ### Getting the distances in code
-Since not seeing the distances defeates the purpose of the widget you can still access them by passing a `MeasurementController` which lets you access the distances between the points and the tolerance of the measurement.
+Since not seeing the distances defeats the purpose of the widget you can still access them by passing a `MeasurementController` which lets you access the distances between the points and the tolerance of the measurement.
 You can listen to the stream of measurements or access the distances and tolerance separately through the `MeasurementController`.
 ``` Dart
 MeasurementController controller = MeasurementController();
@@ -170,7 +170,7 @@ Widget build(BuildContext context) {
 ```
 
 ### Display your drawing in life-size
-For smaller parts you can use the `MeasurementController` to zoom your document to life-size. (The maximal magnification is 10, which might not be sufficient for larger documents or bigger scales)
+For smaller parts, you can use the `MeasurementController` to zoom your document to life-size. (The maximal magnification is 10, which might not be sufficient for larger documents or bigger scales)
 Simply call `MeasurementController::zoomToLifeSize` to set the magnification accordingly and `MeasurementController::resetZoom` to reset the magnification to `1`.
 ``` Dart
 MeasurementController controller = MeasurementController();
@@ -199,8 +199,8 @@ Widget build(BuildContext context) {
 ## Customizability
 
 ### Deleting points
-By default an icon will be displayed at the bottom center which will remove a points when it is beeing draged into the icon and released there.
-But you can also set your own custom widget there by passing a widget to the `deleteChild` parameter and align it by setting `deleteChildAlignment` accordingly.
+By default, an icon will be displayed at the bottom centre which will remove a point when it is being dragged into the icon and released there.
+But you can also set your own custom widget by passing a widget to the `deleteChild` parameter and align it by setting `deleteChildAlignment` accordingly.
 ``` Dart
 Widget build(BuildContext context) {
   return ...
@@ -244,7 +244,7 @@ Widget build(BuildContext context) {
 ![Example with custom magnification glass](assets/gifs/7_custom_magnification_glass.gif)
 
 ### Customize the shown distances
-You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which color the distance should the drawn in.
+You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which colour the distance should the drawn in.
 ``` Dart
 Widget build(BuildContext context) {
   return ...
@@ -264,7 +264,7 @@ Widget build(BuildContext context) {
 ![Example with custom distances](assets/gifs/8_custom_distances.gif)
 
 ### Customize the points and lines
-The size and color of the points and lines can be changed with the `pointStyle` parameter.
+The size and colour of the points and lines can be changed with the `pointStyle` parameter.
 You can choose between a solid line by using 
 ```Dart
 SolidLine(double lineWidth, Color lineColor)
@@ -295,7 +295,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-![Example with custoam lines](assets/gifs/9_custom_lines.gif)
+![Example with custom lines](assets/gifs/9_custom_lines.gif)
 
 # License
 This project is licensed under the [MIT-License](https://github.com/arconsis/measurements/blob/master/LICENSE).
