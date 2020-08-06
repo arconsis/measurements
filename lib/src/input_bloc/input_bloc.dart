@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/src/measurement/repository/measurement_repository.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/measurement/repository/measurement_repository.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
 
 import 'input_event.dart';
 import 'input_state.dart';

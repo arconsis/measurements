@@ -3,7 +3,7 @@
 
 import 'dart:ui';
 
-import 'package:measurements/src/util/colors.dart';
+import 'package:measure/src/util/colors.dart';
 
 
 /// Style class for customizing the appearance of the magnification glass.

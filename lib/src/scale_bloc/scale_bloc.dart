@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measurements/measurements.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
-import 'package:measurements/src/util/logger.dart';
-import 'package:measurements/src/util/utils.dart';
+import 'package:measure/measure.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/util/logger.dart';
+import 'package:measure/src/util/utils.dart';
 
 import 'scale_event.dart';
 import 'scale_state.dart';

@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:measurements/measurements.dart';
+import 'package:measure/measure.dart';
 
 abstract class MetadataEvent extends Equatable {}
 

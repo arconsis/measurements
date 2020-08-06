@@ -1,6 +1,6 @@
-# measurements_example
+# measure_example
 
-Demonstrates how to use the measurements plugin.
+Demonstrates how to use the measure plugin.
 
 ## Getting Started
 

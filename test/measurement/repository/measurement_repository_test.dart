@@ -4,11 +4,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measurements/measurements.dart';
-import 'package:measurements/src/measurement/drawing_holder.dart';
-import 'package:measurements/src/measurement/repository/measurement_repository.dart';
-import 'package:measurements/src/metadata/repository/metadata_repository.dart';
-import 'package:measurements/src/util/utils.dart';
+import 'package:measure/measure.dart';
+import 'package:measure/src/measurement/drawing_holder.dart';
+import 'package:measure/src/measurement/repository/measurement_repository.dart';
+import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:measure/src/util/utils.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 

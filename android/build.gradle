@@ -1,4 +1,4 @@
-group 'com.arconsis.measurements'
+group 'com.arconsis.measure'
 version '1.0-SNAPSHOT'
 
 buildscript {

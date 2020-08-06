@@ -1,9 +1,9 @@
 import Flutter
 import UIKit
 
-public class SwiftMeasurementsPlugin: NSObject, FlutterPlugin {
+public class SwiftMeasurePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "measurements", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "measure", binaryMessenger: registrar.messenger())
     let instance = SwiftMeasurementsPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
