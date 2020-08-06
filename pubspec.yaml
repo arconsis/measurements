@@ -5,7 +5,7 @@ repository: "https://github.com/arconsis/measurements"
 issue_tracker: "https://github.com/arconsis/measurements/issues"
 
 environment:
-  sdk: ^2.6.0
+  sdk: ">=2.6.0 <3.0.0"
   flutter: ^1.12.0
 
 dependencies:

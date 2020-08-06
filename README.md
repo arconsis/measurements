@@ -244,7 +244,7 @@ Widget build(BuildContext context) {
 ![Example with custom magnification glass](assets/gifs/7_custom_magnification_glass.gif)
 
 ### Customize the shown distances
-You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which colour the distance should the drawn in.
+You can change how many decimal places you want to be displayed on the lines, whether the tolerance should be shown and which color the distance should the drawn in.
 ``` Dart
 Widget build(BuildContext context) {
   return ...
@@ -264,7 +264,7 @@ Widget build(BuildContext context) {
 ![Example with custom distances](assets/gifs/8_custom_distances.gif)
 
 ### Customize the points and lines
-The size and colour of the points and lines can be changed with the `pointStyle` parameter.
+The size and color of the points and lines can be changed with the `pointStyle` parameter.
 You can choose between a solid line by using 
 ```Dart
 SolidLine(double lineWidth, Color lineColor)
