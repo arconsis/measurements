@@ -139,17 +139,19 @@ class _MeasurementView extends StatelessWidget {
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
-  _MeasurementView(this.child,
-      this.deleteChild,
-      this.deleteChildAlignment,
-      this.measure,
-      this.showDistanceOnLine,
-      this.measurementInformation,
-      this.magnificationZoomFactor,
-      this.controller,
-      this.pointStyle,
-      this.magnificationStyle,
-      this.distanceStyle,);
+  _MeasurementView(
+    this.child,
+    this.deleteChild,
+    this.deleteChildAlignment,
+    this.measure,
+    this.showDistanceOnLine,
+    this.measurementInformation,
+    this.magnificationZoomFactor,
+    this.controller,
+    this.pointStyle,
+    this.magnificationStyle,
+    this.distanceStyle,
+  );
 
   void _setBackgroundImageToBloc(BuildContext context, double zoom) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
