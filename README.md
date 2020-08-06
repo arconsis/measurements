@@ -5,25 +5,11 @@ This plugin provides a widget in which you can display another widget, for examp
 ![Showcase of Features](assets/gifs/0_all_features.gif)
 
 ## Getting Started
-~~To use this plugin simply include it in your `pubspec.yaml` with~~
+To use this plugin simply include it in your `pubspec.yaml` with
 ```yaml
 dependencies:
-  document_measure: 0.0.1 // not published yet
+  document_measure: 0.0.1
 ```
-
-You can either download this repo and then reference it as
-```yaml
-dependencies:
-  document_measure: 
-    path: path/to/measurement-repo
-```
-or use it over GitHub directly with
-```yaml
-dependencies:
-  document_measure: 
-    git: git://github.com/arconsis/measurements.git
-```
-and make sure to run `flutter packages upgrade`.
 
 # Usage Overview
 * [Functional Usage](#functional-usage)

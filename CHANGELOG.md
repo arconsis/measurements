@@ -1,5 +1,5 @@
-## 0.0.1 [unreleased]
-### Added
+## 0.0.1
+### Added Features
 * Measuring in Meter, Millimeter, Inch and Foot
 * Deleting points
 * Panning and zooming 
