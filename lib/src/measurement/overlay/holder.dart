@@ -4,7 +4,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:measure/measure.dart';
+import 'package:document_measure/document_measure.dart';
 
 class Holder extends Equatable {
   final Offset start, end;

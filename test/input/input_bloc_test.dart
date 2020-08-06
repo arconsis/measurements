@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/src/input_bloc/input_bloc.dart';
-import 'package:measure/src/input_bloc/input_event.dart';
-import 'package:measure/src/input_bloc/input_state.dart';
-import 'package:measure/src/measurement/repository/measurement_repository.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:document_measure/src/input_bloc/input_bloc.dart';
+import 'package:document_measure/src/input_bloc/input_event.dart';
+import 'package:document_measure/src/input_bloc/input_state.dart';
+import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mocks/test_mocks.dart';

@@ -6,11 +6,11 @@ import 'dart:ui';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/measure.dart';
-import 'package:measure/src/metadata/bloc/metadata_bloc.dart';
-import 'package:measure/src/metadata/bloc/metadata_event.dart';
-import 'package:measure/src/metadata/bloc/metadata_state.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/metadata/bloc/metadata_bloc.dart';
+import 'package:document_measure/src/metadata/bloc/metadata_event.dart';
+import 'package:document_measure/src/metadata/bloc/metadata_state.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 

@@ -4,7 +4,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' as material;
-import 'package:measure/src/style/point_style.dart';
+import 'package:document_measure/src/style/point_style.dart';
 
 class MeasurePainter extends material.CustomPainter {
   final Offset start, end;

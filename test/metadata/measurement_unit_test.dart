@@ -2,7 +2,7 @@
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measure/measure.dart';
+import 'package:document_measure/document_measure.dart';
 
 void main() {
   final differenceThreshold = 0.0000001;

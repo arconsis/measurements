@@ -4,7 +4,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:measure/src/style/magnification_style.dart';
+import 'package:document_measure/src/style/magnification_style.dart';
 
 class MagnifyingPainter extends CustomPainter {
   final Offset fingerPosition;

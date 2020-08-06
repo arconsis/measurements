@@ -3,7 +3,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:measure/measure.dart';
+import 'package:document_measure/document_measure.dart';
 
 import 'colors.dart';
 

@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
-import 'package:measure/src/util/logger.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:document_measure/src/util/logger.dart';
 
 import 'metadata_event.dart';
 import 'metadata_state.dart';

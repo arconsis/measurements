@@ -1,4 +1,4 @@
-# measure
+# document_measure
 
 This plugin provides a widget in which you can display another widget, for example, a floor plan of your flat in an image and measure distances between points in your flat.
 
@@ -8,19 +8,19 @@ This plugin provides a widget in which you can display another widget, for examp
 ~~To use this plugin simply include it in your `pubspec.yaml` with~~
 ```yaml
 dependencies:
-  measure: 0.0.1 // not published yet
+  document_measure: 0.0.1 // not published yet
 ```
 
 You can either download this repo and then reference it as
 ```yaml
 dependencies:
-  measure: 
+  document_measure: 
     path: path/to/measurement-repo
 ```
 or use it over GitHub directly with
 ```yaml
 dependencies:
-  measure: 
+  document_measure: 
     git: git://github.com/arconsis/measurements.git
 ```
 and make sure to run `flutter packages upgrade`.

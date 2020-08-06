@@ -6,8 +6,8 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:measure/measure.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
@@ -17,7 +17,7 @@ void main() {
 
   group("Metadata Repository Unit Test", () {
     final viewSize = Size(200, 300);
-    final methodChannel = MethodChannel("measure");
+    final methodChannel = MethodChannel("documentmeasure");
     final pixelPerInch = 10.0;
 
     final expectedMeasurement = true;

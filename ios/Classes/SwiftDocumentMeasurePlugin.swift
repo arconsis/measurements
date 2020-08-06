@@ -1,10 +1,10 @@
 import Flutter
 import UIKit
 
-public class SwiftMeasurePlugin: NSObject, FlutterPlugin {
+public class SwiftDocumentMeasurePlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "measure", binaryMessenger: registrar.messenger())
-        let instance = SwiftMeasurePlugin()
+        let channel = FlutterMethodChannel(name: "documentmeasure", binaryMessenger: registrar.messenger())
+        let instance = SwiftDocumentMeasurePlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 

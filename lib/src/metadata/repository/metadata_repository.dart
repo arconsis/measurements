@@ -5,8 +5,8 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' as widget;
-import 'package:measure/measure.dart';
-import 'package:measure/src/util/logger.dart';
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/util/logger.dart';
 import 'package:rxdart/subjects.dart';
 
 class MetadataRepository {
@@ -67,7 +67,7 @@ class MetadataRepository {
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
 
   Future<double> get zoomFactorForLifeSize async {
-    double pixelPerInch = await MethodChannel("measure").invokeMethod("getPhysicalPixelsPerInch");
+    double pixelPerInch = await MethodChannel("documentmeasure").invokeMethod("getPhysicalPixelsPerInch");
     Size screenSize = _screenSize.value;
 
     if (screenSize == null) return 1;

@@ -3,13 +3,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:measure/measure.dart';
-import 'package:measure/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
-import 'package:measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
-import 'package:measure/src/measurement/bloc/points_bloc/points_bloc.dart';
-import 'package:measure/src/measurement/bloc/points_bloc/points_state.dart';
-import 'package:measure/src/util/logger.dart';
-import 'package:measure/src/util/utils.dart';
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
+import 'package:document_measure/src/measurement/bloc/points_bloc/points_bloc.dart';
+import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
+import 'package:document_measure/src/util/logger.dart';
+import 'package:document_measure/src/util/utils.dart';
 
 import 'painters/distance_painter.dart';
 import 'painters/magnifying_painter.dart';
