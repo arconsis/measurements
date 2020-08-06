@@ -1,3 +1,6 @@
+## 0.0.1+2
+* Reformatted code
+
 ## 0.0.1+1
 * Refactored and improved code
 

@@ -1,6 +1,6 @@
 name: document_measure
 description: This package lets you measure distances in documents. The main use will probabily be technical documents and floorplans, but you are welcome to experiment with it.
-version: 0.0.1+1
+version: 0.0.1+2
 repository: "https://github.com/arconsis/measurements"
 issue_tracker: "https://github.com/arconsis/measurements/issues"
 
