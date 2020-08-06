@@ -30,9 +30,12 @@ void main() {
       mockedMeasurementRepository = MockedMeasurementRepository();
       mockedInputBloc = MockedInputBloc();
 
-      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
-      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-      when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
+      when(mockedMetadataRepository.viewSize)
+          .thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.measurement)
+          .thenAnswer((_) => Stream.fromIterable([true]));
+      when(mockedMetadataRepository.magnificationCircleRadius)
+          .thenAnswer((_) => Stream.fromIterable([10]));
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);
       GetIt.I.registerSingleton(mockedMetadataRepository);
@@ -50,8 +53,10 @@ void main() {
       'initial state',
       skip: 0,
       build: () async {
-        when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
-        when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
+        when(mockedMetadataRepository.backgroundImage)
+            .thenAnswer((_) => Stream.fromIterable([]));
+        when(mockedMetadataRepository.imageScaleFactor)
+            .thenAnswer((_) => Stream.fromIterable([]));
 
         return MagnificationBloc(mockedInputBloc);
       },
@@ -62,8 +67,10 @@ void main() {
       blocTest(
         'stroke events',
         build: () async {
-          when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
-          when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
+          when(mockedMetadataRepository.backgroundImage)
+              .thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
+          when(mockedMetadataRepository.imageScaleFactor)
+              .thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
           return MagnificationBloc(mockedInputBloc);
         },
@@ -73,14 +80,20 @@ void main() {
           bloc.add(MagnificationHideEvent());
         },
         expect: [
-          MagnificationActiveState(Offset(0, 0), Offset(-10, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
-          MagnificationActiveState(Offset(10, 10), Offset(0, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+          MagnificationActiveState(Offset(0, 0), Offset(-10, -50),
+              backgroundImage: MockedImage.mock,
+              imageScaleFactor: imageScaleFactor),
+          MagnificationActiveState(Offset(10, 10), Offset(0, -50),
+              backgroundImage: MockedImage.mock,
+              imageScaleFactor: imageScaleFactor),
           MagnificationInactiveState()
         ],
         verify: (_) async {
           verifyInOrder([
-            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
-            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
+            mockedMeasurementRepository
+                .convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
+            mockedMeasurementRepository
+                .convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
           ]);
 
           verifyNoMoreInteractions(mockedMeasurementRepository);

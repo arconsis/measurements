@@ -40,11 +40,18 @@ class MetadataStartedEvent extends MetadataEvent {
   });
 
   @override
-  List<Object> get props => [measurementInformation, controller, measure, showDistances, magnificationStyle];
+  List<Object> get props => [
+        measurementInformation,
+        controller,
+        measure,
+        showDistances,
+        magnificationStyle,
+      ];
 
   @override
   String toString() {
-    return super.toString() + ' MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
+    return super.toString() +
+        ' MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
   }
 }
 

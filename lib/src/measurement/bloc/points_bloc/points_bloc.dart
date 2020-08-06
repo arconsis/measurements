@@ -34,31 +34,37 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   PointsBloc() : super(PointsEmptyState()) {
     _pointsListener = (points) => add(PointsOnlyEvent(points));
-    _pointsAndDistanceListener = (holder) => add(PointsAndDistancesEvent(holder.points, holder.distances));
+    _pointsAndDistanceListener = (holder) =>
+        add(PointsAndDistancesEvent(holder.points, holder.distances));
 
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _streamSubscriptions.add(_metadataRepository.showDistances.listen((showDistances) {
+    _streamSubscriptions
+        .add(_metadataRepository.showDistances.listen((showDistances) {
       if (showDistances) {
         if (_pointsAndDistancesSubscription == null) {
           _onlyPointsSubscription?.cancel();
           _onlyPointsSubscription = null;
 
-          _pointsAndDistancesSubscription = _measureRepository.drawingHolder.listen(_pointsAndDistanceListener);
+          _pointsAndDistancesSubscription = _measureRepository.drawingHolder
+              .listen(_pointsAndDistanceListener);
         }
       } else {
         if (_onlyPointsSubscription == null) {
           _pointsAndDistancesSubscription?.cancel();
           _pointsAndDistancesSubscription = null;
 
-          _onlyPointsSubscription = _measureRepository.points.listen(_pointsListener);
+          _onlyPointsSubscription =
+              _measureRepository.points.listen(_pointsListener);
         }
       }
     }));
 
-    _streamSubscriptions.add(_metadataRepository.viewCenter.listen((center) => _viewCenter = center));
-    _streamSubscriptions.add(_metadataRepository.tolerance.listen((tolerance) => _tolerance = tolerance));
+    _streamSubscriptions.add(_metadataRepository.viewCenter
+        .listen((center) => _viewCenter = center));
+    _streamSubscriptions.add(_metadataRepository.tolerance
+        .listen((tolerance) => _tolerance = tolerance));
   }
 
   @override
@@ -90,19 +96,23 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     }
   }
 
-  PointsState _mapMultiplePointsWithDistancesToState(PointsAndDistancesEvent event) {
+  PointsState _mapMultiplePointsWithDistancesToState(
+      PointsAndDistancesEvent event) {
     var holders = <Holder>[];
     event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-    event.distances.asMap().forEach((index, distance) => holders[index] = Holder.extend(holders[index], distance));
+    event.distances.asMap().forEach((index, distance) =>
+        holders[index] = Holder.extend(holders[index], distance));
 
     if (event.distances.contains(null)) {
       var nullIndices = <int>[];
       nullIndices.add(event.distances.indexOf(null));
       nullIndices.add(event.distances.lastIndexOf(null));
 
-      return PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, nullIndices);
+      return PointsAndDistanceActiveState(
+          holders, _viewCenter, _tolerance, nullIndices);
     } else if (event.points.length - 1 > event.distances.length) {
-      return PointsAndDistanceActiveState(holders, _viewCenter, _tolerance, [event.distances.length]);
+      return PointsAndDistanceActiveState(
+          holders, _viewCenter, _tolerance, [event.distances.length]);
     } else {
       return PointsAndDistanceState(holders, _viewCenter, _tolerance);
     }

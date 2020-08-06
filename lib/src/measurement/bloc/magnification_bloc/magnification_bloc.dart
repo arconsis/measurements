@@ -32,12 +32,17 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
     _measureRepository = GetIt.I<MeasurementRepository>();
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    _streamSubscriptions.add(_metadataRepository.backgroundImage.listen((image) => _backgroundImage = image));
-    _streamSubscriptions.add(_metadataRepository.imageScaleFactor.listen((factor) => _imageScaleFactor = factor));
-    _streamSubscriptions.add(_metadataRepository.viewSize.listen((size) => _viewSize = size));
-    _streamSubscriptions.add(_metadataRepository.magnificationCircleRadius.listen((radius) {
+    _streamSubscriptions.add(_metadataRepository.backgroundImage
+        .listen((image) => _backgroundImage = image));
+    _streamSubscriptions.add(_metadataRepository.imageScaleFactor
+        .listen((factor) => _imageScaleFactor = factor));
+    _streamSubscriptions
+        .add(_metadataRepository.viewSize.listen((size) => _viewSize = size));
+    _streamSubscriptions
+        .add(_metadataRepository.magnificationCircleRadius.listen((radius) {
       _magnificationRadius = radius;
-      _magnificationOffset = Offset(_defaultMagnificationOffset.dx, _defaultMagnificationOffset.dy + radius);
+      _magnificationOffset = Offset(_defaultMagnificationOffset.dx,
+          _defaultMagnificationOffset.dy + radius);
     }));
 
     _streamSubscriptions.add(inputBloc.listen((state) {
@@ -56,8 +61,12 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
   }
 
   @override
-  Stream<Transition<MagnificationEvent, MagnificationState>> transformTransitions(Stream<Transition<MagnificationEvent, MagnificationState>> transitions) {
-    return transitions.map((Transition<MagnificationEvent, MagnificationState> transition) {
+  Stream<Transition<MagnificationEvent, MagnificationState>>
+      transformTransitions(
+          Stream<Transition<MagnificationEvent, MagnificationState>>
+              transitions) {
+    return transitions
+        .map((Transition<MagnificationEvent, MagnificationState> transition) {
       final state = transition.nextState;
       if (state is MagnificationActiveState) {
         return Transition(
@@ -66,7 +75,8 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
             nextState: MagnificationActiveState(
               state.position,
               state.magnificationOffset,
-              absolutePosition: _measureRepository.convertIntoDocumentLocalTopLeftPosition(state.position),
+              absolutePosition: _measureRepository
+                  .convertIntoDocumentLocalTopLeftPosition(state.position),
               backgroundImage: _backgroundImage,
               imageScaleFactor: _imageScaleFactor,
             ));
@@ -91,7 +101,8 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
     return super.close();
   }
 
-  MagnificationState _mapMagnificationShowToState(MagnificationShowEvent event) {
+  MagnificationState _mapMagnificationShowToState(
+      MagnificationShowEvent event) {
     var magnificationPosition = event.position - _magnificationOffset;
 
     if (_magnificationGlassFitsWithoutModification(magnificationPosition)) {
@@ -104,15 +115,23 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
       }
 
       if (event.position.dx < _magnificationRadius) {
-        modifiedOffset = Offset(event.position.dx - _magnificationRadius, modifiedOffset.dy);
+        modifiedOffset =
+            Offset(event.position.dx - _magnificationRadius, modifiedOffset.dy);
       } else if (event.position.dx > _viewSize.width - _magnificationRadius) {
-        modifiedOffset = Offset(_magnificationRadius - (_viewSize.width - event.position.dx), modifiedOffset.dy);
+        modifiedOffset = Offset(
+            _magnificationRadius - (_viewSize.width - event.position.dx),
+            modifiedOffset.dy);
       }
 
       return MagnificationActiveState(event.position, modifiedOffset);
     }
   }
 
-  bool _magnificationGlassFitsWithoutModification(Offset magnificationPosition) =>
-      magnificationPosition > Offset(_magnificationRadius, _magnificationRadius) && magnificationPosition < Offset(_viewSize.width - _magnificationRadius, _viewSize.height - _magnificationRadius);
+  bool _magnificationGlassFitsWithoutModification(
+          Offset magnificationPosition) =>
+      magnificationPosition >
+          Offset(_magnificationRadius, _magnificationRadius) &&
+      magnificationPosition <
+          Offset(_viewSize.width - _magnificationRadius,
+              _viewSize.height - _magnificationRadius);
 }

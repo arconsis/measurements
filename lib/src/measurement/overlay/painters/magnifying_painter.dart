@@ -17,7 +17,13 @@ class MagnifyingPainter extends CustomPainter {
   RRect _outerCircle, _innerCircle;
   Rect _imageTargetRect, _imageSourceRect;
 
-  MagnifyingPainter({@required this.fingerPosition, @required Offset absolutePosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
+  MagnifyingPainter(
+      {@required this.fingerPosition,
+      @required Offset absolutePosition,
+      @required this.image,
+      @required this.style,
+      double imageScaleFactor,
+      @required Offset magnificationOffset}) {
     _drawPosition = fingerPosition - magnificationOffset;
 
     var diameter = 2 * style.magnificationRadius;
@@ -25,15 +31,22 @@ class MagnifyingPainter extends CustomPainter {
     _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
     _outerCircle = _innerCircle.inflate(style.outerCircleThickness);
 
-    _imageSourceRect = Rect.fromCenter(center: absolutePosition * imageScaleFactor, width: diameter, height: diameter);
-    _imageTargetRect = Rect.fromCenter(center: _drawPosition, width: diameter, height: diameter);
+    _imageSourceRect = Rect.fromCenter(
+        center: absolutePosition * imageScaleFactor,
+        width: diameter,
+        height: diameter);
+    _imageTargetRect = Rect.fromCenter(
+        center: _drawPosition, width: diameter, height: diameter);
 
     _drawPaint.color = style.magnificationColor;
     _drawPaint.strokeWidth = style.crossHairThickness;
   }
 
   RRect getCircle(Offset position, double radius) {
-    return RRect.fromRectAndRadius(Rect.fromCenter(center: position, width: radius * 2, height: radius * 2), Radius.circular(radius));
+    return RRect.fromRectAndRadius(
+        Rect.fromCenter(
+            center: position, width: radius * 2, height: radius * 2),
+        Radius.circular(radius));
   }
 
   @override
@@ -42,8 +55,14 @@ class MagnifyingPainter extends CustomPainter {
     canvas.drawImageRect(image, _imageSourceRect, _imageTargetRect, _drawPaint);
 
     canvas.drawDRRect(_outerCircle, _innerCircle, _drawPaint);
-    canvas.drawLine(Offset(_drawPosition.dx - style.magnificationRadius, _drawPosition.dy), Offset(_drawPosition.dx + style.magnificationRadius, _drawPosition.dy), _drawPaint);
-    canvas.drawLine(Offset(_drawPosition.dx, _drawPosition.dy - style.magnificationRadius), Offset(_drawPosition.dx, _drawPosition.dy + style.magnificationRadius), _drawPaint);
+    canvas.drawLine(
+        Offset(_drawPosition.dx - style.magnificationRadius, _drawPosition.dy),
+        Offset(_drawPosition.dx + style.magnificationRadius, _drawPosition.dy),
+        _drawPaint);
+    canvas.drawLine(
+        Offset(_drawPosition.dx, _drawPosition.dy - style.magnificationRadius),
+        Offset(_drawPosition.dx, _drawPosition.dy + style.magnificationRadius),
+        _drawPaint);
   }
 
   @override

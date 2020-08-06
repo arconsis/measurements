@@ -21,12 +21,17 @@ void main() {
     setUp(() {
       mockedMetadataRepository = MockedMetadataRepository();
 
-      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
-      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(50, 100)]));
-      when(mockedMetadataRepository.screenSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
-      when(mockedMetadataRepository.zoomFactorForLifeSize).thenAnswer((_) async => 2.0);
+      when(mockedMetadataRepository.measurement)
+          .thenAnswer((_) => Stream.fromIterable([false]));
+      when(mockedMetadataRepository.viewSize)
+          .thenAnswer((_) => Stream.fromIterable([Size(50, 100)]));
+      when(mockedMetadataRepository.screenSize)
+          .thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.zoomFactorForLifeSize)
+          .thenAnswer((_) async => 2.0);
       when(mockedMetadataRepository.zoomFactorToFillScreen).thenReturn(5.0);
-      when(mockedMetadataRepository.isDocumentWidthAlignedWithScreenWidth(any)).thenReturn(true);
+      when(mockedMetadataRepository.isDocumentWidthAlignedWithScreenWidth(any))
+          .thenReturn(true);
 
       GetIt.I.registerSingleton(mockedMetadataRepository);
     });
@@ -41,7 +46,8 @@ void main() {
       skip: 0,
       expect: [
         ScaleState(Offset(0, 0), 1.0, Matrix4.identity()),
-        ScaleState(defaultOffset, 1.0, Matrix4.identity()..translate(defaultOffset.dx, defaultOffset.dy)),
+        ScaleState(defaultOffset, 1.0,
+            Matrix4.identity()..translate(defaultOffset.dx, defaultOffset.dy)),
       ],
     );
 
@@ -54,7 +60,11 @@ void main() {
           bloc.add(ScaleUpdateEvent(Offset(10, 0), 1.0));
         },
         expect: [
-          ScaleState(defaultOffset + Offset(10, 0), 1.0, Matrix4.identity()..translate(defaultOffset.dx + 10.0, defaultOffset.dy)),
+          ScaleState(
+              defaultOffset + Offset(10, 0),
+              1.0,
+              Matrix4.identity()
+                ..translate(defaultOffset.dx + 10.0, defaultOffset.dy)),
         ],
       );
 

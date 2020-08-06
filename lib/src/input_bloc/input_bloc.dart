@@ -24,7 +24,8 @@ class InputBloc extends Bloc<InputEvent, InputState> {
     _metadataRepository = GetIt.I<MetadataRepository>();
     _measurementRepository = GetIt.I<MeasurementRepository>();
 
-    _streamSubscription.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
+    _streamSubscription.add(_metadataRepository.measurement
+        .listen((measure) => _measure = measure));
   }
 
   @override

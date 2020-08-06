@@ -48,7 +48,8 @@ class DistancePainter extends material.CustomPainter {
     var distanceValue = distance.value;
 
     if (distanceValue > 0) {
-      _zeroPoint -= Offset(((log(distanceValue) / _log10).floor() - 1) * _offsetPerDigit, 0);
+      _zeroPoint -= Offset(
+          ((log(distanceValue) / _log10).floor() - 1) * _offsetPerDigit, 0);
     }
 
     var difference = end - start;
@@ -66,9 +67,11 @@ class DistancePainter extends material.CustomPainter {
 
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor));
     if (style.showTolerance) {
-      paragraphBuilder.addText('${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
+      paragraphBuilder.addText(
+          '${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
     } else {
-      paragraphBuilder.addText('${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
+      paragraphBuilder.addText(
+          '${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
     }
 
     _paragraph = paragraphBuilder.build();
@@ -107,6 +110,7 @@ extension OffsetExtension on Offset {
     var thisNormalized = normalize();
     var otherNormalized = other.normalize();
 
-    return thisNormalized.dx * otherNormalized.dx + thisNormalized.dy * otherNormalized.dy;
+    return thisNormalized.dx * otherNormalized.dx +
+        thisNormalized.dy * otherNormalized.dy;
   }
 }

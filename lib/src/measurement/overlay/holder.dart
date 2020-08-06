@@ -12,13 +12,15 @@ class Holder extends Equatable {
 
   Holder(this.start, this.end, {this.distance = const Millimeter(0)});
 
-  Holder.extend(Holder old, LengthUnit distance) : this(old.start, old.end, distance: distance);
+  Holder.extend(Holder old, LengthUnit distance)
+      : this(old.start, old.end, distance: distance);
 
   Holder.withDistance(this.start, this.end, this.distance);
 
   @override
   String toString() {
-    return super.toString() + ' First Point: $start, Second Point: $end, Distance: $distance';
+    return super.toString() +
+        ' First Point: $start, Second Point: $end, Distance: $distance';
   }
 
   @override

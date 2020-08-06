@@ -18,6 +18,7 @@ class ScaleState extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + ' offset: $offset, scale: $scale, transform:\n$transform';
+    return super.toString() +
+        ' offset: $offset, scale: $scale, transform:\n$transform';
   }
 }

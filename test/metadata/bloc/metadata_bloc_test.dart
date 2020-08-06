@@ -75,7 +75,8 @@ void main() {
         'background event',
         skip: 0,
         build: () async => MetadataBloc(),
-        act: (bloc) => bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
+        act: (bloc) =>
+            bloc.add(MetadataBackgroundEvent(mockedImage, Size(300, 400))),
         verify: (MetadataBloc bloc) async {
           verify(mockedRepository.registerBackgroundChange(
             mockedImage,
@@ -87,16 +88,19 @@ void main() {
       blocTest(
         'delete region event',
         build: () async => MetadataBloc(),
-        act: (bloc) => bloc.add(MetadataDeleteRegionEvent(Offset(10, 10), Size(10, 10))),
+        act: (bloc) =>
+            bloc.add(MetadataDeleteRegionEvent(Offset(10, 10), Size(10, 10))),
         verify: (MetadataBloc bloc) async {
-          verify(mockedRepository.registerDeleteRegion(Offset(10, 10), Size(10, 10)));
+          verify(mockedRepository.registerDeleteRegion(
+              Offset(10, 10), Size(10, 10)));
         },
       );
 
       blocTest(
         'started, background and delete event',
         build: () async {
-          when(mockedRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
+          when(mockedRepository.measurement)
+              .thenAnswer((_) => Stream.fromIterable([true]));
 
           return MetadataBloc();
         },

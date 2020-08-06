@@ -35,7 +35,8 @@ class Logger {
 
   void log(String message) {
     if (_activeDistricts.contains(district)) {
-      print('${DateTime.now()} measurements: (${_districtName(district)}) $message');
+      print(
+          '${DateTime.now()} measurements: (${_districtName(district)}) $message');
     }
   }
 }

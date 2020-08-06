@@ -20,7 +20,10 @@ class MeasureArea extends StatelessWidget {
   final DistanceStyle distanceStyle;
   final Paint dotPaint = Paint(), pathPaint = Paint();
 
-  MeasureArea({@required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
+  MeasureArea(
+      {@required this.pointStyle,
+      @required this.magnificationStyle,
+      @required this.distanceStyle}) {
     var lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
@@ -28,7 +31,8 @@ class MeasureArea extends StatelessWidget {
     } else if (lineType is DashedLine) {
       strokeWidth = lineType.dashWidth;
     } else {
-      throw UnimplementedError('This line type is not supported! Type was: $lineType');
+      throw UnimplementedError(
+          'This line type is not supported! Type was: $lineType');
     }
 
     dotPaint.color = pointStyle.dotColor;
@@ -75,18 +79,21 @@ class MeasureArea extends StatelessWidget {
   List<Widget> _onlyPoints(PointsOnlyState state) {
     var widgets = <Widget>[];
 
-    state.points.doInBetween((start, end) => widgets.add(_pointPainter(start, end)));
+    state.points
+        .doInBetween((start, end) => widgets.add(_pointPainter(start, end)));
 
     return widgets;
   }
 
-  Iterable<Widget> _pointsAndDistancesWithSpace(PointsAndDistanceActiveState state) {
+  Iterable<Widget> _pointsAndDistancesWithSpace(
+      PointsAndDistanceActiveState state) {
     var widgets = <Widget>[];
 
     state.holders.asMap().forEach((index, holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
       if (!state.nullIndices.contains(index)) {
-        widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
+        widgets.add(_distancePainter(holder.start, holder.end, holder.distance,
+            state.tolerance, state.viewCenter));
       }
     });
 
@@ -98,7 +105,8 @@ class MeasureArea extends StatelessWidget {
 
     state.holders.forEach((holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
-      widgets.add(_distancePainter(holder.start, holder.end, holder.distance, state.tolerance, state.viewCenter));
+      widgets.add(_distancePainter(holder.start, holder.end, holder.distance,
+          state.tolerance, state.viewCenter));
     });
 
     return widgets;
@@ -116,7 +124,8 @@ class MeasureArea extends StatelessWidget {
     );
   }
 
-  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance, double tolerance, Offset viewCenter) {
+  CustomPaint _distancePainter(Offset first, Offset last, LengthUnit distance,
+      double tolerance, Offset viewCenter) {
     return CustomPaint(
       foregroundPainter: DistancePainter(
         start: first,

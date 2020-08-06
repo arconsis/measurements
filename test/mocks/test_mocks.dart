@@ -10,9 +10,11 @@ import 'package:mockito/mockito.dart';
 
 class MockedMetadataRepository extends Mock implements MetadataRepository {}
 
-class MockedMeasurementRepository extends Mock implements MeasurementRepository {}
+class MockedMeasurementRepository extends Mock
+    implements MeasurementRepository {}
 
-class MockedInputBloc extends MockBloc<InputEvent, InputState> implements InputBloc {}
+class MockedInputBloc extends MockBloc<InputEvent, InputState>
+    implements InputBloc {}
 
 class MockedImage extends Mock implements Image {
   static final _mockedImage = MockedImage._private();

@@ -218,15 +218,19 @@ class MeasurementInformation extends Equatable {
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
-  LengthUnit get documentToTargetFactor => documentWidthInLengthUnits.factorTo(targetLengthUnit);
+  LengthUnit get documentToTargetFactor =>
+      documentWidthInLengthUnits.factorTo(targetLengthUnit);
 
-  LengthUnit get documentWidthInUnitOfMeasurement => documentWidthInLengthUnits.convertTo(targetLengthUnit);
+  LengthUnit get documentWidthInUnitOfMeasurement =>
+      documentWidthInLengthUnits.convertTo(targetLengthUnit);
 
   @override
-  List<Object> get props => [scale, documentWidthInLengthUnits, targetLengthUnit];
+  List<Object> get props =>
+      [scale, documentWidthInLengthUnits, targetLengthUnit];
 
   @override
   String toString() {
-    return super.toString() + ' scale: $scale, documentWidth: $documentWidthInLengthUnits, documentHeight: $documentHeightInLengthUnits, targetLengthUnit: $targetLengthUnit';
+    return super.toString() +
+        ' scale: $scale, documentWidth: $documentWidthInLengthUnits, documentHeight: $documentHeightInLengthUnits, targetLengthUnit: $targetLengthUnit';
   }
 }

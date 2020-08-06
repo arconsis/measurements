@@ -43,12 +43,16 @@ extension NumberExtension on num {
 }
 
 extension OffsetExtension on Offset {
-  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target, double threshold, double scale) {
+  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target,
+      double threshold, double scale) {
     var currentOffset = this + offset;
     var thresholdOffset = min(mySize.width, mySize.height) * threshold;
 
-    return Offset((currentOffset.dx + target.dx).fit(-mySize.width + thresholdOffset, bounds.width - thresholdOffset),
-        (currentOffset.dy + target.dy).fit(-mySize.height + thresholdOffset, bounds.height - thresholdOffset));
+    return Offset(
+        (currentOffset.dx + target.dx).fit(
+            -mySize.width + thresholdOffset, bounds.width - thresholdOffset),
+        (currentOffset.dy + target.dy).fit(
+            -mySize.height + thresholdOffset, bounds.height - thresholdOffset));
   }
 }
 

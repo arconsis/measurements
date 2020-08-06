@@ -54,14 +54,17 @@ class PointsAndDistanceState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + ' drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance';
+    return super.toString() +
+        ' drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance';
   }
 }
 
 class PointsAndDistanceActiveState extends PointsAndDistanceState {
   final List<int> nullIndices;
 
-  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter, double tolerance, this.nullIndices) : super(holders, viewCenter, tolerance);
+  PointsAndDistanceActiveState(List<Holder> holders, Offset viewCenter,
+      double tolerance, this.nullIndices)
+      : super(holders, viewCenter, tolerance);
 
   @override
   List<Object> get props => [holders, viewCenter, tolerance, nullIndices];

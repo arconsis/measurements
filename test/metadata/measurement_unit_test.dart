@@ -16,11 +16,13 @@ void main() {
       });
 
       test('meter to inch', () {
-        expect(meter.convertToInch().value - 39.3700787, lessThan(differenceThreshold));
+        expect(meter.convertToInch().value - 39.3700787,
+            lessThan(differenceThreshold));
       });
 
       test('meter to foot', () {
-        expect(meter.convertToFoot().value - 3.2808399, lessThan(differenceThreshold));
+        expect(meter.convertToFoot().value - 3.2808399,
+            lessThan(differenceThreshold));
       });
 
       test('meter to meter', () {
@@ -36,11 +38,13 @@ void main() {
       });
 
       test('millimeter to inch', () {
-        expect(millimeter.convertToInch().value - 0.0393700787, lessThan(differenceThreshold));
+        expect(millimeter.convertToInch().value - 0.0393700787,
+            lessThan(differenceThreshold));
       });
 
       test('millimeter to foot', () {
-        expect(millimeter.convertToFoot().value - 0.0032808399, lessThan(differenceThreshold));
+        expect(millimeter.convertToFoot().value - 0.0032808399,
+            lessThan(differenceThreshold));
       });
 
       test('millimeter to millimeter', () {
@@ -60,7 +64,8 @@ void main() {
       });
 
       test('inch to foot', () {
-        expect(inch.convertToFoot().value - 0.0833333333, lessThan(differenceThreshold));
+        expect(inch.convertToFoot().value - 0.0833333333,
+            lessThan(differenceThreshold));
       });
 
       test('inch to inch', () {

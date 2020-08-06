@@ -14,7 +14,12 @@ class MeasurePainter extends material.CustomPainter {
   final Path _drawPath = Path();
   double _dotRadius;
 
-  MeasurePainter({@material.required this.start, @material.required this.end, @material.required this.style, @material.required this.dotPaint, @material.required this.pathPaint}) {
+  MeasurePainter(
+      {@material.required this.start,
+      @material.required this.end,
+      @material.required this.style,
+      @material.required this.dotPaint,
+      @material.required this.pathPaint}) {
     _dotRadius = style.dotRadius;
 
     var lineType = style.lineType;
@@ -30,7 +35,8 @@ class MeasurePainter extends material.CustomPainter {
       var emptyOffset = (end - start) * lineType.dashDistance / distance;
       var currentPosition = start;
 
-      var numLines = (distance / (lineType.dashLength + lineType.dashDistance)).floor();
+      var numLines =
+          (distance / (lineType.dashLength + lineType.dashDistance)).floor();
 
       for (var i = 0; i < numLines; i++) {
         currentPosition += solidOffset;
@@ -47,7 +53,8 @@ class MeasurePainter extends material.CustomPainter {
         _drawPath.lineTo(currentPosition.dx, currentPosition.dy);
       }
     } else {
-      throw UnimplementedError('This line type is not supported! Type was: $style');
+      throw UnimplementedError(
+          'This line type is not supported! Type was: $style');
     }
   }
 

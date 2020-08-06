@@ -19,5 +19,9 @@ class MagnificationStyle {
   final double outerCircleThickness;
   final double crossHairThickness;
 
-  const MagnificationStyle({this.magnificationColor = drawColor, this.magnificationRadius = 50, this.outerCircleThickness = 2, this.crossHairThickness = 0.0});
+  const MagnificationStyle(
+      {this.magnificationColor = drawColor,
+      this.magnificationRadius = 50,
+      this.outerCircleThickness = 2,
+      this.crossHairThickness = 0.0});
 }

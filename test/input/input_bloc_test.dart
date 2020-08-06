@@ -24,7 +24,8 @@ void main() {
       mockedMetadataRepository = MockedMetadataRepository();
       mockedMeasurementRepository = MockedMeasurementRepository();
 
-      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+      when(mockedMetadataRepository.measurement)
+          .thenAnswer((_) => Stream.fromIterable([]));
 
       GetIt.I.registerSingleton(mockedMetadataRepository);
       GetIt.I.registerSingleton(mockedMeasurementRepository);
@@ -46,8 +47,11 @@ void main() {
       var deleteRegion = Rect.fromPoints(Offset(10, 10), Offset(20, 20));
 
       setUp(() {
-        when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer((realInvocation) => deleteRegion.contains(realInvocation.positionalArguments[0]));
+        when(mockedMetadataRepository.measurement)
+            .thenAnswer((_) => Stream.fromIterable([true]));
+        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer(
+            (realInvocation) =>
+                deleteRegion.contains(realInvocation.positionalArguments[0]));
       });
 
       blocTest(
@@ -132,8 +136,11 @@ void main() {
       var deleteRegion = Rect.fromPoints(Offset(0, 0), Offset(0, 0));
 
       setUp(() {
-        when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
-        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer((realInvocation) => deleteRegion.contains(realInvocation.positionalArguments[0]));
+        when(mockedMetadataRepository.measurement)
+            .thenAnswer((_) => Stream.fromIterable([false]));
+        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer(
+            (realInvocation) =>
+                deleteRegion.contains(realInvocation.positionalArguments[0]));
       });
 
       blocTest(
