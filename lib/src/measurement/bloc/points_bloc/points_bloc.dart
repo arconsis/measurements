@@ -6,7 +6,6 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_event.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
 import 'package:document_measure/src/measurement/overlay/holder.dart';
@@ -19,7 +18,7 @@ import '../../drawing_holder.dart';
 
 class PointsBloc extends Bloc<PointsEvent, PointsState> {
   final _logger = Logger(LogDistricts.POINTS_BLOC);
-  final List<StreamSubscription> _streamSubscriptions = List();
+  final List<StreamSubscription> _streamSubscriptions = [];
 
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
@@ -64,7 +63,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   void onEvent(PointsEvent event) {
-    _logger.log("received event: $event");
+    _logger.log('received event: $event');
     super.onEvent(event);
   }
 
@@ -78,7 +77,7 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   Stream<PointsState> mapEventToState(PointsEvent event) async* {
-    if (event.points.length == 0) {
+    if (event.points.isEmpty) {
       yield PointsEmptyState();
     } else if (event.points.length == 1) {
       yield PointsSingleState(event.points[0]);
@@ -92,12 +91,12 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   }
 
   PointsState _mapMultiplePointsWithDistancesToState(PointsAndDistancesEvent event) {
-    List<Holder> holders = List();
+    var holders = <Holder>[];
     event.points.doInBetween((start, end) => holders.add(Holder(start, end)));
-    event.distances.zip(holders, (LengthUnit distance, Holder holder) => holder.distance = distance);
+    event.distances.asMap().forEach((index, distance) => holders[index] = Holder.extend(holders[index], distance));
 
     if (event.distances.contains(null)) {
-      List<int> nullIndices = List();
+      var nullIndices = <int>[];
       nullIndices.add(event.distances.indexOf(null));
       nullIndices.add(event.distances.lastIndexOf(null));
 

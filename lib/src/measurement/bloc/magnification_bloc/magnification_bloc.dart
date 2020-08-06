@@ -11,16 +11,14 @@ import 'package:document_measure/src/input_bloc/input_bloc.dart';
 import 'package:document_measure/src/input_bloc/input_state.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
-import 'package:document_measure/src/util/logger.dart';
 
 import 'magnification_event.dart';
 import 'magnification_state.dart';
 
 class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
-  final _logger = Logger(LogDistricts.MEASURE_BLOC);
   final _defaultMagnificationOffset = Offset(0, 40);
   final InputBloc inputBloc;
-  final List<StreamSubscription> _streamSubscriptions = List();
+  final List<StreamSubscription> _streamSubscriptions = [];
 
   MeasurementRepository _measureRepository;
   MetadataRepository _metadataRepository;
@@ -95,12 +93,12 @@ class MagnificationBloc extends Bloc<MagnificationEvent, MagnificationState> {
   }
 
   MagnificationState _mapMagnificationShowToState(MagnificationShowEvent event) {
-    Offset magnificationPosition = event.position - _magnificationOffset;
+    var magnificationPosition = event.position - _magnificationOffset;
 
     if (_magnificationGlassFitsWithoutModification(magnificationPosition)) {
       return MagnificationActiveState(event.position, _magnificationOffset);
     } else {
-      Offset modifiedOffset = _magnificationOffset;
+      var modifiedOffset = _magnificationOffset;
 
       if (event.position.dy < _magnificationOffset.dy + _magnificationRadius) {
         modifiedOffset = Offset(modifiedOffset.dx, -modifiedOffset.dy);

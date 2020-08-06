@@ -8,7 +8,6 @@ import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnifi
 import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_bloc.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
-import 'package:document_measure/src/util/logger.dart';
 import 'package:document_measure/src/util/utils.dart';
 
 import 'painters/distance_painter.dart';
@@ -16,22 +15,20 @@ import 'painters/magnifying_painter.dart';
 import 'painters/measure_painter.dart';
 
 class MeasureArea extends StatelessWidget {
-  final _logger = Logger(LogDistricts.MEASURE_AREA);
-
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
   final Paint dotPaint = Paint(), pathPaint = Paint();
 
   MeasureArea({@required this.pointStyle, @required this.magnificationStyle, @required this.distanceStyle}) {
-    LineType lineType = pointStyle.lineType;
+    var lineType = pointStyle.lineType;
     double strokeWidth;
     if (lineType is SolidLine) {
       strokeWidth = lineType.lineWidth;
     } else if (lineType is DashedLine) {
       strokeWidth = lineType.dashWidth;
     } else {
-      throw UnimplementedError("This line type is not supported! Type was: $lineType");
+      throw UnimplementedError('This line type is not supported! Type was: $lineType');
     }
 
     dotPaint.color = pointStyle.dotColor;
@@ -58,7 +55,7 @@ class MeasureArea extends StatelessWidget {
   }
 
   Stack _pointsOverlay(PointsState state) {
-    List<Widget> widgets = List();
+    var widgets = <Widget>[];
 
     if (state is PointsSingleState) {
       widgets.add(_pointPainter(state.point, state.point));
@@ -76,7 +73,7 @@ class MeasureArea extends StatelessWidget {
   }
 
   List<Widget> _onlyPoints(PointsOnlyState state) {
-    List<Widget> widgets = List();
+    var widgets = <Widget>[];
 
     state.points.doInBetween((start, end) => widgets.add(_pointPainter(start, end)));
 
@@ -84,7 +81,7 @@ class MeasureArea extends StatelessWidget {
   }
 
   Iterable<Widget> _pointsAndDistancesWithSpace(PointsAndDistanceActiveState state) {
-    List<Widget> widgets = List();
+    var widgets = <Widget>[];
 
     state.holders.asMap().forEach((index, holder) {
       widgets.add(_pointPainter(holder.start, holder.end));
@@ -97,7 +94,7 @@ class MeasureArea extends StatelessWidget {
   }
 
   List<Widget> _pointsAndDistances(PointsAndDistanceState state) {
-    List<Widget> widgets = List();
+    var widgets = <Widget>[];
 
     state.holders.forEach((holder) {
       widgets.add(_pointPainter(holder.start, holder.end));

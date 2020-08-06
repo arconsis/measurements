@@ -25,7 +25,7 @@ class PointsSingleState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + " point: $point";
+    return super.toString() + ' point: $point';
   }
 }
 
@@ -39,7 +39,7 @@ class PointsOnlyState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + " points: $points";
+    return super.toString() + ' points: $points';
   }
 }
 
@@ -55,7 +55,7 @@ class PointsAndDistanceState extends PointsState {
 
   @override
   String toString() {
-    return super.toString() + " drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance";
+    return super.toString() + ' drawingHolder: $holders, viewCenter: $viewCenter, tolerance: $tolerance';
   }
 }
 
@@ -69,6 +69,6 @@ class PointsAndDistanceActiveState extends PointsAndDistanceState {
 
   @override
   String toString() {
-    return super.toString() + " nullIndex: $nullIndices";
+    return super.toString() + ' nullIndex: $nullIndices';
   }
 }

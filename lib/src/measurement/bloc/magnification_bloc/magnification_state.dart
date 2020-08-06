@@ -27,6 +27,6 @@ class MagnificationActiveState extends MagnificationState {
   @override
   String toString() {
     return super.toString() +
-        " position: $position, absolutePosition: $absolutePosition, magnificationOffset: $magnificationOffset, backgroundImage: $backgroundImage, imageScaleFactor: $imageScaleFactor";
+        ' position: $position, absolutePosition: $absolutePosition, magnificationOffset: $magnificationOffset, backgroundImage: $backgroundImage, imageScaleFactor: $imageScaleFactor';
   }
 }

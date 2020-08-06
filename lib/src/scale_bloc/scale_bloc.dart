@@ -17,7 +17,7 @@ import 'scale_state.dart';
 
 class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunction {
   final logger = Logger(LogDistricts.SCALE_BLOC);
-  final List<StreamSubscription> subscriptions = List();
+  final List<StreamSubscription> subscriptions = [];
 
   final double _minScale = 1.0;
   final double _maxScale = 10.0;

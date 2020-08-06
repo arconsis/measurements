@@ -3,15 +3,15 @@
 
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:document_measure/src/style/magnification_style.dart';
+import 'package:flutter/material.dart';
 
 class MagnifyingPainter extends CustomPainter {
   final Offset fingerPosition;
   final ui.Image image;
   final MagnificationStyle style;
 
-  Paint _drawPaint = Paint();
+  final _drawPaint = Paint();
 
   Offset _drawPosition;
   RRect _outerCircle, _innerCircle;
@@ -20,7 +20,7 @@ class MagnifyingPainter extends CustomPainter {
   MagnifyingPainter({@required this.fingerPosition, @required Offset absolutePosition, @required this.image, @required this.style, double imageScaleFactor, @required Offset magnificationOffset}) {
     _drawPosition = fingerPosition - magnificationOffset;
 
-    double diameter = 2 * style.magnificationRadius;
+    var diameter = 2 * style.magnificationRadius;
 
     _innerCircle = getCircle(_drawPosition, style.magnificationRadius);
     _outerCircle = _innerCircle.inflate(style.outerCircleThickness);
@@ -33,14 +33,7 @@ class MagnifyingPainter extends CustomPainter {
   }
 
   RRect getCircle(Offset position, double radius) {
-    return RRect.fromRectAndRadius(
-        Rect.fromCenter(
-            center: position,
-            width: radius * 2,
-            height: radius * 2
-        ),
-        Radius.circular(radius)
-    );
+    return RRect.fromRectAndRadius(Rect.fromCenter(center: position, width: radius * 2, height: radius * 2), Radius.circular(radius));
   }
 
   @override
@@ -55,7 +48,7 @@ class MagnifyingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    MagnifyingPainter old = oldDelegate as MagnifyingPainter;
+    var old = oldDelegate as MagnifyingPainter;
 
     return old.fingerPosition != fingerPosition || old.image != image;
   }

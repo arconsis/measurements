@@ -1,3 +1,6 @@
+## 0.0.1+1
+* Refactored and improved code
+
 ## 0.0.1+0
 * Updated installation method in README
 

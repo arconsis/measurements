@@ -12,7 +12,7 @@ import 'input_state.dart';
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 class InputBloc extends Bloc<InputEvent, InputState> {
-  final List<StreamSubscription> _streamSubscription = List();
+  final List<StreamSubscription> _streamSubscription = [];
 
   MeasurementRepository _measurementRepository;
   MetadataRepository _metadataRepository;

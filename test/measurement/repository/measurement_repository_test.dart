@@ -3,19 +3,19 @@
 
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/measurement/drawing_holder.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:document_measure/src/util/utils.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Measurement Repository Unit Test", () {
+  group('Measurement Repository Unit Test', () {
     final transformationFactor = Millimeter(5.0);
 
     MetadataRepository metadataRepository;
@@ -44,8 +44,8 @@ void main() {
       transformationFactorController.close();
     });
 
-    group("single events", () {
-      test("down event", () {
+    group('single events', () {
+      test('down event', () {
         final expectedPoints = [Offset(10, 10)];
 
         measurementRepository.registerDownEvent(Offset(10, 10));
@@ -53,7 +53,7 @@ void main() {
         measurementRepository.points.listen((actual) => expect(actual, expectedPoints));
       });
 
-      test("starting with move event should not work", () {
+      test('starting with move event should not work', () {
         final expectedPoints = [];
 
         measurementRepository.registerMoveEvent(Offset(10, 10));
@@ -61,7 +61,7 @@ void main() {
         measurementRepository.points.listen((actual) => expect(actual, expectedPoints));
       });
 
-      test("starting with up event should not work", () {
+      test('starting with up event should not work', () {
         final expectedPoints = [];
 
         measurementRepository.registerUpEvent(Offset(10, 10));
@@ -70,8 +70,8 @@ void main() {
       });
     });
 
-    group("multiple events", () {
-      test("update same point", () {
+    group('multiple events', () {
+      test('update same point', () {
         final expectedPoints = [Offset(15, 15)];
 
         measurementRepository.registerDownEvent(Offset(10, 10));
@@ -82,7 +82,7 @@ void main() {
         measurementRepository.points.listen((actual) => expect(actual, expectedPoints));
       });
 
-      test("update same point without releasing", () {
+      test('update same point without releasing', () {
         final expectedPoints = [Offset(10, 10)];
 
         measurementRepository.registerDownEvent(Offset(10, 10));
@@ -91,7 +91,7 @@ void main() {
         measurementRepository.points.listen((actual) => expect(actual, expectedPoints));
       });
 
-      test("move first point, set second point", () {
+      test('move first point, set second point', () {
         final expectedPoints = [Offset(10, 10), Offset(110, 10)];
 
         measurementRepository.registerDownEvent(Offset(15, 15));
@@ -106,7 +106,7 @@ void main() {
         expect(controller.distances, [100 * transformationFactor.value]);
       });
 
-      test("two points with distance", () {
+      test('two points with distance', () {
         final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 100]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
@@ -119,7 +119,7 @@ void main() {
         expect(controller.distances, [100 * transformationFactor.value]);
       });
 
-      test("two points, holding second should have null distance", () {
+      test('two points, holding second should have null distance', () {
         final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [null]);
 
         measurementRepository.registerDownEvent(Offset(0, 100));
@@ -133,7 +133,7 @@ void main() {
         expect(controller.distances, [100 * transformationFactor.value]);
       });
 
-      test("set five points with distances", () {
+      test('set five points with distances', () {
         final expectedHolder = DrawingHolder([
           Offset(0, 100),
           Offset(100, 100),
@@ -171,7 +171,7 @@ void main() {
         ]);
       });
 
-      test("update transformation factor changes distances", () async {
+      test('update transformation factor changes distances', () async {
         final expectedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 100]);
         final expectedUpdatedHolder = DrawingHolder([Offset(0, 100), Offset(100, 100)], [transformationFactor * 2 * 100]);
 
@@ -197,35 +197,35 @@ void main() {
       });
     });
 
-    group("remove points", () {
-      test("add one point and delete it", () async {
-        testRemoval(measurementRepository, transformationFactor, [Offset(10, 10)], [0]);
+    group('remove points', () {
+      test('add one point and delete it', () async {
+        await testRemoval(measurementRepository, transformationFactor, [Offset(10, 10)], [0]);
       });
 
-      test("add two points and delete one", () async {
-        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0)], [0]);
+      test('add two points and delete one', () async {
+        await testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0)], [0]);
       });
 
-      test("add three points and delete the middle one", () async {
-        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1]);
+      test('add three points and delete the middle one', () async {
+        await testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1]);
       });
 
-      test("add three points and delete two", () async {
-        testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1, 0]);
+      test('add three points and delete two', () async {
+        await testRemoval(measurementRepository, transformationFactor, [Offset(0, 0), Offset(100, 0), Offset(100, 100)], [1, 0]);
       });
     });
   });
 }
 
 Future<void> testRemoval(MeasurementRepository repository, LengthUnit transformationFactor, List<Offset> points, List<int> deleteIndices) async {
-  final distances = List<LengthUnit>();
+  final distances = <LengthUnit>[];
   points.doInBetween((Offset first, Offset second) => distances.add(transformationFactor * (second - first).distance));
 
-  final removedPoints = List<Offset>();
+  final removedPoints = <Offset>[];
   deleteIndices.forEach((index) => removedPoints.add(points[index]));
 
-  final trimmedPoints = List<Offset>();
-  final trimmedDistances = List<LengthUnit>();
+  final trimmedPoints = <Offset>[];
+  final trimmedDistances = <LengthUnit>[];
   trimmedPoints.addAll(points);
   deleteIndices.forEach((index) => trimmedPoints.removeAt(index));
   trimmedPoints.doInBetween((Offset first, Offset second) => trimmedDistances.add(transformationFactor * (second - first).distance));

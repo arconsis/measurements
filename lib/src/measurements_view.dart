@@ -81,7 +81,7 @@ class Measurements extends StatelessWidget {
     this.deleteChildAlignment = Alignment.bottomCenter,
     this.measure = true,
     this.showDistanceOnLine = true,
-    this.measurementInformation = const MeasurementInformation.A4(),
+    this.measurementInformation = const MeasurementInformation.dinA4(),
     this.magnificationZoomFactor = 2.0,
     this.controller,
     this.pointStyle = const PointStyle(),
@@ -166,7 +166,7 @@ class _Measurements extends StatelessWidget {
             BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(image, boundary.size));
           }
         } else {
-          _logger.log("image dimensions are 0");
+          _logger.log('image dimensions are 0');
         }
       }
     });
@@ -175,13 +175,13 @@ class _Measurements extends StatelessWidget {
   void _setScreenInfoToBloc(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_deleteKey.currentContext != null && _parentKey.currentContext != null) {
-        RenderObject parentObject = _parentKey.currentContext.findRenderObject();
-        RenderObject deleteObject = _deleteKey.currentContext.findRenderObject();
+        var parentObject = _parentKey.currentContext.findRenderObject();
+        var deleteObject = _deleteKey.currentContext.findRenderObject();
 
         final translation = deleteObject.getTransformTo(parentObject).getTranslation();
-        Size deleteSize = _deleteKey.currentContext.size;
+        var deleteSize = _deleteKey.currentContext.size;
 
-        _logger.log("Translation is: $translation size is $deleteSize");
+        _logger.log('Translation is: $translation size is $deleteSize');
 
         BlocProvider.of<MetadataBloc>(context)?.add(MetadataScreenSizeEvent(_parentKey.currentContext.size));
         BlocProvider.of<MetadataBloc>(context)?.add(MetadataDeleteRegionEvent(Offset(translation.x, translation.y), deleteSize));

@@ -44,13 +44,13 @@ class DistancePainter extends material.CustomPainter {
       _zeroPoint = _zeroPointWithoutTolerance;
     }
 
-    double distanceValue = distance.value;
+    var distanceValue = distance.value;
 
     if (distanceValue > 0) {
       _zeroPoint -= Offset(((log(distanceValue) / _log10).floor() - 1) * _offsetPerDigit, 0);
     }
 
-    Offset difference = end - start;
+    var difference = end - start;
     _position = start + difference / 2.0;
     _radians = difference.direction;
 
@@ -58,18 +58,18 @@ class DistancePainter extends material.CustomPainter {
       _radians += pi;
     }
 
-    Offset positionToCenter = viewCenter - _position;
+    var positionToCenter = viewCenter - _position;
 
-    Offset offset = difference.normal();
+    var offset = difference.normal();
     offset *= offset
         .cosAlpha(positionToCenter)
         .sign;
 
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor));
     if (style.showTolerance) {
-      paragraphBuilder.addText("${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}");
+      paragraphBuilder.addText('${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}±${tolerance.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
     } else {
-      paragraphBuilder.addText("${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}");
+      paragraphBuilder.addText('${distanceValue?.toStringAsFixed(style.numDecimalPlaces)}${distance.getAbbreviation()}');
     }
 
     _paragraph = paragraphBuilder.build();
@@ -88,7 +88,7 @@ class DistancePainter extends material.CustomPainter {
 
   @override
   bool shouldRepaint(material.CustomPainter oldDelegate) {
-    DistancePainter old = oldDelegate as DistancePainter;
+    var old = oldDelegate as DistancePainter;
 
     return distance != old.distance || _position != old._position;
   }
@@ -96,17 +96,17 @@ class DistancePainter extends material.CustomPainter {
 
 extension OffsetExtension on Offset {
   Offset normal() {
-    Offset normalized = this.normalize();
+    var normalized = normalize();
     return Offset(-normalized.dy, normalized.dx);
   }
 
   Offset normalize() {
-    return this / this.distance;
+    return this / distance;
   }
 
   double cosAlpha(Offset other) {
-    Offset thisNormalized = this.normalize();
-    Offset otherNormalized = other.normalize();
+    var thisNormalized = normalize();
+    var otherNormalized = other.normalize();
 
     return thisNormalized.dx * otherNormalized.dx + thisNormalized.dy * otherNormalized.dy;
   }

@@ -15,7 +15,7 @@ abstract class InputEvent extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " position: $position";
+    return super.toString() + ' position: $position';
   }
 }
 

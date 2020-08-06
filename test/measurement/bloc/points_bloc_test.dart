@@ -18,7 +18,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Points Bloc Unit Test", () {
+  group('Points Bloc Unit Test', () {
     MeasurementRepository measurementRepository;
     MetadataRepository metadataRepository;
 
@@ -39,7 +39,7 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       build: () async {
         when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([]));
         when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
@@ -52,9 +52,9 @@ void main() {
       ],
     );
 
-    group("UI events", () {
+    group('UI events', () {
       blocTest(
-        "no points",
+        'no points',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
@@ -74,7 +74,7 @@ void main() {
       );
 
       blocTest(
-        "single point",
+        'single point',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
@@ -91,7 +91,7 @@ void main() {
       );
 
       blocTest(
-        "two points without distance",
+        'two points without distance',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
@@ -108,7 +108,7 @@ void main() {
       );
 
       blocTest(
-        "two points with distance",
+        'two points with distance',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
@@ -125,7 +125,7 @@ void main() {
       );
 
       blocTest(
-        "active measurement with two points and distances",
+        'active measurement with two points and distances',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
@@ -142,7 +142,7 @@ void main() {
       );
 
       blocTest(
-        "active measurement on second last point with five points and distances",
+        'active measurement on second last point with five points and distances',
         build: () async {
           when(metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
           when(metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
