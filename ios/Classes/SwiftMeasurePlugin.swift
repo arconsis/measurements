@@ -23,9 +23,6 @@ public class SwiftMeasurePlugin: NSObject, FlutterPlugin {
                 ppi = 326.0
             }
             
-            print("name: \(UIDevice().name)")
-            print("ppi: \(ppi)")
-            
             result(ppi)
         } else {
             result(nil)
