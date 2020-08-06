@@ -4,8 +4,8 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:flutter/material.dart' as material;
 import 'package:document_measure/document_measure.dart';
+import 'package:flutter/material.dart' as material;
 
 class DistancePainter extends material.CustomPainter {
   static final double _log10 = log(10);
@@ -32,12 +32,13 @@ class DistancePainter extends material.CustomPainter {
     ),
   );
 
-  DistancePainter({@material.required Offset start,
-    @material.required Offset end,
-    @material.required this.distance,
-    @material.required this.viewCenter,
-    @material.required double tolerance,
-    @material.required DistanceStyle style}) {
+  DistancePainter(
+      {@material.required Offset start,
+      @material.required Offset end,
+      @material.required this.distance,
+      @material.required this.viewCenter,
+      @material.required double tolerance,
+      @material.required DistanceStyle style}) {
     if (style.showTolerance) {
       _zeroPoint = _zeroPointWithTolerance;
     } else {
@@ -61,9 +62,7 @@ class DistancePainter extends material.CustomPainter {
     var positionToCenter = viewCenter - _position;
 
     var offset = difference.normal();
-    offset *= offset
-        .cosAlpha(positionToCenter)
-        .sign;
+    offset *= offset.cosAlpha(positionToCenter).sign;
 
     paragraphBuilder.pushStyle(TextStyle(color: style.textColor));
     if (style.showTolerance) {

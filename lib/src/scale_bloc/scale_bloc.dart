@@ -1,19 +1,19 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:document_measure/src/util/logger.dart';
 import 'package:document_measure/src/util/utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'scale_event.dart';
 import 'scale_state.dart';
-
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunction {
   final logger = Logger(LogDistricts.SCALE_BLOC);

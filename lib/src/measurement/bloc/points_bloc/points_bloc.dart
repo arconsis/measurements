@@ -4,8 +4,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_event.dart';
 import 'package:document_measure/src/measurement/bloc/points_bloc/points_state.dart';
 import 'package:document_measure/src/measurement/overlay/holder.dart';
@@ -13,6 +11,8 @@ import 'package:document_measure/src/measurement/repository/measurement_reposito
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:document_measure/src/util/logger.dart';
 import 'package:document_measure/src/util/utils.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../drawing_holder.dart';
 

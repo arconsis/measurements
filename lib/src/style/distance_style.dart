@@ -5,7 +5,6 @@ import 'dart:ui';
 
 import 'package:document_measure/src/util/colors.dart';
 
-
 /// Style class for customizing the distances on the lines between two points.
 ///
 /// [showTolerance] will show up as for example 10.0±0.1mm instead of 10.0mm

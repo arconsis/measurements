@@ -1,9 +1,9 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
+import 'package:document_measure/document_measure.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:document_measure/document_measure.dart';
 
 import 'colors.dart';
 

@@ -3,9 +3,9 @@
 
 import 'dart:ui' as ui;
 
+import 'package:document_measure/document_measure.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:document_measure/document_measure.dart';
 
 abstract class MetadataEvent extends Equatable {}
 

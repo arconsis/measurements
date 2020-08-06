@@ -5,7 +5,6 @@ import 'dart:ui';
 
 import 'package:document_measure/src/util/colors.dart';
 
-
 /// Style class for customizing the appearance of the magnification glass.
 ///
 /// [magnificationColor] will be used for all lines and circles of the magnification glass.

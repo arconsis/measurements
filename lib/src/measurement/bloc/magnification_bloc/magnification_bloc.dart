@@ -1,16 +1,15 @@
-import 'dart:async';
-
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
+import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:document_measure/src/input_bloc/input_bloc.dart';
 import 'package:document_measure/src/input_bloc/input_state.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'magnification_event.dart';
 import 'magnification_state.dart';

@@ -3,10 +3,10 @@
 
 import 'dart:ui';
 
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart' as widget;
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/util/logger.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' as widget;
 import 'package:rxdart/subjects.dart';
 
 class MetadataRepository {

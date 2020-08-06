@@ -1,13 +1,13 @@
-import 'dart:async';
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
+import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';

@@ -3,12 +3,11 @@
 
 import 'dart:ui';
 
+import 'package:document_measure/src/measurement/overlay/holder.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/gestures.dart';
-import 'package:document_measure/src/measurement/overlay/holder.dart';
 
-abstract class PointsState extends Equatable {
-}
+abstract class PointsState extends Equatable {}
 
 class PointsEmptyState extends PointsState {
   @override

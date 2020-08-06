@@ -3,8 +3,8 @@
 
 import 'dart:ui';
 
-import 'package:equatable/equatable.dart';
 import 'package:document_measure/document_measure.dart';
+import 'package:equatable/equatable.dart';
 
 class DrawingHolder extends Equatable {
   final List<Offset> points;
