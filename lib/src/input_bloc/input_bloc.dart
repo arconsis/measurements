@@ -1,32 +1,31 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'dart:async';
 
+import 'package:document_measure/src/di/get_it.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
+import '../measurement/repository/measurement_repository.dart';
+import '../metadata/repository/metadata_repository.dart';
 import 'input_event.dart';
 import 'input_state.dart';
 
 class InputBloc extends Bloc<InputEvent, InputState> {
   final List<StreamSubscription> _streamSubscription = [];
 
-  MeasurementRepository _measurementRepository;
-  MetadataRepository _metadataRepository;
+  final MeasurementRepository _measurementRepository;
+  final MetadataRepository _metadataRepository;
 
   bool _measure = false;
   bool _delete = false;
 
-  InputBloc() : super(InputEmptyState()) {
-    _metadataRepository = GetIt.I<MetadataRepository>();
-    _measurementRepository = GetIt.I<MeasurementRepository>();
-
-    _streamSubscription.add(_metadataRepository.measurement
-        .listen((measure) => _measure = measure));
+  InputBloc(this._metadataRepository, this._measurementRepository) : super(InputEmptyState()) {
+    _streamSubscription.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
   }
+
+  factory InputBloc.create() => InputBloc(get<MetadataRepository>(), get<MeasurementRepository>());
 
   @override
   void onEvent(InputEvent event) {

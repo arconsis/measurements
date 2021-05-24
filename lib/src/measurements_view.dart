@@ -1,8 +1,8 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'dart:math';
 
+import 'package:document_measure/src/get_it/get_it.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -68,14 +68,14 @@ class Measurements extends StatelessWidget {
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
-  final MeasurementController controller;
+  final MeasurementController? controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
 
   Measurements({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.deleteChild = const _DeleteChild(),
     this.deleteChildAlignment = Alignment.bottomCenter,
     this.measure = true,
@@ -87,13 +87,7 @@ class Measurements extends StatelessWidget {
     this.magnificationStyle = const MagnificationStyle(),
     this.distanceStyle = const DistanceStyle(),
   }) {
-    if (!GetIt.I.isRegistered<MetadataRepository>()) {
-      GetIt.I.registerSingleton(MetadataRepository());
-    }
-    if (!GetIt.I.isRegistered<MeasurementRepository>()) {
-      GetIt.I.registerSingleton(
-          MeasurementRepository(GetIt.I<MetadataRepository>()));
-    }
+    registerMembers();
   }
 
   @override
@@ -101,7 +95,7 @@ class Measurements extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => MetadataBloc()),
-        BlocProvider(create: (context) => InputBloc()),
+        BlocProvider(create: (context) => InputBloc.create()),
         BlocProvider(create: (context) => ScaleBloc()),
       ],
       child: _Measurements(
@@ -134,7 +128,7 @@ class _Measurements extends StatelessWidget {
   final bool showDistanceOnLine;
   final MeasurementInformation measurementInformation;
   final double magnificationZoomFactor;
-  final MeasurementController controller;
+  final MeasurementController? controller;
   final PointStyle pointStyle;
   final MagnificationStyle magnificationStyle;
   final DistanceStyle distanceStyle;
@@ -154,50 +148,46 @@ class _Measurements extends StatelessWidget {
   );
 
   void _setBackgroundImageToBloc(BuildContext context, double zoom) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
       if (_childKey.currentContext != null) {
-        RenderRepaintBoundary boundary =
-            _childKey.currentContext.findRenderObject();
+        final boundary = _childKey.currentContext?.findRenderObject();
 
-        if (boundary.size.width > 0.0 && boundary.size.height > 0.0) {
-          final pixelRatio =
-              min(10.0, max(1.0, magnificationZoomFactor * zoom));
-          final image = await boundary.toImage(pixelRatio: pixelRatio);
+        if (boundary != null && boundary.isRepaintBoundary) {
+          final size = boundary.paintBounds.size;
+          if (size.width > 0.0 && size.height > 0.0) {
+            final pixelRatio = min(10.0, max(1.0, magnificationZoomFactor * zoom));
+            final image = await boundary.toImage(pixelRatio: pixelRatio);
 
-          if (image.width > 0) {
-            BlocProvider.of<MetadataBloc>(context)
-                .add(MetadataBackgroundEvent(image, boundary.size));
+            if (image.width > 0) {
+              BlocProvider.of<MetadataBloc>(context).add(MetadataBackgroundEvent(image, boundary.size));
+            }
+          } else {
+            _logger.log('image dimensions are 0');
           }
-        } else {
-          _logger.log('image dimensions are 0');
         }
       }
     });
   }
 
   void _setScreenInfoToBloc(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_deleteKey.currentContext != null &&
-          _parentKey.currentContext != null) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      if (_deleteKey.currentContext != null && _parentKey.currentContext != null) {
         var parentObject = _parentKey.currentContext.findRenderObject();
         var deleteObject = _deleteKey.currentContext.findRenderObject();
 
-        final translation =
-            deleteObject.getTransformTo(parentObject).getTranslation();
+        final translation = deleteObject.getTransformTo(parentObject).getTranslation();
         var deleteSize = _deleteKey.currentContext.size;
 
         _logger.log('Translation is: $translation size is $deleteSize');
 
-        BlocProvider.of<MetadataBloc>(context)
-            ?.add(MetadataScreenSizeEvent(_parentKey.currentContext.size));
-        BlocProvider.of<MetadataBloc>(context)?.add(MetadataDeleteRegionEvent(
-            Offset(translation.x, translation.y), deleteSize));
+        BlocProvider.of<MetadataBloc>(context).add(MetadataScreenSizeEvent(_parentKey.currentContext.size));
+        BlocProvider.of<MetadataBloc>(context).add(MetadataDeleteRegionEvent(Offset(translation.x, translation.y), deleteSize));
       }
     });
   }
 
   void _setStartupArgumentsToBloc(BuildContext context) {
-    BlocProvider.of<MetadataBloc>(context)?.add(MetadataStartedEvent(
+    BlocProvider.of<MetadataBloc>(context).add(MetadataStartedEvent(
       measurementInformation: measurementInformation,
       measure: measure,
       showDistances: showDistanceOnLine,
@@ -220,28 +210,19 @@ class _Measurements extends StatelessWidget {
   }
 
   Widget _overlay(BuildContext context, ScaleState scaleState) {
-    return OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
+    return OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
       _setBackgroundImageToBloc(context, scaleState.scale);
       _setScreenInfoToBloc(context);
 
       return MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => PointsBloc()),
-          BlocProvider(
-              create: (context) =>
-                  MagnificationBloc(BlocProvider.of<InputBloc>(context))),
+          BlocProvider(create: (context) => MagnificationBloc(BlocProvider.of<InputBloc>(context))),
         ],
         child: Listener(
-          onPointerDown: (PointerDownEvent event) =>
-              BlocProvider.of<InputBloc>(context)
-                  .add(InputDownEvent(event.localPosition)),
-          onPointerMove: (PointerMoveEvent event) =>
-              BlocProvider.of<InputBloc>(context)
-                  .add(InputMoveEvent(event.localPosition)),
-          onPointerUp: (PointerUpEvent event) =>
-              BlocProvider.of<InputBloc>(context)
-                  .add(InputUpEvent(event.localPosition)),
+          onPointerDown: (PointerDownEvent event) => BlocProvider.of<InputBloc>(context).add(InputDownEvent(event.localPosition)),
+          onPointerMove: (PointerMoveEvent event) => BlocProvider.of<InputBloc>(context).add(InputMoveEvent(event.localPosition)),
+          onPointerUp: (PointerUpEvent event) => BlocProvider.of<InputBloc>(context).add(InputUpEvent(event.localPosition)),
           child: Stack(
             children: <Widget>[
               Transform(
@@ -265,14 +246,10 @@ class _Measurements extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onScaleStart: (ScaleStartDetails details) =>
-                    BlocProvider.of<ScaleBloc>(context)
-                        .add(ScaleStartEvent(details.localFocalPoint)),
+                onScaleStart: (ScaleStartDetails details) => BlocProvider.of<ScaleBloc>(context).add(ScaleStartEvent(details.localFocalPoint)),
                 onScaleUpdate: (ScaleUpdateDetails details) =>
-                    BlocProvider.of<ScaleBloc>(context).add(ScaleUpdateEvent(
-                        details.localFocalPoint, details.scale)),
-                onDoubleTap: () => BlocProvider.of<ScaleBloc>(context)
-                    .add(ScaleDoubleTapEvent()),
+                    BlocProvider.of<ScaleBloc>(context).add(ScaleUpdateEvent(details.localFocalPoint, details.scale)),
+                onDoubleTap: () => BlocProvider.of<ScaleBloc>(context).add(ScaleDoubleTapEvent()),
               )
             ],
           ),
