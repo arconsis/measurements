@@ -1,6 +1,5 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'package:document_measure/document_measure.dart';
 import 'package:document_measure/src/measurement/drawing_holder.dart';
 import 'package:document_measure/src/measurement/overlay/measure_area.dart';
@@ -34,13 +33,12 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final controller = MeasurementController();
-  final measurementInformation = MeasurementInformation(
-      documentWidthInLengthUnits: Millimeter(imageWidth * 2),
-      documentHeightInLengthUnits: Millimeter(imageHeight * 2));
+  final measurementInformation =
+      MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth * 2), documentHeightInLengthUnits: Millimeter(imageHeight * 2));
 
   group('Measurement Widget Integration Test', () {
-    MetadataRepository metadataRepository;
-    MeasurementRepository measurementRepository;
+    late MetadataRepository metadataRepository;
+    late MeasurementRepository measurementRepository;
 
     setUp(() {
       metadataRepository = MetadataRepository();
@@ -56,8 +54,7 @@ void main() {
     });
 
     group('widget setup', () {
-      testWidgets('measurement should show child also when measure is false',
-          (WidgetTester tester) async {
+      testWidgets('measurement should show child also when measure is false', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
         )));
@@ -66,9 +63,7 @@ void main() {
         expect(find.byType(typeOf<MeasureArea>()), findsOneWidget);
       });
 
-      testWidgets(
-          'measurement should show child under measure area when measuring',
-          (WidgetTester tester) async {
+      testWidgets('measurement should show child under measure area when measuring', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -95,12 +90,10 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        measurementRepository.points
-            .listen((actual) => expect(actual, [Offset(100, 100)]));
+        measurementRepository.points.listen((actual) => expect(actual, [Offset(100, 100)]));
       });
 
-      testWidgets('adding multiple points and getting distances',
-          (WidgetTester tester) async {
+      testWidgets('adding multiple points and getting distances', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -125,25 +118,15 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final expectedDrawingHolder = DrawingHolder([
-          Offset(100, 100),
-          Offset(100, 300),
-          Offset(300, 300),
-          Offset(300, 100)
-        ], [
-          Millimeter(400),
-          Millimeter(400),
-          Millimeter(400)
-        ]);
+        final expectedDrawingHolder =
+            DrawingHolder([Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)], [Millimeter(400), Millimeter(400), Millimeter(400)]);
 
-        measurementRepository.drawingHolder
-            .listen((actual) => expect(actual, expectedDrawingHolder));
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
         expect(controller.distances, equals([400, 400, 400]));
         expect(controller.tolerance, equals(2));
       });
 
-      testWidgets('add points without distances and then turn on distances',
-          (WidgetTester tester) async {
+      testWidgets('add points without distances and then turn on distances', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
@@ -168,12 +151,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        measurementRepository.points.listen((actual) => expectSync(actual, [
-              Offset(100, 100),
-              Offset(100, 300),
-              Offset(300, 300),
-              Offset(300, 100)
-            ]));
+        measurementRepository.points.listen((actual) => expectSync(actual, [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)]));
         expect(controller.distances, equals([400, 400, 400]));
         expect(controller.tolerance, equals(2));
 
@@ -186,34 +164,22 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final expectedDrawingHolder = DrawingHolder([
-          Offset(100, 100),
-          Offset(100, 300),
-          Offset(300, 300),
-          Offset(300, 100)
-        ], [
-          Millimeter(400),
-          Millimeter(400),
-          Millimeter(400)
-        ]);
+        final expectedDrawingHolder =
+            DrawingHolder([Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)], [Millimeter(400), Millimeter(400), Millimeter(400)]);
 
-        measurementRepository.drawingHolder
-            .listen((actual) => expect(actual, expectedDrawingHolder));
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
         expect(controller.distances, equals([400, 400, 400]));
         expect(controller.tolerance, equals(2));
       });
 
-      testWidgets('adding multiple points and getting distances with set scale',
-          (WidgetTester tester) async {
+      testWidgets('adding multiple points and getting distances with set scale', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
           controller: controller,
-          measurementInformation: MeasurementInformation(
-              documentWidthInLengthUnits: Millimeter(imageWidth),
-              documentHeightInLengthUnits: Millimeter(imageHeight),
-              scale: 2.0),
+          measurementInformation:
+              MeasurementInformation(documentWidthInLengthUnits: Millimeter(imageWidth), documentHeightInLengthUnits: Millimeter(imageHeight), scale: 2.0),
         )));
 
         await tester.pumpAndSettle();
@@ -233,17 +199,11 @@ void main() {
         await tester.pumpAndSettle();
 
         final expectedDrawingHolder = DrawingHolder(
-          [
-            Offset(100, 100),
-            Offset(100, 300),
-            Offset(300, 300),
-            Offset(300, 100)
-          ],
+          [Offset(100, 100), Offset(100, 300), Offset(300, 300), Offset(300, 100)],
           [Millimeter(100), Millimeter(100), Millimeter(100)],
         );
 
-        measurementRepository.drawingHolder
-            .listen((actual) => expect(actual, expectedDrawingHolder));
+        measurementRepository.drawingHolder.listen((actual) => expect(actual, expectedDrawingHolder));
         expect(controller.distances, equals([100, 100, 100]));
         expect(controller.tolerance, equals(0.5));
       });
@@ -261,17 +221,14 @@ void main() {
         });
       });
 
-      testWidgets('set zoom to original size and reset zoom level',
-          (WidgetTester tester) async {
+      testWidgets('set zoom to original size and reset zoom level', (WidgetTester tester) async {
         await tester.pumpWidget(fillTemplate(Measurements(
           child: imageWidget,
           measure: true,
           showDistanceOnLine: true,
           controller: controller,
-          measurementInformation: MeasurementInformation(
-              documentWidthInLengthUnits: Inch(imageWidth),
-              documentHeightInLengthUnits: Inch(imageHeight),
-              scale: 2.0),
+          measurementInformation:
+              MeasurementInformation(documentWidthInLengthUnits: Inch(imageWidth), documentHeightInLengthUnits: Inch(imageHeight), scale: 2.0),
         )));
 
         await tester.pump();

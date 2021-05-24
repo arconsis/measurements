@@ -1,6 +1,5 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'dart:math';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -13,23 +12,20 @@ import 'package:document_measure/src/measurement/repository/measurement_reposito
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
 
 void main() {
   group('Points Bloc Unit Test', () {
-    MeasurementRepository measurementRepository;
-    MetadataRepository metadataRepository;
+    late MeasurementRepository measurementRepository;
+    late MetadataRepository metadataRepository;
 
     setUp(() {
       measurementRepository = MockedMeasurementRepository();
       metadataRepository = MockedMetadataRepository();
 
-      when(metadataRepository.tolerance)
-          .thenAnswer((_) => Stream.fromIterable([0.0]));
-      when(metadataRepository.unitOfMeasurement)
-          .thenAnswer((_) => Stream.fromIterable([Millimeter.asUnit()]));
+      when(() => metadataRepository.tolerance).thenAnswer((_) => Stream.fromIterable([0.0]));
+      when(() => metadataRepository.unitOfMeasurement).thenAnswer((_) => Stream.fromIterable([Millimeter.asUnit()]));
 
       GetIt.I.registerSingleton(measurementRepository);
       GetIt.I.registerSingleton(metadataRepository);
@@ -42,16 +38,14 @@ void main() {
 
     blocTest(
       'initial state',
-      build: () async {
-        when(metadataRepository.showDistances)
-            .thenAnswer((_) => Stream.fromIterable([]));
-        when(metadataRepository.viewCenter)
-            .thenAnswer((_) => Stream.fromIterable([]));
+      build: () {
+        when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([]));
+        when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
 
         return PointsBloc();
       },
       skip: 0,
-      expect: [
+      expect: () => [
         PointsEmptyState(),
       ],
     );
@@ -59,148 +53,110 @@ void main() {
     group('UI events', () {
       blocTest(
         'no points',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([false]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
 
-          when(measurementRepository.points)
-              .thenAnswer((_) => Stream.fromIterable([
-                    [Offset(10, 10)],
-                    [],
-                  ]));
+          when(() => measurementRepository.points).thenAnswer((_) => Stream.fromIterable([
+                [Offset(10, 10)],
+                [],
+              ]));
 
           return PointsBloc();
         },
         wait: Duration(microseconds: 1),
         skip: 2,
-        expect: [
+        expect: () => [
           PointsEmptyState(),
         ],
       );
 
       blocTest(
         'single point',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([false]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
 
-          when(measurementRepository.points)
-              .thenAnswer((_) => Stream.fromIterable([
-                    [Offset(10, 10)]
-                  ]));
+          when(() => measurementRepository.points).thenAnswer((_) => Stream.fromIterable([
+                [Offset(10, 10)]
+              ]));
 
           return PointsBloc();
         },
-        expect: [
+        expect: () => [
           PointsSingleState(Offset(10, 10)),
         ],
       );
 
       blocTest(
         'two points without distance',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([false]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([false]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([]));
 
-          when(measurementRepository.points)
-              .thenAnswer((_) => Stream.fromIterable([
-                    [Offset(10, 10), Offset(20, 20)]
-                  ]));
+          when(() => measurementRepository.points).thenAnswer((_) => Stream.fromIterable([
+                [Offset(10, 10), Offset(20, 20)]
+              ]));
 
           return PointsBloc();
         },
-        expect: [
+        expect: () => [
           PointsOnlyState([Offset(10, 10), Offset(20, 20)])
         ],
       );
 
       blocTest(
         'two points with distance',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([true]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
-          when(measurementRepository.drawingHolder)
-              .thenAnswer((_) => Stream.fromIterable([
-                    DrawingHolder([Offset(10, 10), Offset(20, 20)],
-                        [Millimeter(sqrt(200))])
-                  ]));
+          when(() => measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([
+                DrawingHolder([Offset(10, 10), Offset(20, 20)], [Millimeter(sqrt(200))])
+              ]));
 
           return PointsBloc();
         },
-        expect: [
-          PointsAndDistanceState([
-            Holder.withDistance(
-                Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200)))
-          ], Offset(0, 0), 0.0)
+        expect: () => [
+          PointsAndDistanceState([Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200)))], Offset(0, 0), 0.0)
         ],
       );
 
       blocTest(
         'active measurement with two points and distances',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([true]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
-          when(measurementRepository.drawingHolder)
-              .thenAnswer((_) => Stream.fromIterable([
-                    DrawingHolder([Offset(10, 10), Offset(20, 20)], [null])
-                  ]));
+          when(() => measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([
+                DrawingHolder([Offset(10, 10), Offset(20, 20)], [null])
+              ]));
 
           return PointsBloc();
         },
-        expect: [
-          PointsAndDistanceActiveState(
-              [Holder.withDistance(Offset(10, 10), Offset(20, 20), null)],
-              Offset(0, 0),
-              0.0,
-              [0, 0]),
+        expect: () => [
+          PointsAndDistanceActiveState([Holder.withDistance(Offset(10, 10), Offset(20, 20), null)], Offset(0, 0), 0.0, [0, 0]),
         ],
       );
 
       blocTest(
         'active measurement on second last point with five points and distances',
-        build: () async {
-          when(metadataRepository.showDistances)
-              .thenAnswer((_) => Stream.fromIterable([true]));
-          when(metadataRepository.viewCenter)
-              .thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
+        build: () {
+          when(() => metadataRepository.showDistances).thenAnswer((_) => Stream.fromIterable([true]));
+          when(() => metadataRepository.viewCenter).thenAnswer((_) => Stream.fromIterable([Offset(0, 0)]));
 
-          when(measurementRepository.drawingHolder)
-              .thenAnswer((_) => Stream.fromIterable([
-                    DrawingHolder([
-                      Offset(10, 10),
-                      Offset(20, 20),
-                      Offset(20, 30),
-                      Offset(30, 30),
-                      Offset(10, 30)
-                    ], [
-                      Millimeter(sqrt(200)),
-                      Millimeter(10),
-                      null,
-                      null
-                    ])
-                  ]));
+          when(() => measurementRepository.drawingHolder).thenAnswer((_) => Stream.fromIterable([
+                DrawingHolder(
+                    [Offset(10, 10), Offset(20, 20), Offset(20, 30), Offset(30, 30), Offset(10, 30)], [Millimeter(sqrt(200)), Millimeter(10), null, null])
+              ]));
 
           return PointsBloc();
         },
-        expect: [
+        expect: () => [
           PointsAndDistanceActiveState(
             [
-              Holder.withDistance(
-                  Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200))),
-              Holder.withDistance(
-                  Offset(20, 20), Offset(20, 30), Millimeter(10)),
+              Holder.withDistance(Offset(10, 10), Offset(20, 20), Millimeter(sqrt(200))),
+              Holder.withDistance(Offset(20, 20), Offset(20, 30), Millimeter(10)),
               Holder.withDistance(Offset(20, 30), Offset(30, 30), null),
               Holder.withDistance(Offset(30, 30), Offset(10, 30), null)
             ],

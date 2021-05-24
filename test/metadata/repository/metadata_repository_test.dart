@@ -1,6 +1,5 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'dart:async';
 import 'dart:ui';
 
@@ -23,11 +22,8 @@ void main() {
     final expectedMeasurement = true;
     final expectedShowDistance = true;
     final expectedController = MeasurementController();
-    final expectedMeasurementInformation = MeasurementInformation(
-        documentWidthInLengthUnits: Inch(200),
-        documentHeightInLengthUnits: Inch(200),
-        scale: 4.0,
-        targetLengthUnit: Inch.asUnit());
+    final expectedMeasurementInformation =
+        MeasurementInformation(documentWidthInLengthUnits: Inch(200), documentHeightInLengthUnits: Inch(200), scale: 4.0, targetLengthUnit: Inch.asUnit());
     final expectedViewCenter = Offset(100, 150);
     final Image expectedImage = MockedImage.mock;
     final expectedMagnificationStyle = MagnificationStyle();
@@ -35,12 +31,9 @@ void main() {
     final expectedImageScaleFactor = 3.0;
     final expectedTransformationFactor = Inch(1 / 4);
     final expectedZoomFactor = 5 / 6;
-    final expectedImageToDocumentFactor = expectedMeasurementInformation
-            .documentWidthInLengthUnits.value
-            .toDouble() /
-        viewSize.width;
+    final expectedImageToDocumentFactor = expectedMeasurementInformation.documentWidthInLengthUnits.value.toDouble() / viewSize.width;
 
-    MetadataRepository metadataRepository;
+    late MetadataRepository metadataRepository;
 
     setUpAll(() {
       methodChannel.setMockMethodCallHandler((call) async {
@@ -77,23 +70,15 @@ void main() {
 
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
 
-      metadataRepository.measurement
-          .listen((actual) => expect(actual, expectedMeasurement));
-      metadataRepository.showDistances
-          .listen((actual) => expect(actual, expectedShowDistance));
-      metadataRepository.controller
-          .listen((actual) => expect(actual, expectedController));
-      metadataRepository.viewCenter
-          .listen((actual) => expect(actual, expectedViewCenter));
-      metadataRepository.backgroundImage
-          .listen((actual) => expect(actual, expectedImage));
+      metadataRepository.measurement.listen((actual) => expect(actual, expectedMeasurement));
+      metadataRepository.showDistances.listen((actual) => expect(actual, expectedShowDistance));
+      metadataRepository.controller.listen((actual) => expect(actual, expectedController));
+      metadataRepository.viewCenter.listen((actual) => expect(actual, expectedViewCenter));
+      metadataRepository.backgroundImage.listen((actual) => expect(actual, expectedImage));
 
-      metadataRepository.imageScaleFactor
-          .listen((actual) => expect(actual, expectedImageScaleFactor));
-      metadataRepository.transformationFactor
-          .listen((actual) => expect(actual, expectedTransformationFactor));
-      metadataRepository.imageToDocumentScaleFactor
-          .listen((actual) => expect(actual, expectedImageToDocumentFactor));
+      metadataRepository.imageScaleFactor.listen((actual) => expect(actual, expectedImageScaleFactor));
+      metadataRepository.transformationFactor.listen((actual) => expect(actual, expectedTransformationFactor));
+      metadataRepository.imageToDocumentScaleFactor.listen((actual) => expect(actual, expectedImageToDocumentFactor));
     });
 
     test('started and updated view size', () {
@@ -111,25 +96,19 @@ void main() {
 
       metadataRepository.registerBackgroundChange(expectedImage, viewSize);
 
-      StreamSubscription<double> subscription;
-      subscription =
-          metadataRepository.imageToDocumentScaleFactor.listen((actual) {
+      late StreamSubscription<double> subscription;
+      subscription = metadataRepository.imageToDocumentScaleFactor.listen((actual) {
         expect(actual, expectedImageToDocumentFactor);
         subscription.cancel();
       });
 
-      metadataRepository.registerBackgroundChange(
-          expectedImage, updatedViewSize);
-      metadataRepository.imageToDocumentScaleFactor.listen((actual) => expect(
-          actual,
-          expectedMeasurementInformation.documentHeightInLengthUnits.value
-                  .toDouble() /
-              updatedViewSize.height));
+      metadataRepository.registerBackgroundChange(expectedImage, updatedViewSize);
+      metadataRepository.imageToDocumentScaleFactor
+          .listen((actual) => expect(actual, expectedMeasurementInformation.documentHeightInLengthUnits.value.toDouble() / updatedViewSize.height));
     });
 
     group('original zoom factor', () {
-      test('started without background and get zoom factor for original size',
-          () async {
+      test('started without background and get zoom factor for original size', () async {
         metadataRepository.registerStartupValuesChange(
           measurementInformation: expectedMeasurementInformation,
           measure: expectedMeasurement,
@@ -155,8 +134,7 @@ void main() {
         metadataRepository.registerBackgroundChange(expectedImage, viewSize);
         metadataRepository.registerScreenSize(Size(200, 300));
 
-        expect(await metadataRepository.zoomFactorForLifeSize,
-            equals(expectedZoomFactor));
+        expect(await metadataRepository.zoomFactorForLifeSize, equals(expectedZoomFactor));
       });
     });
   });

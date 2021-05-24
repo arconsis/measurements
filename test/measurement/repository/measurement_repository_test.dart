@@ -18,10 +18,10 @@ void main() {
   group('Measurement Repository Unit Test', () {
     final transformationFactor = Millimeter(5.0);
 
-    MetadataRepository metadataRepository;
-    MeasurementRepository measurementRepository;
-    BehaviorSubject<LengthUnit> transformationFactorController;
-    MeasurementController controller;
+    late MetadataRepository metadataRepository;
+    late MeasurementRepository measurementRepository;
+    late BehaviorSubject<LengthUnit> transformationFactorController;
+    late MeasurementController controller;
 
     setUp(() {
       metadataRepository = MockedMetadataRepository();

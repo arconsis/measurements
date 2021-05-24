@@ -6,7 +6,6 @@ import 'package:document_measure/src/input_bloc/input_event.dart';
 import 'package:document_measure/src/input_bloc/input_state.dart';
 import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
 import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
-import 'package:mockito/mockito.dart';
 
 class MockedMetadataRepository extends Mock implements MetadataRepository {}
 

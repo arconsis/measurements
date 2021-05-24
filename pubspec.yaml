@@ -5,24 +5,24 @@ repository: "https://github.com/arconsis/measurements"
 issue_tracker: "https://github.com/arconsis/measurements/issues"
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
-  flutter: ^1.12.0
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ^2.0.0
 
 dependencies:
   equatable: ^1.2.2
   flutter:
     sdk: flutter
-  flutter_bloc: ^5.0.1
-  get_it: ^4.0.4
+  flutter_bloc: ^7.0.0
+  get_it: ^7.1.3
   path_provider: ^1.6.11
   rxdart: ^0.24.1
 
 dev_dependencies:
-  bloc_test: 6.0.1
+  bloc_test: 8.0.1
   flutter_test:
     sdk: flutter
-  mockito: 4.1.1
-  pedantic: 1.9.0
+  mockito: 5.0.8
+  pedantic: 1.11.0
 
 flutter:
   assets:
