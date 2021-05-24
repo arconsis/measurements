@@ -25,7 +25,7 @@ class PointsOnlyEvent extends PointsEvent {
 }
 
 class PointsAndDistancesEvent extends PointsEvent {
-  final List<LengthUnit> distances;
+  final List<LengthUnit?> distances;
 
   PointsAndDistancesEvent(List<Offset> points, this.distances) : super(points);
 

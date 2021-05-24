@@ -8,11 +8,11 @@ import 'package:equatable/equatable.dart';
 
 class Holder extends Equatable {
   final Offset start, end;
-  final LengthUnit distance;
+  final LengthUnit? distance;
 
   Holder(this.start, this.end, {this.distance = const Millimeter(0)});
 
-  Holder.extend(Holder old, LengthUnit distance)
+  Holder.extend(Holder old, LengthUnit? distance)
       : this(old.start, old.end, distance: distance);
 
   Holder.withDistance(this.start, this.end, this.distance);
@@ -24,5 +24,5 @@ class Holder extends Equatable {
   }
 
   @override
-  List<Object> get props => [start, end, distance];
+  List<Object?> get props => [start, end, distance];
 }
