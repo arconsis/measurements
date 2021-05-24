@@ -243,7 +243,7 @@ packages:
     source: hosted
     version: "0.12.6"
   meta:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: meta
       url: "https://pub.dartlang.org"
@@ -341,7 +341,7 @@ packages:
     source: hosted
     version: "1.0.2"
   pedantic:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: pedantic
       url: "https://pub.dartlang.org"

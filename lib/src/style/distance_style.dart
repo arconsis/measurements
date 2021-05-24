@@ -3,8 +3,7 @@
 
 import 'dart:ui';
 
-import 'package:measure/src/util/colors.dart';
-
+import 'package:document_measure/src/util/colors.dart';
 
 /// Style class for customizing the distances on the lines between two points.
 ///
@@ -19,5 +18,8 @@ class DistanceStyle {
   final int numDecimalPlaces;
   final bool showTolerance;
 
-  const DistanceStyle({this.textColor = drawColor, this.numDecimalPlaces = 2, this.showTolerance = false});
+  const DistanceStyle(
+      {this.textColor = drawColor,
+      this.numDecimalPlaces = 2,
+      this.showTolerance = false});
 }

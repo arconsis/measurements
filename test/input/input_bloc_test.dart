@@ -1,23 +1,22 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:document_measure/src/input_bloc/input_bloc.dart';
+import 'package:document_measure/src/input_bloc/input_event.dart';
+import 'package:document_measure/src/input_bloc/input_state.dart';
+import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/src/input_bloc/input_bloc.dart';
-import 'package:measure/src/input_bloc/input_event.dart';
-import 'package:measure/src/input_bloc/input_state.dart';
-import 'package:measure/src/measurement/repository/measurement_repository.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mocks/test_mocks.dart';
 
-
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 void main() {
-  group("Input Bloc Test", () {
+  group('Input Bloc Test', () {
     MetadataRepository mockedMetadataRepository;
     MeasurementRepository mockedMeasurementRepository;
 
@@ -25,7 +24,8 @@ void main() {
       mockedMetadataRepository = MockedMetadataRepository();
       mockedMeasurementRepository = MockedMeasurementRepository();
 
-      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([]));
+      when(mockedMetadataRepository.measurement)
+          .thenAnswer((_) => Stream.fromIterable([]));
 
       GetIt.I.registerSingleton(mockedMetadataRepository);
       GetIt.I.registerSingleton(mockedMeasurementRepository);
@@ -37,22 +37,25 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       build: () async => InputBloc(),
       skip: 0,
       expect: [InputEmptyState()],
     );
 
-    group("with measuring", () {
-      Rect deleteRegion = Rect.fromPoints(Offset(10, 10), Offset(20, 20));
+    group('with measuring', () {
+      var deleteRegion = Rect.fromPoints(Offset(10, 10), Offset(20, 20));
 
       setUp(() {
-        when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer((realInvocation) => deleteRegion.contains(realInvocation.positionalArguments[0]));
+        when(mockedMetadataRepository.measurement)
+            .thenAnswer((_) => Stream.fromIterable([true]));
+        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer(
+            (realInvocation) =>
+                deleteRegion.contains(realInvocation.positionalArguments[0]));
       });
 
       blocTest(
-        "down move up all outside of delete area",
+        'down move up all outside of delete area',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(50, 50)));
@@ -67,7 +70,7 @@ void main() {
       );
 
       blocTest(
-        "down outside then move to delete area and up in there",
+        'down outside then move to delete area and up in there',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(50, 50)));
@@ -82,7 +85,7 @@ void main() {
       );
 
       blocTest(
-        "down move up all in delete area",
+        'down move up all in delete area',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(12, 12)));
@@ -97,7 +100,7 @@ void main() {
       );
 
       blocTest(
-        "down in delete area then move out and up",
+        'down in delete area then move out and up',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(12, 12)));
@@ -112,7 +115,7 @@ void main() {
       );
 
       blocTest(
-        "down in delete area then move outside and back in and up in delete area",
+        'down in delete area then move outside and back in and up in delete area',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(12, 12)));
@@ -129,16 +132,19 @@ void main() {
       );
     });
 
-    group("without measuring", () {
-      Rect deleteRegion = Rect.fromPoints(Offset(0, 0), Offset(0, 0));
+    group('without measuring', () {
+      var deleteRegion = Rect.fromPoints(Offset(0, 0), Offset(0, 0));
 
       setUp(() {
-        when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([false]));
-        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer((realInvocation) => deleteRegion.contains(realInvocation.positionalArguments[0]));
+        when(mockedMetadataRepository.measurement)
+            .thenAnswer((_) => Stream.fromIterable([false]));
+        when(mockedMetadataRepository.isInDeleteRegion(any)).thenAnswer(
+            (realInvocation) =>
+                deleteRegion.contains(realInvocation.positionalArguments[0]));
       });
 
       blocTest(
-        "down move up should ignore all",
+        'down move up should ignore all',
         build: () async => InputBloc(),
         act: (bloc) async {
           bloc.add(InputDownEvent(Offset(12, 12)));

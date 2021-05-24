@@ -3,10 +3,10 @@
 
 import 'dart:ui';
 
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/util/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' as widget;
-import 'package:measure/measure.dart';
-import 'package:measure/src/util/logger.dart';
 import 'package:rxdart/subjects.dart';
 
 class MetadataRepository {
@@ -52,7 +52,8 @@ class MetadataRepository {
 
   Stream<double> get imageScaleFactor => _imageScaleFactor.stream;
 
-  Stream<double> get imageToDocumentScaleFactor => _imageToDocumentFactor.stream;
+  Stream<double> get imageToDocumentScaleFactor =>
+      _imageToDocumentFactor.stream;
 
   Stream<Image> get backgroundImage => _currentBackgroundImage.stream;
 
@@ -67,17 +68,22 @@ class MetadataRepository {
   Stream<double> get magnificationCircleRadius => _magnificationRadius.stream;
 
   Future<double> get zoomFactorForLifeSize async {
-    double pixelPerInch = await MethodChannel("measure").invokeMethod("getPhysicalPixelsPerInch");
-    Size screenSize = _screenSize.value;
+    var pixelPerInch = await MethodChannel('documentmeasure')
+        .invokeMethod('getPhysicalPixelsPerInch');
+    var screenSize = _screenSize.value;
 
     if (screenSize == null) return 1;
 
-    MeasurementInformation information = _measurementInformation.value;
+    var information = _measurementInformation.value;
 
     if (isDocumentWidthAlignedWithScreenWidth(screenSize)) {
-      return information.documentWidthInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.width * information.scale * window.devicePixelRatio);
+      return information.documentWidthInLengthUnits.convertToInch().value *
+          pixelPerInch /
+          (screenSize.width * information.scale * window.devicePixelRatio);
     } else {
-      return information.documentHeightInLengthUnits.convertToInch().value * pixelPerInch / (screenSize.height * information.scale * window.devicePixelRatio);
+      return information.documentHeightInLengthUnits.convertToInch().value *
+          pixelPerInch /
+          (screenSize.height * information.scale * window.devicePixelRatio);
     }
   }
 
@@ -102,7 +108,8 @@ class MetadataRepository {
     _unitOfMeasurement.value = measurementInformation.targetLengthUnit;
     _enableMeasure.value = measure;
     _showDistance.value = showDistance;
-    _magnificationRadius.value = magnificationStyle.magnificationRadius + magnificationStyle.outerCircleThickness;
+    _magnificationRadius.value = magnificationStyle.magnificationRadius +
+        magnificationStyle.outerCircleThickness;
     _controller.value = controller;
 
     _updateTransformationFactor();
@@ -114,24 +121,26 @@ class MetadataRepository {
     _viewCenter.value = Offset(size.width / 2, size.height / 2);
     _imageScaleFactor.value = backgroundImage.width / size.width;
 
-    _logger.log("view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size $size");
+    _logger.log(
+        'view size: ${_viewSize.value} view center: ${_viewCenter.value} image scale: ${_imageScaleFactor.value} image size $size');
 
     _updateImageToDocumentFactor(size);
     _updateTransformationFactor();
   }
 
   void registerResizing(Offset position, double zoom) {
-    _logger.log("Offset: $position, zoom: $zoom");
+    _logger.log('Offset: $position, zoom: $zoom');
     _contentPosition.value = position;
     _zoomLevel.value = zoom;
     _updateTransformationFactor();
   }
 
-  void registerDeleteRegion(Offset position, Size size) => _deleteRegion = Rect.fromPoints(position, position + Offset(size.width, size.height));
+  void registerDeleteRegion(Offset position, Size size) => _deleteRegion =
+      Rect.fromPoints(position, position + Offset(size.width, size.height));
 
   void registerScreenSize(Size size) {
     _screenSize.value = size;
-    _logger.log("_screenSize: ${_screenSize.value}");
+    _logger.log('_screenSize: ${_screenSize.value}');
   }
 
   void registerMeasurementFunction(MeasurementFunction function) {
@@ -169,9 +178,12 @@ class MetadataRepository {
     _zoomLevel.close();
   }
 
-  double _getDocumentWidth() => _measurementInformation.value.documentWidthInLengthUnits.value.toDouble();
+  double _getDocumentWidth() =>
+      _measurementInformation.value.documentWidthInLengthUnits.value.toDouble();
 
-  double _getDocumentHeight() => _measurementInformation.value.documentHeightInLengthUnits.value.toDouble();
+  double _getDocumentHeight() =>
+      _measurementInformation.value.documentHeightInLengthUnits.value
+          .toDouble();
 
   void _updateImageToDocumentFactor(Size viewSize) {
     if (_screenSize.value == null) return;
@@ -184,18 +196,24 @@ class MetadataRepository {
   }
 
   void _updateTransformationFactor() async {
-    if (_zoomLevel.hasValue && _viewSize.hasValue && _measurementInformation.hasValue) {
-      double zoomLevel = _zoomLevel.value;
-      double viewWidth = _viewSize.value.width;
-      MeasurementInformation measurementInfo = _measurementInformation.value;
+    if (_zoomLevel.hasValue &&
+        _viewSize.hasValue &&
+        _measurementInformation.hasValue) {
+      var zoomLevel = _zoomLevel.value;
+      var viewWidth = _viewSize.value.width;
+      var measurementInfo = _measurementInformation.value;
 
-      _transformationFactor.value = measurementInfo.documentToTargetFactor / measurementInfo.scale;
-      _tolerance.value = measurementInfo.documentWidthInUnitOfMeasurement.value / (measurementInfo.scale * viewWidth) / zoomLevel;
+      _transformationFactor.value =
+          measurementInfo.documentToTargetFactor / measurementInfo.scale;
+      _tolerance.value =
+          measurementInfo.documentWidthInUnitOfMeasurement.value /
+              (measurementInfo.scale * viewWidth) /
+              zoomLevel;
 
       _controller.value?.tolerance = _tolerance.value;
 
-      _logger.log("tolerance is: ${_transformationFactor.value}");
-      _logger.log("updated transformationFactor");
+      _logger.log('tolerance is: ${_transformationFactor.value}');
+      _logger.log('updated transformationFactor');
     }
   }
 }

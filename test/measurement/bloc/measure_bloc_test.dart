@@ -4,21 +4,21 @@
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:document_measure/src/input_bloc/input_bloc.dart';
+import 'package:document_measure/src/input_bloc/input_state.dart';
+import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
+import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_event.dart';
+import 'package:document_measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
+import 'package:document_measure/src/measurement/repository/measurement_repository.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/src/input_bloc/input_bloc.dart';
-import 'package:measure/src/input_bloc/input_state.dart';
-import 'package:measure/src/measurement/bloc/magnification_bloc/magnification_bloc.dart';
-import 'package:measure/src/measurement/bloc/magnification_bloc/magnification_event.dart';
-import 'package:measure/src/measurement/bloc/magnification_bloc/magnification_state.dart';
-import 'package:measure/src/measurement/repository/measurement_repository.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../mocks/test_mocks.dart';
 
 void main() {
-  group("Measure Bloc Unit Test", () {
+  group('Measure Bloc Unit Test', () {
     final imageScaleFactor = 3.0;
 
     MetadataRepository mockedMetadataRepository;
@@ -30,9 +30,12 @@ void main() {
       mockedMeasurementRepository = MockedMeasurementRepository();
       mockedInputBloc = MockedInputBloc();
 
-      when(mockedMetadataRepository.viewSize).thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
-      when(mockedMetadataRepository.measurement).thenAnswer((_) => Stream.fromIterable([true]));
-      when(mockedMetadataRepository.magnificationCircleRadius).thenAnswer((_) => Stream.fromIterable([10]));
+      when(mockedMetadataRepository.viewSize)
+          .thenAnswer((_) => Stream.fromIterable([Size(100, 200)]));
+      when(mockedMetadataRepository.measurement)
+          .thenAnswer((_) => Stream.fromIterable([true]));
+      when(mockedMetadataRepository.magnificationCircleRadius)
+          .thenAnswer((_) => Stream.fromIterable([10]));
 
       GetIt.I.registerSingleton(mockedMeasurementRepository);
       GetIt.I.registerSingleton(mockedMetadataRepository);
@@ -47,23 +50,27 @@ void main() {
     });
 
     blocTest(
-      "initial state",
+      'initial state',
       skip: 0,
       build: () async {
-        when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([]));
-        when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([]));
+        when(mockedMetadataRepository.backgroundImage)
+            .thenAnswer((_) => Stream.fromIterable([]));
+        when(mockedMetadataRepository.imageScaleFactor)
+            .thenAnswer((_) => Stream.fromIterable([]));
 
         return MagnificationBloc(mockedInputBloc);
       },
       expect: [MagnificationInactiveState()],
     );
 
-    group("UI events", () {
+    group('UI events', () {
       blocTest(
-        "stroke events",
+        'stroke events',
         build: () async {
-          when(mockedMetadataRepository.backgroundImage).thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
-          when(mockedMetadataRepository.imageScaleFactor).thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
+          when(mockedMetadataRepository.backgroundImage)
+              .thenAnswer((_) => Stream.fromIterable([MockedImage.mock]));
+          when(mockedMetadataRepository.imageScaleFactor)
+              .thenAnswer((_) => Stream.fromIterable([imageScaleFactor]));
 
           return MagnificationBloc(mockedInputBloc);
         },
@@ -73,14 +80,20 @@ void main() {
           bloc.add(MagnificationHideEvent());
         },
         expect: [
-          MagnificationActiveState(Offset(0, 0), Offset(-10, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
-          MagnificationActiveState(Offset(10, 10), Offset(0, -50), backgroundImage: MockedImage.mock, imageScaleFactor: imageScaleFactor),
+          MagnificationActiveState(Offset(0, 0), Offset(-10, -50),
+              backgroundImage: MockedImage.mock,
+              imageScaleFactor: imageScaleFactor),
+          MagnificationActiveState(Offset(10, 10), Offset(0, -50),
+              backgroundImage: MockedImage.mock,
+              imageScaleFactor: imageScaleFactor),
           MagnificationInactiveState()
         ],
         verify: (_) async {
           verifyInOrder([
-            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
-            mockedMeasurementRepository.convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
+            mockedMeasurementRepository
+                .convertIntoDocumentLocalTopLeftPosition(Offset(0, 0)),
+            mockedMeasurementRepository
+                .convertIntoDocumentLocalTopLeftPosition(Offset(10, 10)),
           ]);
 
           verifyNoMoreInteractions(mockedMeasurementRepository);

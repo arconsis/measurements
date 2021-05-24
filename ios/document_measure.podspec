@@ -1,11 +1,11 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint measure.podspec' to validate before publishing.
+# Run `pod lib lint documentmeasure.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'measure'
+  s.name             = 'document_measure'
   s.version          = '0.0.1'
-  s.summary          = 'Flutter Measure Plugin'
+  s.summary          = 'Flutter Document Measure Plugin'
   s.description      = <<-DESC
 A widget that allows you to measure distances in documents.
                        DESC

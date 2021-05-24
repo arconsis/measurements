@@ -1,4 +1,4 @@
-package com.arconsis.measure_example
+package com.arconsis.documentmeasure_example
 
 import io.flutter.embedding.android.FlutterActivity
 

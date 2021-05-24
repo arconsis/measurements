@@ -1,4 +1,4 @@
-name: measure_example
+name: document_measure_example
 description: Demonstrates how to use the measurements plugin.
 publish_to: 'none'
 
@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  measure:
+  document_measure:
     path: ../
 
 dev_dependencies:

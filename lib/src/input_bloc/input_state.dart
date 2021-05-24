@@ -1,9 +1,9 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 abstract class InputState extends Equatable {
   @override
@@ -19,7 +19,7 @@ abstract class InputPositionalState extends InputState {
   List<Object> get props => [position];
 
   @override
-  String toString() => super.toString() + " position: $position";
+  String toString() => super.toString() + ' position: $position';
 }
 
 class InputStandardState extends InputPositionalState {

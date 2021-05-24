@@ -1,6 +1,6 @@
-# measure_example
+# documentmeasure_example
 
-Demonstrates how to use the measure plugin.
+Demonstrates how to use the documentmeasure plugin.
 
 ## Getting Started
 

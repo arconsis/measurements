@@ -1,10 +1,9 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart' as meta;
-
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 /// The [LengthUnits] allow us to offer different units for measurement and changing between them.
 abstract class LengthUnit extends Equatable {
@@ -13,7 +12,7 @@ abstract class LengthUnit extends Equatable {
   const LengthUnit(this.value);
 
   @override
-  String toString() => super.toString() + " $value${getAbbreviation()}";
+  String toString() => super.toString() + ' $value${getAbbreviation()}';
 
   @override
   List<Object> get props => [value];
@@ -101,7 +100,7 @@ class Meter extends LengthUnit {
   double millimeterFactor() => 1000;
 
   @override
-  String getAbbreviation() => "m";
+  String getAbbreviation() => 'm';
 
   @override
   Meter operator *(double value) => Meter(this.value * value);
@@ -128,7 +127,7 @@ class Millimeter extends LengthUnit {
   double millimeterFactor() => 1;
 
   @override
-  String getAbbreviation() => "mm";
+  String getAbbreviation() => 'mm';
 
   @override
   Millimeter operator *(double value) => Millimeter(this.value * value);
@@ -155,7 +154,7 @@ class Inch extends LengthUnit {
   double millimeterFactor() => 25.4;
 
   @override
-  String getAbbreviation() => "in";
+  String getAbbreviation() => 'in';
 
   @override
   Inch operator *(double value) => Inch(this.value * value);
@@ -182,7 +181,7 @@ class Foot extends LengthUnit {
   double millimeterFactor() => 304.8;
 
   @override
-  String getAbbreviation() => "ft";
+  String getAbbreviation() => 'ft';
 
   @override
   Foot operator *(double value) => Foot(this.value * value);
@@ -212,24 +211,26 @@ class MeasurementInformation extends Equatable {
   });
 
   /// Default constructor for a DIN A4 document with a scale of 1 and Millimeters as the target unit.
-  const MeasurementInformation.A4({
+  const MeasurementInformation.dinA4({
     this.scale = 1.0,
     this.documentWidthInLengthUnits = const Millimeter(210.0),
     this.documentHeightInLengthUnits = const Millimeter(297.0),
     this.targetLengthUnit = const Millimeter.asUnit(),
   });
 
-  @meta.protected
-  LengthUnit get documentToTargetFactor => documentWidthInLengthUnits.factorTo(targetLengthUnit);
+  LengthUnit get documentToTargetFactor =>
+      documentWidthInLengthUnits.factorTo(targetLengthUnit);
 
-  @meta.protected
-  LengthUnit get documentWidthInUnitOfMeasurement => documentWidthInLengthUnits.convertTo(targetLengthUnit);
+  LengthUnit get documentWidthInUnitOfMeasurement =>
+      documentWidthInLengthUnits.convertTo(targetLengthUnit);
 
   @override
-  List<Object> get props => [scale, documentWidthInLengthUnits, targetLengthUnit];
+  List<Object> get props =>
+      [scale, documentWidthInLengthUnits, targetLengthUnit];
 
   @override
   String toString() {
-    return super.toString() + " scale: $scale, documentWidth: $documentWidthInLengthUnits, documentHeight: $documentHeightInLengthUnits, targetLengthUnit: $targetLengthUnit";
+    return super.toString() +
+        ' scale: $scale, documentWidth: $documentWidthInLengthUnits, documentHeight: $documentHeightInLengthUnits, targetLengthUnit: $targetLengthUnit';
   }
 }

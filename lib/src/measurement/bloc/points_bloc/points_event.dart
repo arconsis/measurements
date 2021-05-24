@@ -3,8 +3,8 @@
 
 import 'dart:ui';
 
+import 'package:document_measure/document_measure.dart';
 import 'package:equatable/equatable.dart';
-import 'package:measure/measure.dart';
 
 abstract class PointsEvent extends Equatable {
   final List<Offset> points;
@@ -16,7 +16,7 @@ abstract class PointsEvent extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " points: $points";
+    return super.toString() + ' points: $points';
   }
 }
 
@@ -34,6 +34,6 @@ class PointsAndDistancesEvent extends PointsEvent {
 
   @override
   String toString() {
-    return super.toString() + " distances: $distances";
+    return super.toString() + ' distances: $distances';
   }
 }

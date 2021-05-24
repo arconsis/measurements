@@ -1,16 +1,16 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
 import 'logger.dart';
 
 extension IterableExtension on Iterable {
   void doInBetween<T>(Function(T, T) function) {
-    Iterator iterator = this.iterator;
+    var iterator = this.iterator;
     iterator.moveNext();
 
     T current = iterator.current, next;
@@ -25,7 +25,7 @@ extension IterableExtension on Iterable {
   }
 
   void zip<T, K>(Iterable<T> iterable, Function(K, T) function) {
-    Iterator thisIterator = this.iterator, otherIterator = iterable.iterator;
+    Iterator thisIterator = iterator, otherIterator = iterable.iterator;
 
     while (thisIterator.moveNext() && otherIterator.moveNext()) {
       K thisCurrent = thisIterator.current;
@@ -43,12 +43,16 @@ extension NumberExtension on num {
 }
 
 extension OffsetExtension on Offset {
-  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target, double threshold, double scale) {
-    Offset currentOffset = this + offset;
-    double thresholdOffset = min(mySize.width, mySize.height) * threshold;
+  Offset fitInto(Size mySize, Size bounds, Offset offset, Offset target,
+      double threshold, double scale) {
+    var currentOffset = this + offset;
+    var thresholdOffset = min(mySize.width, mySize.height) * threshold;
 
-    return Offset((currentOffset.dx + target.dx).fit(-mySize.width + thresholdOffset, bounds.width - thresholdOffset),
-        (currentOffset.dy + target.dy).fit(-mySize.height + thresholdOffset, bounds.height - thresholdOffset));
+    return Offset(
+        (currentOffset.dx + target.dx).fit(
+            -mySize.width + thresholdOffset, bounds.width - thresholdOffset),
+        (currentOffset.dy + target.dy).fit(
+            -mySize.height + thresholdOffset, bounds.height - thresholdOffset));
   }
 }
 

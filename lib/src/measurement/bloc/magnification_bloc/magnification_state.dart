@@ -19,14 +19,21 @@ class MagnificationActiveState extends MagnificationState {
   final Image backgroundImage;
   final double imageScaleFactor;
 
-  MagnificationActiveState(this.position, this.magnificationOffset, {this.absolutePosition, this.backgroundImage, this.imageScaleFactor});
+  MagnificationActiveState(this.position, this.magnificationOffset,
+      {this.absolutePosition, this.backgroundImage, this.imageScaleFactor});
 
   @override
-  List<Object> get props => [position, absolutePosition, magnificationOffset, backgroundImage, imageScaleFactor];
+  List<Object> get props => [
+        position,
+        absolutePosition,
+        magnificationOffset,
+        backgroundImage,
+        imageScaleFactor
+      ];
 
   @override
   String toString() {
     return super.toString() +
-        " position: $position, absolutePosition: $absolutePosition, magnificationOffset: $magnificationOffset, backgroundImage: $backgroundImage, imageScaleFactor: $imageScaleFactor";
+        ' position: $position, absolutePosition: $absolutePosition, magnificationOffset: $magnificationOffset, backgroundImage: $backgroundImage, imageScaleFactor: $imageScaleFactor';
   }
 }

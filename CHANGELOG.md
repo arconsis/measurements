@@ -1,5 +1,14 @@
-## 0.0.1 [unreleased]
-### Added
+## 0.0.1+2
+* Reformatted code
+
+## 0.0.1+1
+* Refactored and improved code
+
+## 0.0.1+0
+* Updated installation method in README
+
+## 0.0.1
+### Added Features
 * Measuring in Meter, Millimeter, Inch and Foot
 * Deleting points
 * Panning and zooming 

@@ -1,29 +1,17 @@
-# measure
+# document_measure
+
+![Pub Version](https://img.shields.io/pub/v/document_measure)
+![GitHub](https://img.shields.io/github/license/arconsis/measurements)
 
 This plugin provides a widget in which you can display another widget, for example, a floor plan of your flat in an image and measure distances between points in your flat.
 
 ![Showcase of Features](assets/gifs/0_all_features.gif)
 
 ## Getting Started
-~~To use this plugin simply include it in your `pubspec.yaml` with~~
-```yaml
-dependencies:
-  measure: 0.0.1 // not published yet
+To use this plugin simply include `document_measure` in your `pubspec.yaml` and then include it in your code
+```dart
+include: 'package:document_measure/document_measure.dart'
 ```
-
-You can either download this repo and then reference it as
-```yaml
-dependencies:
-  measure: 
-    path: path/to/measurement-repo
-```
-or use it over GitHub directly with
-```yaml
-dependencies:
-  measure: 
-    git: git://github.com/arconsis/measurements.git
-```
-and make sure to run `flutter packages upgrade`.
 
 # Usage Overview
 * [Functional Usage](#functional-usage)

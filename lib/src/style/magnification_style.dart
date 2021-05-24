@@ -3,8 +3,7 @@
 
 import 'dart:ui';
 
-import 'package:measure/src/util/colors.dart';
-
+import 'package:document_measure/src/util/colors.dart';
 
 /// Style class for customizing the appearance of the magnification glass.
 ///
@@ -20,5 +19,9 @@ class MagnificationStyle {
   final double outerCircleThickness;
   final double crossHairThickness;
 
-  const MagnificationStyle({this.magnificationColor = drawColor, this.magnificationRadius = 50, this.outerCircleThickness = 2, this.crossHairThickness = 0.0});
+  const MagnificationStyle(
+      {this.magnificationColor = drawColor,
+      this.magnificationRadius = 50,
+      this.outerCircleThickness = 2,
+      this.crossHairThickness = 0.0});
 }

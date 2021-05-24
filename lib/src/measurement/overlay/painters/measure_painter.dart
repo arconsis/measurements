@@ -3,8 +3,8 @@
 
 import 'dart:ui';
 
+import 'package:document_measure/src/style/point_style.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:measure/src/style/point_style.dart';
 
 class MeasurePainter extends material.CustomPainter {
   final Offset start, end;
@@ -14,25 +14,31 @@ class MeasurePainter extends material.CustomPainter {
   final Path _drawPath = Path();
   double _dotRadius;
 
-  MeasurePainter({@material.required this.start, @material.required this.end, @material.required this.style, @material.required this.dotPaint, @material.required this.pathPaint}) {
+  MeasurePainter(
+      {@material.required this.start,
+      @material.required this.end,
+      @material.required this.style,
+      @material.required this.dotPaint,
+      @material.required this.pathPaint}) {
     _dotRadius = style.dotRadius;
 
-    LineType lineType = style.lineType;
+    var lineType = style.lineType;
     _drawPath.reset();
     _drawPath.moveTo(start.dx, start.dy);
 
     if (lineType is SolidLine) {
       _drawPath.lineTo(end.dx, end.dy);
     } else if (lineType is DashedLine) {
-      double distance = (end - start).distance;
+      var distance = (end - start).distance;
 
-      Offset solidOffset = (end - start) * lineType.dashLength / distance;
-      Offset emptyOffset = (end - start) * lineType.dashDistance / distance;
-      Offset currentPosition = start;
+      var solidOffset = (end - start) * lineType.dashLength / distance;
+      var emptyOffset = (end - start) * lineType.dashDistance / distance;
+      var currentPosition = start;
 
-      int numLines = (distance / (lineType.dashLength + lineType.dashDistance)).floor();
+      var numLines =
+          (distance / (lineType.dashLength + lineType.dashDistance)).floor();
 
-      for (int i = 0; i < numLines; i++) {
+      for (var i = 0; i < numLines; i++) {
         currentPosition += solidOffset;
         _drawPath.lineTo(currentPosition.dx, currentPosition.dy);
         currentPosition += emptyOffset;
@@ -47,7 +53,8 @@ class MeasurePainter extends material.CustomPainter {
         _drawPath.lineTo(currentPosition.dx, currentPosition.dy);
       }
     } else {
-      throw UnimplementedError("This line type is not supported! Type was: $style");
+      throw UnimplementedError(
+          'This line type is not supported! Type was: $style');
     }
   }
 
@@ -61,7 +68,7 @@ class MeasurePainter extends material.CustomPainter {
 
   @override
   bool shouldRepaint(material.CustomPainter oldDelegate) {
-    MeasurePainter old = oldDelegate as MeasurePainter;
+    var old = oldDelegate as MeasurePainter;
 
     return old.start != start || old.end != end || old.style != style;
   }

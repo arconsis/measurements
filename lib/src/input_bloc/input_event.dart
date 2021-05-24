@@ -1,9 +1,9 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
 abstract class InputEvent extends Equatable {
   final Offset position;
@@ -15,7 +15,7 @@ abstract class InputEvent extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " position: $position";
+    return super.toString() + ' position: $position';
   }
 }
 

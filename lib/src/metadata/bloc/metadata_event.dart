@@ -3,9 +3,9 @@
 
 import 'dart:ui' as ui;
 
+import 'package:document_measure/document_measure.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:measure/measure.dart';
 
 abstract class MetadataEvent extends Equatable {}
 
@@ -20,7 +20,7 @@ class MetadataBackgroundEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " size: $size, backgroundImage: $backgroundImage";
+    return super.toString() + ' size: $size, backgroundImage: $backgroundImage';
   }
 }
 
@@ -40,11 +40,18 @@ class MetadataStartedEvent extends MetadataEvent {
   });
 
   @override
-  List<Object> get props => [measurementInformation, controller, measure, showDistances, magnificationStyle];
+  List<Object> get props => [
+        measurementInformation,
+        controller,
+        measure,
+        showDistances,
+        magnificationStyle,
+      ];
 
   @override
   String toString() {
-    return super.toString() + " MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle";
+    return super.toString() +
+        ' MeasurementInformation: $measurementInformation, measure: $measure, showDistances: $showDistances, magnificationStyle: $magnificationStyle';
   }
 }
 
@@ -58,7 +65,7 @@ class MetadataOrientationEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " orientation: $orientation";
+    return super.toString() + ' orientation: $orientation';
   }
 }
 
@@ -72,7 +79,7 @@ class MetadataScreenSizeEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " screenSize: $screenSize";
+    return super.toString() + ' screenSize: $screenSize';
   }
 }
 
@@ -87,6 +94,6 @@ class MetadataDeleteRegionEvent extends MetadataEvent {
 
   @override
   String toString() {
-    return super.toString() + " position: $position, deleteSize: $deleteSize";
+    return super.toString() + ' position: $position, deleteSize: $deleteSize';
   }
 }

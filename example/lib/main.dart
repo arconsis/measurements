@@ -1,9 +1,9 @@
 /// Copyright (c) 2020 arconsis IT-Solutions GmbH
 /// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
 
+import 'package:document_measure/document_measure.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:measure/measure.dart';
 
 import 'colors.dart';
 
@@ -26,7 +26,12 @@ class _MyAppState extends State<MyApp> {
   bool showTolerance = false;
   bool zoomed = false;
 
-  List<LengthUnit> unitsOfMeasurement = [Meter.asUnit(), Millimeter.asUnit(), Inch.asUnit(), Foot.asUnit()];
+  List<LengthUnit> unitsOfMeasurement = [
+    Meter.asUnit(),
+    Millimeter.asUnit(),
+    Inch.asUnit(),
+    Foot.asUnit()
+  ];
   int unitIndex = 0;
 
   MeasurementController controller;
@@ -67,7 +72,8 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               IconButton(
-                onPressed: () => setState(() => showDistanceOnLine = !showDistanceOnLine),
+                onPressed: () =>
+                    setState(() => showDistanceOnLine = !showDistanceOnLine),
                 icon: Icon(
                   Icons.vertical_align_bottom,
                   color: getButtonColor(showDistanceOnLine),
@@ -76,8 +82,9 @@ class _MyAppState extends State<MyApp> {
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
-                  onPressed: () => setState(() => showTolerance = !showTolerance),
-                  child: Text("±"),
+                  onPressed: () =>
+                      setState(() => showTolerance = !showTolerance),
+                  child: Text('±'),
                   textColor: getButtonColor(showTolerance),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -86,7 +93,8 @@ class _MyAppState extends State<MyApp> {
               SizedBox.fromSize(
                 child: MaterialButton(
                   shape: CircleBorder(),
-                  onPressed: () => setState(() => unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
+                  onPressed: () => setState(() =>
+                      unitIndex = (unitIndex + 1) % unitsOfMeasurement.length),
                   child: Text(unitsOfMeasurement[unitIndex].getAbbreviation()),
                   textColor: unselectedColor,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -105,14 +113,15 @@ class _MyAppState extends State<MyApp> {
                       zoomed = !zoomed;
                     });
                   },
-                  icon: Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
+                  icon:
+                      Icon(Icons.zoom_out_map, color: getButtonColor(zoomed))),
             ],
           ),
         ),
         body: Center(
           child: Measurements(
             child: Image.asset(
-              "assets/images/floorplan448x449mm.png",
+              'assets/images/floorplan448x449mm.png',
             ),
             measurementInformation: MeasurementInformation(
               scale: 1 / 50.0,

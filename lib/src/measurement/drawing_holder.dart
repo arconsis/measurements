@@ -3,8 +3,8 @@
 
 import 'dart:ui';
 
+import 'package:document_measure/document_measure.dart';
 import 'package:equatable/equatable.dart';
-import 'package:measure/measure.dart';
 
 class DrawingHolder extends Equatable {
   final List<Offset> points;
@@ -14,7 +14,7 @@ class DrawingHolder extends Equatable {
 
   @override
   String toString() {
-    return super.toString() + " points: $points, distances: $distances";
+    return super.toString() + ' points: $points, distances: $distances';
   }
 
   @override

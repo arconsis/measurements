@@ -1,23 +1,24 @@
+/// Copyright (c) 2020 arconsis IT-Solutions GmbH
+/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
+
 import 'dart:async';
 
+import 'package:document_measure/document_measure.dart';
+import 'package:document_measure/src/metadata/repository/metadata_repository.dart';
+import 'package:document_measure/src/util/logger.dart';
+import 'package:document_measure/src/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:measure/measure.dart';
-import 'package:measure/src/metadata/repository/metadata_repository.dart';
-import 'package:measure/src/util/logger.dart';
-import 'package:measure/src/util/utils.dart';
 
 import 'scale_event.dart';
 import 'scale_state.dart';
 
-/// Copyright (c) 2020 arconsis IT-Solutions GmbH
-/// Licensed under MIT (https://github.com/arconsis/measurements/blob/master/LICENSE)
-
-class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunction {
+class ScaleBloc extends Bloc<ScaleEvent, ScaleState>
+    implements MeasurementFunction {
   final logger = Logger(LogDistricts.SCALE_BLOC);
-  final List<StreamSubscription> subscriptions = List();
+  final List<StreamSubscription> subscriptions = [];
 
   final double _minScale = 1.0;
   final double _maxScale = 10.0;
@@ -42,7 +43,8 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
   ScaleBloc() : super(ScaleState(Offset(0, 0), 1.0, Matrix4.identity())) {
     _metadataRepository = GetIt.I<MetadataRepository>();
 
-    subscriptions.add(_metadataRepository.measurement.listen((measure) => _measure = measure));
+    subscriptions.add(_metadataRepository.measurement
+        .listen((measure) => _measure = measure));
     subscriptions.add(_metadataRepository.viewSize.listen((size) {
       _viewSize = size;
       _updateDefaultOffset();
@@ -79,9 +81,17 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
       _currentScale = _accumulatedScale;
     } else if (event is ScaleUpdateEvent) {
       if (event.scale == 1.0) {
-        _workingTranslate = _currentTranslate.fitInto(_viewSize, _screenSize, _defaultOffset, event.position - _translateStart, 0.01, _accumulatedScale) - _defaultOffset;
+        _workingTranslate = _currentTranslate.fitInto(
+                _viewSize,
+                _screenSize,
+                _defaultOffset,
+                event.position - _translateStart,
+                0.01,
+                _accumulatedScale) -
+            _defaultOffset;
       } else {
-        _accumulatedScale = (_currentScale * event.scale).fit(_minScale, _maxScale);
+        _accumulatedScale =
+            (_currentScale * event.scale).fit(_minScale, _maxScale);
       }
     } else if (event is ScaleDoubleTapEvent) {
       if (_currentScale == 1.0) {
@@ -146,20 +156,23 @@ class ScaleBloc extends Bloc<ScaleEvent, ScaleState> implements MeasurementFunct
 
   @override
   bool zoomToLifeSize() {
-    if (!(_originalScale?.isInBounds(_minScale, _maxScale) ?? false)) return false;
+    if (!(_originalScale?.isInBounds(_minScale, _maxScale) ?? false))
+      return false;
 
     add(ScaleOriginalEvent());
     return true;
   }
 
-  void _registerResizing() => _metadataRepository.registerResizing(_getTranslate(), _accumulatedScale);
+  void _registerResizing() =>
+      _metadataRepository.registerResizing(_getTranslate(), _accumulatedScale);
 
   Offset _getTranslate() => _defaultOffset + _workingTranslate;
 
   void _updateDefaultOffset() {
     if (_screenSize == null || _viewSize == null) return;
 
-    _defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0, (_screenSize.height - _viewSize.height) / 2.0);
+    _defaultOffset = Offset((_screenSize.width - _viewSize.width) / 2.0,
+        (_screenSize.height - _viewSize.height) / 2.0);
 
     add(ScaleCenterUpdatedEvent());
     _registerResizing();
