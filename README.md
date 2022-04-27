@@ -1,3 +1,9 @@
+# This repository is archived!
+
+This repository is no longer maintained. Issues will not be answered.
+
+You are still free to fork and use it of course.
+
 # document_measure
 
 ![Pub Version](https://img.shields.io/pub/v/document_measure)
